@@ -12,24 +12,20 @@ class Token:
         self.type = type
 
 class TokenLine extends Token:
-    var speaker: String
-    var line: String
+    var dia_line: DialogueLine
     @warning_ignore("shadowed_variable")
     func _init(indent: int, parent: Token, speaker: String, line: String):
         super(indent, parent, LINE)
-        self.speaker = speaker
-        self.line = line
+        self.dia_line = DialogueLine.new(speaker, line)
 
 class TokenOptionToken:
+    var dia_option: DialogueOption
     var next: Token
-    var idx: int
-    var text: String
     var parent: TokenOption
     @warning_ignore("shadowed_variable")
     func _init(next: Token, idx: int, text: String, parent: TokenOption):
+        self.dia_option = DialogueOption.new(idx, text)
         self.next = next
-        self.idx = idx
-        self.text = text
         self.parent = parent
 
 class TokenOption extends Token:
@@ -100,7 +96,7 @@ static func parse_token_from_token_list(in_tokens: Array[DialogueLexer.Token], p
 
 static func parse_line(tok: DialogueLexer.Token, parent: Token, index: int) -> Dictionary:
     var spl := tok.text.find(":")
-    var token := TokenLine.new(tok.indent, parent, tok.text.substr(0, spl), tok.text.substr(spl, -1))
+    var token := TokenLine.new(tok.indent, parent, tok.text.substr(0, spl).strip_edges(), tok.text.substr(spl + 1, -1).strip_edges())
     return {"token": token, "index": index + 1}
     
 static func parse_option(tok: DialogueLexer.Token, parent: Token, index: int, tokens: Array[DialogueLexer.Token]) -> Dictionary:
@@ -115,8 +111,8 @@ static func parse_option(tok: DialogueLexer.Token, parent: Token, index: int, to
             index += 1
             break
         
-        var next_is_same_opt := tokens[index+1].type == DialogueLexer.Token.OPTION and tokens[index+1].indent == curr_tok.indent
-        if not next_is_same_opt and tokens[index+1].indent > curr_tok.indent:
+        var next_is_same_opt := tokens[index + 1].type == DialogueLexer.Token.OPTION and tokens[index + 1].indent == curr_tok.indent
+        if not next_is_same_opt and tokens[index + 1].indent > curr_tok.indent:
             var next_d := parse_token_from_token_list(tokens.slice(index + 1, tokens.size()), tok_opt, curr_tok.indent)
             index = index + next_d["index"] + 1
             tok_opt_tok.next = next_d["token"]

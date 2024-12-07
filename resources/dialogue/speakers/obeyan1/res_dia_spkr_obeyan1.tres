@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="DialogueSpeakerRes" load_steps=4 format=3 uid="uid://b2l74ul73b421"]
+
+[ext_resource type="FontFile" uid="uid://c3xhxybt6dbnb" path="res://resources/fonts/comic_sans_ms.ttf" id="1_h4fvy"]
+[ext_resource type="Script" path="res://scripts/dialogue/dialogue_speaker_res.gd" id="2_pesbi"]
+[ext_resource type="SpriteFrames" uid="uid://defv2d2w5p3og" path="res://resources/dialogue/speakers/obeyan1/res_dia_spkr_obeyan1_anim.tres" id="3_7vd3k"]
+
+[resource]
+script = ExtResource("2_pesbi")
+name = "Obeyan1"
+font = ExtResource("1_h4fvy")
+sprite_frames = ExtResource("3_7vd3k")
+sound_effects = Array[String]([])
