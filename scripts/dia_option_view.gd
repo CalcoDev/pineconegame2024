@@ -10,8 +10,10 @@ class OptionNode:
     var hbox: HBoxContainer
     var selected: Control
     var label: RichTextLabel
+    # var idx: int
     @warning_ignore("shadowed_variable")
     func _init(hbox: HBoxContainer, selected: Control, label: RichTextLabel) -> void:
+        # self.idx = idx
         self.hbox = hbox
         self.selected = selected
         self.label = label
@@ -24,6 +26,9 @@ class OptionNode:
         selected.visible = true
     func unmark_selected() -> void:
         selected.visible = false
+
+# [idx -> Array]
+# var _option_nodes: Dictionary
 var _option_nodes: Array[OptionNode]
 var _option_node_cols: Array[VBoxContainer]
 
@@ -116,8 +121,17 @@ func _move_idx_by_vec(row: int, col: int) -> void:
     var next_row: int = (curr_row + row) % _active_options_grid_size.y
     var next_col: int = (curr_col + col) % _active_options_grid_size.x
     var idx := next_col * _active_options_grid_size.y + next_row
-    # while idx not in _options:
-    #     next_row = (curr_row + row) % _active_options_grid_size.y
-    #     next_col = (curr_col + col) % _active_options_grid_size.x
+    print("index: ", idx, " | size: ", _options.size())
+    var orig := idx
+    while idx >= _options.size():
+        print("tryin idx: ", idx)
+        next_row = (curr_row + row) % _active_options_grid_size.y
+        next_col = (curr_col + col) % _active_options_grid_size.x
+        idx = next_col * _active_options_grid_size.y + next_row
+        if idx == orig:
+            orig = -1
+            break
+    if orig == -1:
+        return
     print("next pos: ", next_row, " ", next_col)
     _selected_option_idx = idx

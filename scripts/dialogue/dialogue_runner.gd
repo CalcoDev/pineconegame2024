@@ -72,7 +72,7 @@ func start_dialogue(node_title: String = "main") -> void:
         _start_dialogue()
     current_node_name = node_title
     await _start_node_coro()
-    # stop()
+    stop()
 
 # stops playing a node from the loaded list
 func stop() -> void:
@@ -80,11 +80,8 @@ func stop() -> void:
     _complete_dialogue()
 
 func _start_node_coro() -> void:
-    var idx: int = 0
-    var nodes: Array[DialogueParser.Token] = _dialogue_nodes_tokens[current_node_name]
-    var l: int = nodes.size()
-    while idx < l:
-        var current := nodes[idx]
+    var current: DialogueParser.Token = _dialogue_nodes_tokens[current_node_name][0]
+    while current != null:
         match current.type:
             DialogueParser.Token.LINE:
                 var line := current as DialogueParser.TokenLine
@@ -96,12 +93,16 @@ func _start_node_coro() -> void:
                     await get_tree().process_frame
             DialogueParser.Token.OPTION:
                 var opt := current as DialogueParser.TokenOption
-                var state := {"sum": 0}
-                var on_finished := func():
+                # TODO(calco): We can only handle a single selectio atm lol
+                var state := {"sum": 0, "index": 0}
+                var on_finished := func(index: int):
                     state["sum"] += 1
+                    state["index"] = index
                 var cnt := _views_run_options(opt.generate_dialogue_options(), on_finished)
                 while state["sum"] < cnt:
                     await get_tree().process_frame
+                current = opt.options[state["index"]].next
+                continue # break out of loopo as I mannually asign next
             DialogueParser.Token.INSTRUCTION:
                 var instr := current as DialogueParser.TokenInstruction
                 print("command: ", instr.value)
@@ -109,7 +110,7 @@ func _start_node_coro() -> void:
             DialogueParser.Token.CODE:
                 var code := current as DialogueParser.TokenCode
                 print("code: ", code.value)
-        idx += 1
+        current = current.next
 
 func _start_dialogue() -> void:
     on_dia_start.emit()

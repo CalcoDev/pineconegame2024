@@ -6,7 +6,13 @@ Narrator: Aren't they so Mudoshin?
 	-> No. Pas de Mudoshin.
 		<<jump arent_mudoshin>>
 	-> sth
+		Narrator: Well, you cchose the secret 3rd option!
+		Narrator: Congrats!
 	-> sth else else
+		-> A
+			Narrator: AAAA
+		-> B
+			Narrator: BB
 ===
 
 title: old_main

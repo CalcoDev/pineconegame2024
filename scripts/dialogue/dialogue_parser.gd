@@ -4,7 +4,9 @@ class Token:
     enum {LINE, OPTION, INSTRUCTION, CODE}
     var indent: int
     var parent: Token
+    var next: Token
     var type: int
+    var index: int
     @warning_ignore("shadowed_variable")
     func _init(indent: int, parent: Token, type: int):
         self.indent = indent
@@ -96,6 +98,8 @@ static func parse_token_from_token_list(in_tokens: Array[DialogueLexer.Token], p
                 ctk = d["token"]
                 idx = d["index"]
         tokens.append(ctk)
+        if parent_token != null:
+            parent_token.next = ctk
         parent_token = ctk
     return {"token": tokens[0], "index": idx, "tokens": tokens}
 
