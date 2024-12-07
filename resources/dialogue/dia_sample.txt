@@ -1,5 +1,16 @@
 title: main
 ---
+Narrator: Aren't they so Mudoshin?
+	-> Yes. Yes, they are.
+		<<jump are_mudoshin>>
+	-> No. Pas de Mudoshin.
+		<<jump arent_mudoshin>>
+	-> sth
+	-> sth else else
+===
+
+title: old_main
+---
 Narrator: Hello! This is my custom [wave]dialogue[/wave]!
 Narrator: I even have multiple screens!
 Narrator: And, look, I can even invite my friends!

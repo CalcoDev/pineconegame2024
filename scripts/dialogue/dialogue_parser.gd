@@ -35,6 +35,11 @@ class TokenOption extends Token:
         super(indent, parent, OPTION)
     func add_option(token: TokenOptionToken) -> void:
         options.append(token)
+    func generate_dialogue_options() -> Array[DialogueOption]:
+        var a: Array[DialogueOption] = []
+        for opt in options:
+            a.append(opt.dia_option)
+        return a
 
 # basic because ... honestly this should be sth else probably
 class TokenInstruction extends Token:
@@ -104,7 +109,7 @@ static func parse_option(tok: DialogueLexer.Token, parent: Token, index: int, to
     var curr_tok := tokens[index]
     var opt_idx: int = 0
     while curr_tok.type == DialogueLexer.Token.OPTION and curr_tok.indent == tok_opt.indent:
-        var tok_opt_tok := TokenOptionToken.new(null, opt_idx, curr_tok.text, tok_opt)
+        var tok_opt_tok := TokenOptionToken.new(null, opt_idx, curr_tok.text.replace("->", "").strip_edges(), tok_opt)
         opt_idx += 1
         tok_opt.add_option(tok_opt_tok)
         if tokens.size() <= index + 1:

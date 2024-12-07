@@ -88,17 +88,20 @@ func _start_node_coro() -> void:
         match current.type:
             DialogueParser.Token.LINE:
                 var line := current as DialogueParser.TokenLine
-                print("line. ", line.dia_line.text)
                 var state := {"sum": 0}
                 var on_finished := func():
-                    print(state["sum"], " finished out of sth")
                     state["sum"] += 1
                 var cnt = _views_run_line(line.dia_line, on_finished)
-                print("waiting for ", cnt, " to finish.")
                 while state["sum"] < cnt:
                     await get_tree().process_frame
             DialogueParser.Token.OPTION:
-                print("option met. skipping")
+                var opt := current as DialogueParser.TokenOption
+                var state := {"sum": 0}
+                var on_finished := func():
+                    state["sum"] += 1
+                var cnt := _views_run_options(opt.generate_dialogue_options(), on_finished)
+                while state["sum"] < cnt:
+                    await get_tree().process_frame
             DialogueParser.Token.INSTRUCTION:
                 var instr := current as DialogueParser.TokenInstruction
                 print("command: ", instr.value)
@@ -127,7 +130,7 @@ func _views_run_line(line: DialogueLine, on_finished: Callable) -> int:
             s += 1
     return s
 
-func _views_run_optionns(options: Array[DialogueOption], on_selected: Callable) -> int:
+func _views_run_options(options: Array[DialogueOption], on_selected: Callable) -> int:
     var s: int = 0
     for view in dialogue_views:
         if view.can_handle_options():
