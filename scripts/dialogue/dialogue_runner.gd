@@ -2,7 +2,7 @@ class_name DialogueRunner
 extends Node
 
 # runs when a command is run
-signal on_command(command: String)
+signal on_command(command: DialogueCommand)
 # runs when dialogue is entirely finished
 signal on_dia_complete()
 # runs when new dialogue is started
@@ -70,8 +70,7 @@ func start_dialogue(node_title: String = "main") -> void:
     if not is_running:
         is_running = true
         _start_dialogue()
-    current_node_name = node_title
-    await _start_node_coro()
+    await _start_node_coro(node_title)
     stop()
 
 # stops playing a node from the loaded list
@@ -79,7 +78,9 @@ func stop() -> void:
     is_running = false
     _complete_dialogue()
 
-func _start_node_coro() -> void:
+func _start_node_coro(node_title: String) -> void:
+    current_node_name = node_title
+    on_node_start.emit()
     var current: DialogueParser.Token = _dialogue_nodes_tokens[current_node_name][0]
     while current != null:
         match current.type:
@@ -105,12 +106,22 @@ func _start_node_coro() -> void:
                 continue # break out of loopo as I mannually asign next
             DialogueParser.Token.INSTRUCTION:
                 var instr := current as DialogueParser.TokenInstruction
-                print("command: ", instr.value)
-                # on_command.emit(instr.)
+                var cmd := instr.dia_command
+                on_command.emit(cmd)
+                if cmd.cmd in _command_handlers:
+                    _command_handlers[cmd.cmd].call(cmd)
+                match cmd.cmd:
+                    "jump":
+                        var node := cmd.args[0]
+                        assert(node_exists(node), "Jump to null node!")
+                        var prev_node := current_node_name
+                        await _start_node_coro(node)
+                        current_node_name = prev_node
             DialogueParser.Token.CODE:
                 var code := current as DialogueParser.TokenCode
                 print("code: ", code.value)
         current = current.next
+    on_node_complete.emit()
 
 func _start_dialogue() -> void:
     on_dia_start.emit()
@@ -140,6 +151,7 @@ func _views_run_options(options: Array[DialogueOption], on_selected: Callable) -
     return s
 
 func _enter_tree() -> void:
+    assert(dialogue_views.size() > 0, "no dialogue views!")
     _load_speakers()
 
 func get_speaker(speaker_name: String) -> DialogueSpeakerRes:

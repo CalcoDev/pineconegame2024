@@ -29,6 +29,7 @@ Narrator: Aren't they so Mudoshin?
 		<<jump are_mudoshin>>
 	-> No. Pas de Mudoshin.
 		<<jump arent_mudoshin>>
+Narrator: AAAA some other code.
 ===
 
 title: nested_options

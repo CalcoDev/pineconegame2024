@@ -66,7 +66,6 @@ func _process(_delta: float) -> void:
             var inp_row := -1 * (int(Input.is_action_just_pressed("dia_opt_up")) - int(Input.is_action_just_pressed("dia_opt_down")))
             var old_idx := _selected_option_idx
             if inp_col != 0 or inp_row != 0:
-                print("inp: ", inp_row, " ", inp_col)
                 _move_idx_by_vec(inp_row, inp_col) # transposed cuz [col1, col2, col3]
                 if old_idx != _selected_option_idx:
                     _option_nodes[old_idx].unmark_selected()
@@ -94,7 +93,6 @@ func _run_options(options: Array[DialogueOption], on_selected: Callable) -> void
     _active_options_grid_size.x = maxi(1, ceili(_options.size() as float / options_grid_size.y))
     # nr of rows
     _active_options_grid_size.y = (_options.size() % options_grid_size.y) + 1 if _active_options_grid_size.x == 1 else options_grid_size.y
-    print(_active_options_grid_size)
 
 func _show_opts() -> void:
     for opt in _option_nodes:
@@ -117,14 +115,11 @@ func _move_idx_by_vec(row: int, col: int) -> void:
     var curr_row: int = _selected_option_idx % options_grid_size.y
     @warning_ignore("integer_division")
     var curr_col: int = _selected_option_idx / options_grid_size.y
-    print("old pos: ", curr_row, " ", curr_col)
     var next_row: int = (curr_row + row) % _active_options_grid_size.y
     var next_col: int = (curr_col + col) % _active_options_grid_size.x
     var idx := next_col * _active_options_grid_size.y + next_row
-    print("index: ", idx, " | size: ", _options.size())
     var orig := idx
     while idx >= _options.size():
-        print("tryin idx: ", idx)
         next_row = (curr_row + row) % _active_options_grid_size.y
         next_col = (curr_col + col) % _active_options_grid_size.x
         idx = next_col * _active_options_grid_size.y + next_row
@@ -133,5 +128,4 @@ func _move_idx_by_vec(row: int, col: int) -> void:
             break
     if orig == -1:
         return
-    print("next pos: ", next_row, " ", next_col)
     _selected_option_idx = idx

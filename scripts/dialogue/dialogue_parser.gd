@@ -45,11 +45,15 @@ class TokenOption extends Token:
 
 # basic because ... honestly this should be sth else probably
 class TokenInstruction extends Token:
-    var value: String
+    var dia_command: DialogueCommand
     @warning_ignore("shadowed_variable")
     func _init(indent: int, parent: Token, value: String):
         super(indent, parent, INSTRUCTION)
-        self.value = value
+        value = value.strip_edges().substr(2, len(value) - 4).strip_edges()
+        var spl := value.split(" ")
+        var args: Array[String] = []
+        args.assign(Array(spl.slice(1)))
+        self.dia_command = DialogueCommand.new(value, spl[0], args)
 
 # really basic as Godot will handle stuff
 class TokenCode extends Token:
