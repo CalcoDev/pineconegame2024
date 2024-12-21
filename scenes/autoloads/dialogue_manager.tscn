@@ -1,0 +1,560 @@
+[gd_scene load_steps=21 format=3 uid="uid://bs4uj3244majj"]
+
+[ext_resource type="Script" path="res://scripts/dialogue/dialogue_manager.gd" id="1_4s0db"]
+[ext_resource type="Script" path="res://scripts/dialogue/dialogue_runner.gd" id="1_bseb2"]
+[ext_resource type="Script" path="res://scripts/dialogue/dia_box_view.gd" id="2_foav0"]
+[ext_resource type="Script" path="res://scripts/dialogue/dia_line_view.gd" id="3_fqjon"]
+[ext_resource type="Script" path="res://scripts/dialogue/dia_option_view.gd" id="4_tu7hx"]
+[ext_resource type="Texture2D" uid="uid://d1iikfwdreks" path="res://assets/art/dialogue/dialogue_box_nineslice.png" id="5_0nabx"]
+[ext_resource type="FontFile" uid="uid://dpk4r84bel6r1" path="res://resources/fonts/MartianMono-NrMd.ttf" id="6_24fxi"]
+[ext_resource type="Texture2D" uid="uid://cqgai48rvxykl" path="res://assets/art/dialogue/dialogue_option_arrow.png" id="7_tdj1n"]
+
+[sub_resource type="Animation" id="Animation_heyo8"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:scale")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(1, 1)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("NinePatchRect/LineView/HSplitContainer/AnimatedSprite2D:visible")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [true]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("NinePatchRect/LineView/HSplitContainer/Control:custom_minimum_size")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(128, 0)]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("NinePatchRect/LineView:visible")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [false]
+}
+tracks/4/type = "value"
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/path = NodePath("NinePatchRect/OptionView:visible")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [true]
+}
+
+[sub_resource type="Animation" id="Animation_2ony2"]
+resource_name = "hide"
+length = 0.3
+step = 0.05
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:scale")
+tracks/0/interp = 2
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.1, 0.3),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [Vector2(1, 1), Vector2(1.2, 1.2), Vector2(1e-05, 1e-05)]
+}
+
+[sub_resource type="Animation" id="Animation_dngsg"]
+resource_name = "show"
+length = 0.3
+step = 0.05
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:scale")
+tracks/0/interp = 2
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.2, 0.3),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [Vector2(1e-05, 1e-05), Vector2(1.2, 1.2), Vector2(1, 1)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_o6osa"]
+_data = {
+"RESET": SubResource("Animation_heyo8"),
+"hide": SubResource("Animation_2ony2"),
+"show": SubResource("Animation_dngsg")
+}
+
+[sub_resource type="Animation" id="Animation_2fy05"]
+resource_name = "hide_lineview"
+length = 0.001
+step = 0.05
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("NinePatchRect/LineView:visible")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [false]
+}
+
+[sub_resource type="Animation" id="Animation_ktpdc"]
+resource_name = "hide_optionview"
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("NinePatchRect/OptionView:visible")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [false]
+}
+
+[sub_resource type="Animation" id="Animation_y0s3m"]
+resource_name = "hide_speaker"
+length = 0.001
+step = 0.05
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("NinePatchRect/LineView/HSplitContainer/AnimatedSprite2D:visible")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [false]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("NinePatchRect/LineView/HSplitContainer/Control:custom_minimum_size")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(0, 0)]
+}
+
+[sub_resource type="Animation" id="Animation_7xb4m"]
+resource_name = "show_lineview"
+length = 0.001
+step = 0.05
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("NinePatchRect/LineView:visible")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [true]
+}
+
+[sub_resource type="Animation" id="Animation_nbfwj"]
+resource_name = "show_optionview"
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("NinePatchRect/OptionView:visible")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [true]
+}
+
+[sub_resource type="Animation" id="Animation_ju3tg"]
+resource_name = "show_speaker"
+length = 0.001
+step = 0.05
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("NinePatchRect/LineView/HSplitContainer/AnimatedSprite2D:visible")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [true]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("NinePatchRect/LineView/HSplitContainer/Control:custom_minimum_size")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(128, 0)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_1iapn"]
+_data = {
+"RESET": SubResource("Animation_heyo8"),
+"hide_lineview": SubResource("Animation_2fy05"),
+"hide_optionview": SubResource("Animation_ktpdc"),
+"hide_speaker": SubResource("Animation_y0s3m"),
+"show_lineview": SubResource("Animation_7xb4m"),
+"show_optionview": SubResource("Animation_nbfwj"),
+"show_speaker": SubResource("Animation_ju3tg")
+}
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_d3knr"]
+
+[node name="DialogueManager" type="Node2D" node_paths=PackedStringArray("runner")]
+script = ExtResource("1_4s0db")
+runner = NodePath("CanvasLayer/DialogueRunner")
+autoloads = Array[String](["res://resources/dialogue/dia_fedor_office.txt"])
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+
+[node name="DialogueRunner" type="Node" parent="CanvasLayer" node_paths=PackedStringArray("dialogue_views")]
+script = ExtResource("1_bseb2")
+dialogue_views = [NodePath("../DiaBoxView"), NodePath("../DialogueLineView")]
+speakers_directory = "res://resources/dialogue/speakers"
+
+[node name="DiaBoxView" type="Node" parent="CanvasLayer" node_paths=PackedStringArray("box_animator", "view_animator")]
+script = ExtResource("2_foav0")
+box_animator = NodePath("../BoxAnimator")
+view_animator = NodePath("../ViewAnimator")
+
+[node name="DialogueLineView" type="Node" parent="CanvasLayer" node_paths=PackedStringArray("text_lbl", "speaker_sprite", "dia_box")]
+script = ExtResource("3_fqjon")
+text_lbl = NodePath("../DialogueDisplay/NinePatchRect/LineView/HSplitContainer/RichTextLabel")
+speaker_sprite = NodePath("../DialogueDisplay/NinePatchRect/LineView/HSplitContainer/AnimatedSprite2D")
+dia_box = NodePath("../DiaBoxView")
+
+[node name="DiaOptionView" type="Node" parent="CanvasLayer" node_paths=PackedStringArray("options_node", "dia_box")]
+script = ExtResource("4_tu7hx")
+options_node = NodePath("../DialogueDisplay/NinePatchRect/OptionView/Options")
+dia_box = NodePath("../DiaBoxView")
+
+[node name="BoxAnimator" type="AnimationPlayer" parent="CanvasLayer"]
+root_node = NodePath("../DialogueDisplay")
+libraries = {
+"": SubResource("AnimationLibrary_o6osa")
+}
+
+[node name="ViewAnimator" type="AnimationPlayer" parent="CanvasLayer"]
+root_node = NodePath("../DialogueDisplay")
+libraries = {
+"": SubResource("AnimationLibrary_1iapn")
+}
+
+[node name="DialogueDisplay" type="Control" parent="CanvasLayer"]
+layout_mode = 3
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = 9.0
+offset_top = 117.0
+offset_right = 9.0
+offset_bottom = 117.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="NinePatchRect" type="NinePatchRect" parent="CanvasLayer/DialogueDisplay"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -241.0
+offset_top = -36.0
+offset_right = 241.0
+offset_bottom = 36.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("5_0nabx")
+patch_margin_left = 8
+patch_margin_top = 8
+patch_margin_right = 8
+patch_margin_bottom = 8
+axis_stretch_horizontal = 1
+axis_stretch_vertical = 1
+
+[node name="LineView" type="MarginContainer" parent="CanvasLayer/DialogueDisplay/NinePatchRect"]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 4
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 8
+
+[node name="HSplitContainer" type="HBoxContainer" parent="CanvasLayer/DialogueDisplay/NinePatchRect/LineView"]
+layout_mode = 2
+
+[node name="RichTextLabel" type="RichTextLabel" parent="CanvasLayer/DialogueDisplay/NinePatchRect/LineView/HSplitContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_fonts/normal_font = ExtResource("6_24fxi")
+theme_override_font_sizes/normal_font_size = 16
+bbcode_enabled = true
+text = "an you... be careful around town
+they're a bunch of downright animals out there"
+scroll_active = false
+
+[node name="Control" type="Control" parent="CanvasLayer/DialogueDisplay/NinePatchRect/LineView/HSplitContainer"]
+custom_minimum_size = Vector2(128, 0)
+layout_mode = 2
+size_flags_horizontal = 8
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="CanvasLayer/DialogueDisplay/NinePatchRect/LineView/HSplitContainer"]
+position = Vector2(407, 1)
+scale = Vector2(2, 2)
+sprite_frames = SubResource("SpriteFrames_d3knr")
+
+[node name="OptionView" type="MarginContainer" parent="CanvasLayer/DialogueDisplay/NinePatchRect"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 4
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 8
+
+[node name="Options" type="HBoxContainer" parent="CanvasLayer/DialogueDisplay/NinePatchRect/OptionView"]
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/DialogueDisplay/NinePatchRect/OptionView/Options"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="1" type="HBoxContainer" parent="CanvasLayer/DialogueDisplay/NinePatchRect/OptionView/Options/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="TextureRect" type="TextureRect" parent="CanvasLayer/DialogueDisplay/NinePatchRect/OptionView/Options/VBoxContainer/1"]
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 0
+texture = ExtResource("7_tdj1n")
+
+[node name="1" type="RichTextLabel" parent="CanvasLayer/DialogueDisplay/NinePatchRect/OptionView/Options/VBoxContainer/1"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_fonts/normal_font = ExtResource("6_24fxi")
+bbcode_enabled = true
+text = "Yes, yes they are."
+scroll_active = false
+
+[node name="2" type="HBoxContainer" parent="CanvasLayer/DialogueDisplay/NinePatchRect/OptionView/Options/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="TextureRect" type="TextureRect" parent="CanvasLayer/DialogueDisplay/NinePatchRect/OptionView/Options/VBoxContainer/2"]
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 0
+texture = ExtResource("7_tdj1n")
+
+[node name="2" type="RichTextLabel" parent="CanvasLayer/DialogueDisplay/NinePatchRect/OptionView/Options/VBoxContainer/2"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_fonts/normal_font = ExtResource("6_24fxi")
+bbcode_enabled = true
+text = "Option 2"
+scroll_active = false
+
+[node name="3" type="HBoxContainer" parent="CanvasLayer/DialogueDisplay/NinePatchRect/OptionView/Options/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="TextureRect" type="TextureRect" parent="CanvasLayer/DialogueDisplay/NinePatchRect/OptionView/Options/VBoxContainer/3"]
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 0
+texture = ExtResource("7_tdj1n")
+
+[node name="3" type="RichTextLabel" parent="CanvasLayer/DialogueDisplay/NinePatchRect/OptionView/Options/VBoxContainer/3"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_fonts/normal_font = ExtResource("6_24fxi")
+bbcode_enabled = true
+text = "Option 3"
+scroll_active = false
+
+[node name="VBoxContainer2" type="VBoxContainer" parent="CanvasLayer/DialogueDisplay/NinePatchRect/OptionView/Options"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="4" type="HBoxContainer" parent="CanvasLayer/DialogueDisplay/NinePatchRect/OptionView/Options/VBoxContainer2"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="TextureRect" type="TextureRect" parent="CanvasLayer/DialogueDisplay/NinePatchRect/OptionView/Options/VBoxContainer2/4"]
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 0
+texture = ExtResource("7_tdj1n")
+
+[node name="4" type="RichTextLabel" parent="CanvasLayer/DialogueDisplay/NinePatchRect/OptionView/Options/VBoxContainer2/4"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_fonts/normal_font = ExtResource("6_24fxi")
+bbcode_enabled = true
+text = "Option 1"
+scroll_active = false
+
+[node name="5" type="HBoxContainer" parent="CanvasLayer/DialogueDisplay/NinePatchRect/OptionView/Options/VBoxContainer2"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="TextureRect" type="TextureRect" parent="CanvasLayer/DialogueDisplay/NinePatchRect/OptionView/Options/VBoxContainer2/5"]
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 0
+texture = ExtResource("7_tdj1n")
+
+[node name="5" type="RichTextLabel" parent="CanvasLayer/DialogueDisplay/NinePatchRect/OptionView/Options/VBoxContainer2/5"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_fonts/normal_font = ExtResource("6_24fxi")
+bbcode_enabled = true
+text = "Option 2"
+scroll_active = false
+
+[node name="6" type="HBoxContainer" parent="CanvasLayer/DialogueDisplay/NinePatchRect/OptionView/Options/VBoxContainer2"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="TextureRect" type="TextureRect" parent="CanvasLayer/DialogueDisplay/NinePatchRect/OptionView/Options/VBoxContainer2/6"]
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 0
+texture = ExtResource("7_tdj1n")
+
+[node name="6" type="RichTextLabel" parent="CanvasLayer/DialogueDisplay/NinePatchRect/OptionView/Options/VBoxContainer2/6"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_fonts/normal_font = ExtResource("6_24fxi")
+bbcode_enabled = true
+text = "Option 3"
+scroll_active = false
+
+[node name="VBoxContainer3" type="VBoxContainer" parent="CanvasLayer/DialogueDisplay/NinePatchRect/OptionView/Options"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="7" type="HBoxContainer" parent="CanvasLayer/DialogueDisplay/NinePatchRect/OptionView/Options/VBoxContainer3"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="TextureRect" type="TextureRect" parent="CanvasLayer/DialogueDisplay/NinePatchRect/OptionView/Options/VBoxContainer3/7"]
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 0
+texture = ExtResource("7_tdj1n")
+
+[node name="7" type="RichTextLabel" parent="CanvasLayer/DialogueDisplay/NinePatchRect/OptionView/Options/VBoxContainer3/7"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_fonts/normal_font = ExtResource("6_24fxi")
+bbcode_enabled = true
+text = "Option 1"
+scroll_active = false
+
+[node name="8" type="HBoxContainer" parent="CanvasLayer/DialogueDisplay/NinePatchRect/OptionView/Options/VBoxContainer3"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="TextureRect" type="TextureRect" parent="CanvasLayer/DialogueDisplay/NinePatchRect/OptionView/Options/VBoxContainer3/8"]
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 0
+texture = ExtResource("7_tdj1n")
+
+[node name="8" type="RichTextLabel" parent="CanvasLayer/DialogueDisplay/NinePatchRect/OptionView/Options/VBoxContainer3/8"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_fonts/normal_font = ExtResource("6_24fxi")
+bbcode_enabled = true
+text = "Option 2"
+scroll_active = false
+
+[node name="9" type="HBoxContainer" parent="CanvasLayer/DialogueDisplay/NinePatchRect/OptionView/Options/VBoxContainer3"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="TextureRect" type="TextureRect" parent="CanvasLayer/DialogueDisplay/NinePatchRect/OptionView/Options/VBoxContainer3/9"]
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 0
+texture = ExtResource("7_tdj1n")
+
+[node name="9" type="RichTextLabel" parent="CanvasLayer/DialogueDisplay/NinePatchRect/OptionView/Options/VBoxContainer3/9"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_fonts/normal_font = ExtResource("6_24fxi")
+bbcode_enabled = true
+text = "Option 3"
+scroll_active = false

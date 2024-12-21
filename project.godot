@@ -21,13 +21,15 @@ config/icon="res://assets/art/icon.png"
 [autoload]
 
 PhantomCameraManager="*res://addons/phantom_camera/scripts/managers/phantom_camera_manager.gd"
+InteractionManager="res://scenes/autoloads/interaction_manager.tscn"
+DialogueManager="res://scenes/autoloads/dialogue_manager.tscn"
 
 [display]
 
-window/size/viewport_width=320
-window/size/viewport_height=180
-window/size/window_width_override=1920
-window/size/window_height_override=1080
+window/size/viewport_width=640
+window/size/viewport_height=360
+window/size/window_width_override=960
+window/size/window_height_override=540
 window/stretch/mode="viewport"
 window/vsync/vsync_mode=0
 
@@ -101,16 +103,22 @@ fall={
 "events": [Object(InputEventKey,"resource_local_to_scene":false,"resource_name":"","device":-1,"window_id":0,"alt_pressed":false,"shift_pressed":false,"ctrl_pressed":false,"meta_pressed":false,"pressed":false,"keycode":0,"physical_keycode":83,"key_label":0,"unicode":115,"location":0,"echo":false,"script":null)
 ]
 }
+interact={
+"deadzone": 0.5,
+"events": [Object(InputEventKey,"resource_local_to_scene":false,"resource_name":"","device":-1,"window_id":0,"alt_pressed":false,"shift_pressed":false,"ctrl_pressed":false,"meta_pressed":false,"pressed":false,"keycode":0,"physical_keycode":69,"key_label":0,"unicode":101,"location":0,"echo":false,"script":null)
+]
+}
 
 [layer_names]
 
 2d_physics/layer_1="World"
 2d_physics/layer_2="Entities"
+2d_physics/layer_4="WorldOneWay"
+2d_physics/layer_10="Interaction"
 2d_physics/layer_32="mouse_area_detect"
 
 [physics]
 
-2d/physics_engine="Rapier2D"
 2d/default_gravity=490.0
 
 [rendering]

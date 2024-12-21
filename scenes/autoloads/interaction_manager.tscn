@@ -1,0 +1,29 @@
+[gd_scene load_steps=3 format=3 uid="uid://bbldoor67prnl"]
+
+[ext_resource type="Texture2D" uid="uid://c8ps26lrruldd" path="res://assets/art/interactions/interaction_nineslice.png" id="1_8yycn"]
+[ext_resource type="Script" path="res://scripts/interactions/interaction_manager.gd" id="1_i6dkg"]
+
+[node name="InteractionManager" type="Node2D" node_paths=PackedStringArray("items")]
+script = ExtResource("1_i6dkg")
+items = [NodePath("CanvasLayer/Item")]
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+
+[node name="Item" type="Control" parent="CanvasLayer"]
+layout_mode = 3
+anchors_preset = 0
+
+[node name="TextureRect" type="TextureRect" parent="CanvasLayer/Item"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -20.0
+offset_right = 20.0
+offset_bottom = 20.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("1_8yycn")

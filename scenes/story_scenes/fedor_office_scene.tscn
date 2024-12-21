@@ -1,4 +1,4 @@
-[gd_scene load_steps=35 format=3 uid="uid://c55f0ya56ckor"]
+[gd_scene load_steps=43 format=3 uid="uid://c55f0ya56ckor"]
 
 [ext_resource type="Texture2D" uid="uid://ldvrdjt4glyp" path="res://assets/art/fedor_office/fedor_rooms.png" id="1_t4l55"]
 [ext_resource type="Texture2D" uid="uid://b34ppb8ia5igy" path="res://assets/art/fedor_office/fedor_outlines.png" id="2_5nve1"]
@@ -23,6 +23,12 @@
 [ext_resource type="Texture2D" uid="uid://5booanymb60g" path="res://assets/art/fedor_office/fedor_box_2.png" id="21_g5hnq"]
 [ext_resource type="Texture2D" uid="uid://bdykyuw4b6vo7" path="res://assets/art/fedor_office/fedor_office_tree.png" id="22_t82kl"]
 [ext_resource type="Texture2D" uid="uid://7it5p48rtivb" path="res://assets/art/fedor_office/fedor_office_desk.png" id="23_s0b7w"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_05nic"]
+size = Vector2(2564, 8)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_xje4x"]
+size = Vector2(7, 180)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_r41x7"]
 size = Vector2(597, 180)
@@ -57,6 +63,24 @@ size = Vector2(22, 1)
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_h1oe4"]
 size = Vector2(17, 1)
 
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_4mrvj"]
+size = Vector2(51, 1)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_olqo3"]
+size = Vector2(65.5, 1)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_dt6j3"]
+size = Vector2(96, 1)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_7ystk"]
+size = Vector2(18, 1)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_yx8mi"]
+size = Vector2(16, 1)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_rnt4n"]
+size = Vector2(146, 1.5)
+
 [node name="FedorOfficeScene" type="Node2D"]
 
 [node name="rooms_background" type="Sprite2D" parent="."]
@@ -74,17 +98,43 @@ z_index = -1
 texture = ExtResource("3_j6bls")
 centered = false
 
+[node name="Top" type="StaticBody2D" parent="."]
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Top"]
+position = Vector2(1282, 4)
+shape = SubResource("RectangleShape2D_05nic")
+
+[node name="Left" type="StaticBody2D" parent="."]
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Left"]
+position = Vector2(3.5, 90)
+shape = SubResource("RectangleShape2D_xje4x")
+
+[node name="Right" type="StaticBody2D" parent="."]
+position = Vector2(2557, 0)
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Right"]
+position = Vector2(3.5, 90)
+shape = SubResource("RectangleShape2D_xje4x")
+
+[node name="Bottom" type="StaticBody2D" parent="."]
+position = Vector2(0, 174)
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Bottom"]
+position = Vector2(1282, 4)
+shape = SubResource("RectangleShape2D_05nic")
+
 [node name="ParallaxBackground" type="ParallaxBackground" parent="."]
 
 [node name="ParallaxLayer" type="ParallaxLayer" parent="ParallaxBackground"]
 
-[node name="StaticBody2D" type="StaticBody2D" parent="."]
-
-[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="StaticBody2D"]
-build_mode = 1
-polygon = PackedVector2Array(7, 174, 2552, 174, 2552, 8, 7, 8)
-
 [node name="Camera2D" type="Camera2D" parent="."]
+physics_interpolation_mode = 1
+position = Vector2(160, 90)
 zoom = Vector2(2, 2)
 limit_left = 0
 limit_top = 0
@@ -107,6 +157,10 @@ position = Vector2(160, 90)
 position = Vector2(138.5, 0)
 shape = SubResource("RectangleShape2D_r41x7")
 
+[node name="PhantomCamera2D" parent="Room" index="1" node_paths=PackedStringArray("follow_target")]
+position = Vector2(160, 90)
+follow_target = NodePath("../../Player")
+
 [node name="Room2" parent="." instance=ExtResource("3_ppyem")]
 position = Vector2(757, 90)
 
@@ -121,13 +175,12 @@ position = Vector2(757, 90)
 position = Vector2(1198, 90)
 
 [node name="CollisionShape2D" parent="Room3" index="0"]
-position = Vector2(413, -7)
+position = Vector2(413, 0)
 scale = Vector2(1.00375, 1.00292)
 shape = SubResource("RectangleShape2D_cysd1")
 
 [node name="PhantomCamera2D" parent="Room3" index="1"]
-position = Vector2(1210, 83)
-snap_to_pixel = true
+position = Vector2(1210, 90)
 
 [node name="Room4" parent="." instance=ExtResource("3_ppyem")]
 position = Vector2(2320, 90)
@@ -146,6 +199,8 @@ position = Vector2(54, 115)
 texture = ExtResource("5_503x6")
 
 [node name="StaticBody2D" type="StaticBody2D" parent="Objects/elevator_entrance"]
+collision_layer = 8
+collision_mask = 0
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Objects/elevator_entrance/StaticBody2D"]
 position = Vector2(7, -50)
@@ -158,6 +213,8 @@ texture = ExtResource("7_pruao")
 
 [node name="StaticBody2D" type="StaticBody2D" parent="Objects/elpdesk_entrance"]
 position = Vector2(-1, 0)
+collision_layer = 8
+collision_mask = 0
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Objects/elpdesk_entrance/StaticBody2D"]
 position = Vector2(1, 47)
@@ -166,6 +223,8 @@ one_way_collision = true
 
 [node name="StaticBody2D2" type="StaticBody2D" parent="Objects/elpdesk_entrance"]
 position = Vector2(-7, -73)
+collision_layer = 8
+collision_mask = 0
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Objects/elpdesk_entrance/StaticBody2D2"]
 position = Vector2(1, 47)
@@ -174,6 +233,8 @@ one_way_collision = true
 
 [node name="StaticBody2D3" type="StaticBody2D" parent="Objects/elpdesk_entrance"]
 position = Vector2(3, -82)
+collision_layer = 8
+collision_mask = 0
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Objects/elpdesk_entrance/StaticBody2D3"]
 position = Vector2(-64.9352, 44.5701)
@@ -182,6 +243,8 @@ one_way_collision = true
 
 [node name="StaticBody2D4" type="StaticBody2D" parent="Objects/elpdesk_entrance"]
 position = Vector2(119, -79)
+collision_layer = 8
+collision_mask = 0
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Objects/elpdesk_entrance/StaticBody2D4"]
 position = Vector2(-64.9352, 44.5701)
@@ -190,6 +253,8 @@ one_way_collision = true
 
 [node name="StaticBody2D5" type="StaticBody2D" parent="Objects/elpdesk_entrance"]
 position = Vector2(60, -104)
+collision_layer = 8
+collision_mask = 0
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Objects/elpdesk_entrance/StaticBody2D5"]
 position = Vector2(-67, 44)
@@ -201,6 +266,8 @@ position = Vector2(513, 85)
 texture = ExtResource("8_d8h2g")
 
 [node name="StaticBody2D" type="StaticBody2D" parent="Objects/fedor_painting_entrance"]
+collision_layer = 8
+collision_mask = 0
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Objects/fedor_painting_entrance/StaticBody2D"]
 position = Vector2(0, -18)
@@ -209,6 +276,8 @@ one_way_collision = true
 
 [node name="StaticBody2D2" type="StaticBody2D" parent="Objects/fedor_painting_entrance"]
 position = Vector2(-1, 51)
+collision_layer = 8
+collision_mask = 0
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Objects/fedor_painting_entrance/StaticBody2D2"]
 position = Vector2(0, -18)
@@ -221,6 +290,8 @@ texture = ExtResource("9_ihy68")
 
 [node name="StaticBody2D3" type="StaticBody2D" parent="Objects/fedor_painting_flipped_entrance"]
 position = Vector2(0, -1)
+collision_layer = 8
+collision_mask = 0
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Objects/fedor_painting_flipped_entrance/StaticBody2D3"]
 position = Vector2(0, -18)
@@ -229,6 +300,8 @@ one_way_collision = true
 
 [node name="StaticBody2D4" type="StaticBody2D" parent="Objects/fedor_painting_flipped_entrance"]
 position = Vector2(0, 50)
+collision_layer = 8
+collision_mask = 0
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Objects/fedor_painting_flipped_entrance/StaticBody2D4"]
 position = Vector2(0, -18)
@@ -272,6 +345,8 @@ position = Vector2(233, 151)
 texture = ExtResource("12_g8ggd")
 
 [node name="StaticBody2D" type="StaticBody2D" parent="Objects/chairs_entrance"]
+collision_layer = 8
+collision_mask = 0
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Objects/chairs_entrance/StaticBody2D"]
 position = Vector2(2, 3.5)
@@ -280,6 +355,8 @@ one_way_collision = true
 
 [node name="StaticBody2D2" type="StaticBody2D" parent="Objects/chairs_entrance"]
 position = Vector2(-24, 5)
+collision_layer = 8
+collision_mask = 0
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Objects/chairs_entrance/StaticBody2D2"]
 position = Vector2(-1, 4)
@@ -288,6 +365,8 @@ one_way_collision = true
 
 [node name="StaticBody2D3" type="StaticBody2D" parent="Objects/chairs_entrance"]
 position = Vector2(27, 4)
+collision_layer = 8
+collision_mask = 0
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Objects/chairs_entrance/StaticBody2D3"]
 position = Vector2(-1, 4)
@@ -300,6 +379,8 @@ scale = Vector2(-1, 1)
 texture = ExtResource("12_g8ggd")
 
 [node name="StaticBody2D" type="StaticBody2D" parent="Objects/chairs_entrance2"]
+collision_layer = 8
+collision_mask = 0
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Objects/chairs_entrance2/StaticBody2D"]
 position = Vector2(2, 3.5)
@@ -308,6 +389,8 @@ one_way_collision = true
 
 [node name="StaticBody2D2" type="StaticBody2D" parent="Objects/chairs_entrance2"]
 position = Vector2(-24, 5)
+collision_layer = 8
+collision_mask = 0
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Objects/chairs_entrance2/StaticBody2D2"]
 position = Vector2(-1, 4)
@@ -316,6 +399,8 @@ one_way_collision = true
 
 [node name="StaticBody2D3" type="StaticBody2D" parent="Objects/chairs_entrance2"]
 position = Vector2(27, 4)
+collision_layer = 8
+collision_mask = 0
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Objects/chairs_entrance2/StaticBody2D3"]
 position = Vector2(-1, 4)
@@ -326,13 +411,43 @@ one_way_collision = true
 position = Vector2(703, 115)
 texture = ExtResource("13_n0l0i")
 
+[node name="StaticBody2D" type="StaticBody2D" parent="Objects/trial_room_1"]
+position = Vector2(-2, 13)
+collision_layer = 8
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Objects/trial_room_1/StaticBody2D"]
+position = Vector2(4.5, -50)
+shape = SubResource("RectangleShape2D_4mrvj")
+one_way_collision = true
+
 [node name="trial_room_2" type="Sprite2D" parent="Objects"]
 position = Vector2(811, 115)
 texture = ExtResource("14_pl0rf")
 
+[node name="StaticBody2D" type="StaticBody2D" parent="Objects/trial_room_2"]
+position = Vector2(-2, 13)
+collision_layer = 8
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Objects/trial_room_2/StaticBody2D"]
+position = Vector2(8.25, -52)
+shape = SubResource("RectangleShape2D_olqo3")
+one_way_collision = true
+
 [node name="trial_room_3" type="Sprite2D" parent="Objects"]
 position = Vector2(925, 115)
 texture = ExtResource("15_7lgig")
+
+[node name="StaticBody2D" type="StaticBody2D" parent="Objects/trial_room_3"]
+position = Vector2(-2, 13)
+collision_layer = 8
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Objects/trial_room_3/StaticBody2D"]
+position = Vector2(4.5, -50)
+shape = SubResource("RectangleShape2D_4mrvj")
+one_way_collision = true
 
 [node name="trophy_shelf" type="Sprite2D" parent="Objects"]
 position = Vector2(979, 55)
@@ -422,6 +537,16 @@ position = Vector2(3.00001, -42)
 rotation = -0.0881724
 texture = ExtResource("17_lbctr")
 
+[node name="StaticBody2D" type="StaticBody2D" parent="Objects/trophy_shelf"]
+position = Vector2(-2, 13)
+collision_layer = 8
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Objects/trophy_shelf/StaticBody2D"]
+position = Vector2(2.25, -16.5)
+shape = SubResource("RectangleShape2D_dt6j3")
+one_way_collision = true
+
 [node name="skill_scroll_entrance8" type="Sprite2D" parent="Objects"]
 position = Vector2(1004, 129)
 texture = ExtResource("10_j62v0")
@@ -434,25 +559,85 @@ texture = ExtResource("10_j62v0")
 position = Vector2(1186, 159)
 texture = ExtResource("18_krdbx")
 
+[node name="StaticBody2D" type="StaticBody2D" parent="Objects/corridor_table"]
+position = Vector2(-2, 13)
+collision_layer = 8
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Objects/corridor_table/StaticBody2D"]
+position = Vector2(2, -27.5)
+shape = SubResource("RectangleShape2D_dt6j3")
+one_way_collision = true
+
 [node name="corridor_table2" type="Sprite2D" parent="Objects"]
 position = Vector2(1355, 159)
 texture = ExtResource("18_krdbx")
+
+[node name="StaticBody2D" type="StaticBody2D" parent="Objects/corridor_table2"]
+position = Vector2(-2, 13)
+collision_layer = 8
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Objects/corridor_table2/StaticBody2D"]
+position = Vector2(2, -27.5)
+shape = SubResource("RectangleShape2D_dt6j3")
+one_way_collision = true
 
 [node name="corridor_table3" type="Sprite2D" parent="Objects"]
 position = Vector2(1535, 159)
 texture = ExtResource("18_krdbx")
 
+[node name="StaticBody2D" type="StaticBody2D" parent="Objects/corridor_table3"]
+position = Vector2(-2, 13)
+collision_layer = 8
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Objects/corridor_table3/StaticBody2D"]
+position = Vector2(2, -27.5)
+shape = SubResource("RectangleShape2D_dt6j3")
+one_way_collision = true
+
 [node name="corridor_table4" type="Sprite2D" parent="Objects"]
 position = Vector2(1717, 159)
 texture = ExtResource("18_krdbx")
+
+[node name="StaticBody2D" type="StaticBody2D" parent="Objects/corridor_table4"]
+position = Vector2(-2, 13)
+collision_layer = 8
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Objects/corridor_table4/StaticBody2D"]
+position = Vector2(2, -27.5)
+shape = SubResource("RectangleShape2D_dt6j3")
+one_way_collision = true
 
 [node name="corridor_table5" type="Sprite2D" parent="Objects"]
 position = Vector2(1893, 159)
 texture = ExtResource("18_krdbx")
 
+[node name="StaticBody2D" type="StaticBody2D" parent="Objects/corridor_table5"]
+position = Vector2(-2, 13)
+collision_layer = 8
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Objects/corridor_table5/StaticBody2D"]
+position = Vector2(2, -27.5)
+shape = SubResource("RectangleShape2D_dt6j3")
+one_way_collision = true
+
 [node name="corridor_table6" type="Sprite2D" parent="Objects"]
 position = Vector2(2040, 159)
 texture = ExtResource("18_krdbx")
+
+[node name="StaticBody2D" type="StaticBody2D" parent="Objects/corridor_table6"]
+position = Vector2(-2, 13)
+collision_layer = 8
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Objects/corridor_table6/StaticBody2D"]
+position = Vector2(2, -27.5)
+shape = SubResource("RectangleShape2D_dt6j3")
+one_way_collision = true
 
 [node name="corridor_tree" type="Sprite2D" parent="Objects"]
 position = Vector2(1089, 143)
@@ -504,346 +689,1192 @@ texture = ExtResource("11_upvfv")
 position = Vector2(1153, 136)
 texture = ExtResource("20_i7cyh")
 
+[node name="StaticBody2D" type="StaticBody2D" parent="Objects/corridor_box_a"]
+position = Vector2(-2, 13)
+collision_layer = 8
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Objects/corridor_box_a/StaticBody2D"]
+position = Vector2(2, -20.5)
+shape = SubResource("RectangleShape2D_7ystk")
+one_way_collision = true
+
 [node name="corridor_box_a4" type="Sprite2D" parent="Objects"]
 position = Vector2(1336, 107)
 texture = ExtResource("20_i7cyh")
+
+[node name="StaticBody2D" type="StaticBody2D" parent="Objects/corridor_box_a4"]
+position = Vector2(-2, 13)
+collision_layer = 8
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Objects/corridor_box_a4/StaticBody2D"]
+position = Vector2(2, -20.5)
+shape = SubResource("RectangleShape2D_7ystk")
+one_way_collision = true
 
 [node name="corridor_box_a5" type="Sprite2D" parent="Objects"]
 position = Vector2(1354.6, 136.498)
 texture = ExtResource("20_i7cyh")
 
+[node name="StaticBody2D" type="StaticBody2D" parent="Objects/corridor_box_a5"]
+position = Vector2(-2, 13)
+collision_layer = 8
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Objects/corridor_box_a5/StaticBody2D"]
+position = Vector2(2, -20.5)
+shape = SubResource("RectangleShape2D_7ystk")
+one_way_collision = true
+
 [node name="corridor_box_a6" type="Sprite2D" parent="Objects"]
 position = Vector2(1372.6, 136.498)
 texture = ExtResource("20_i7cyh")
+
+[node name="StaticBody2D" type="StaticBody2D" parent="Objects/corridor_box_a6"]
+position = Vector2(-2, 13)
+collision_layer = 8
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Objects/corridor_box_a6/StaticBody2D"]
+position = Vector2(2, -20.5)
+shape = SubResource("RectangleShape2D_7ystk")
+one_way_collision = true
 
 [node name="corridor_box_a7" type="Sprite2D" parent="Objects"]
 position = Vector2(1361.6, 120.498)
 texture = ExtResource("20_i7cyh")
 
+[node name="StaticBody2D" type="StaticBody2D" parent="Objects/corridor_box_a7"]
+position = Vector2(-2, 13)
+collision_layer = 8
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Objects/corridor_box_a7/StaticBody2D"]
+position = Vector2(2, -20.5)
+shape = SubResource("RectangleShape2D_7ystk")
+one_way_collision = true
+
 [node name="corridor_box_a8" type="Sprite2D" parent="Objects"]
 position = Vector2(1352.6, 104.498)
 texture = ExtResource("20_i7cyh")
+
+[node name="StaticBody2D" type="StaticBody2D" parent="Objects/corridor_box_a8"]
+position = Vector2(-2, 13)
+collision_layer = 8
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Objects/corridor_box_a8/StaticBody2D"]
+position = Vector2(2, -20.5)
+shape = SubResource("RectangleShape2D_7ystk")
+one_way_collision = true
 
 [node name="corridor_box_a9" type="Sprite2D" parent="Objects"]
 position = Vector2(1338, 91)
 rotation = -0.389395
 texture = ExtResource("20_i7cyh")
 
+[node name="StaticBody2D" type="StaticBody2D" parent="Objects/corridor_box_a9"]
+position = Vector2(-2, 13)
+collision_layer = 8
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Objects/corridor_box_a9/StaticBody2D"]
+position = Vector2(2, -20.5)
+shape = SubResource("RectangleShape2D_7ystk")
+one_way_collision = true
+
 [node name="corridor_box_a2" type="Sprite2D" parent="Objects"]
 position = Vector2(1170, 136)
 texture = ExtResource("20_i7cyh")
 
+[node name="StaticBody2D" type="StaticBody2D" parent="Objects/corridor_box_a2"]
+position = Vector2(-2, 13)
+collision_layer = 8
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Objects/corridor_box_a2/StaticBody2D"]
+position = Vector2(2, -20.5)
+shape = SubResource("RectangleShape2D_7ystk")
+one_way_collision = true
+
 [node name="corridor_box_a3" type="Sprite2D" parent="Objects"]
 position = Vector2(1161, 120)
 texture = ExtResource("20_i7cyh")
+
+[node name="StaticBody2D" type="StaticBody2D" parent="Objects/corridor_box_a3"]
+position = Vector2(-2, 13)
+collision_layer = 8
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Objects/corridor_box_a3/StaticBody2D"]
+position = Vector2(2, -20.5)
+shape = SubResource("RectangleShape2D_7ystk")
+one_way_collision = true
 
 [node name="corridor_box_b" type="Sprite2D" parent="Objects"]
 z_index = -1
 position = Vector2(1210, 136)
 texture = ExtResource("21_g5hnq")
 
+[node name="StaticBody2D" type="StaticBody2D" parent="Objects/corridor_box_b"]
+position = Vector2(-2, 13)
+collision_layer = 8
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Objects/corridor_box_b/StaticBody2D"]
+position = Vector2(2, -20.5)
+shape = SubResource("RectangleShape2D_yx8mi")
+one_way_collision = true
+
 [node name="corridor_box_b2" type="Sprite2D" parent="Objects"]
 z_index = -1
 position = Vector2(1226, 136)
 texture = ExtResource("21_g5hnq")
+
+[node name="StaticBody2D" type="StaticBody2D" parent="Objects/corridor_box_b2"]
+position = Vector2(-2, 13)
+collision_layer = 8
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Objects/corridor_box_b2/StaticBody2D"]
+position = Vector2(2, -20.5)
+shape = SubResource("RectangleShape2D_yx8mi")
+one_way_collision = true
 
 [node name="corridor_box_b3" type="Sprite2D" parent="Objects"]
 z_index = -1
 position = Vector2(1218, 120)
 texture = ExtResource("21_g5hnq")
 
+[node name="StaticBody2D" type="StaticBody2D" parent="Objects/corridor_box_b3"]
+position = Vector2(-2, 13)
+collision_layer = 8
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Objects/corridor_box_b3/StaticBody2D"]
+position = Vector2(2, -20.5)
+shape = SubResource("RectangleShape2D_yx8mi")
+one_way_collision = true
+
 [node name="corridor_box_b4" type="Sprite2D" parent="Objects"]
 position = Vector2(1328.5, 129.5)
 scale = Vector2(1.8125, 1.8125)
 texture = ExtResource("21_g5hnq")
 
+[node name="StaticBody2D" type="StaticBody2D" parent="Objects/corridor_box_b4"]
+position = Vector2(-2, 13)
+collision_layer = 8
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Objects/corridor_box_b4/StaticBody2D"]
+position = Vector2(2, -20.5)
+shape = SubResource("RectangleShape2D_yx8mi")
+one_way_collision = true
+
 [node name="corridor_box_a10" type="Sprite2D" parent="Objects"]
 position = Vector2(1354.6, 136.498)
 texture = ExtResource("20_i7cyh")
+
+[node name="StaticBody2D" type="StaticBody2D" parent="Objects/corridor_box_a10"]
+position = Vector2(-2, 13)
+collision_layer = 8
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Objects/corridor_box_a10/StaticBody2D"]
+position = Vector2(2, -20.5)
+shape = SubResource("RectangleShape2D_7ystk")
+one_way_collision = true
 
 [node name="corridor_box_a11" type="Sprite2D" parent="Objects"]
 position = Vector2(1372.6, 136.498)
 texture = ExtResource("20_i7cyh")
 
+[node name="StaticBody2D" type="StaticBody2D" parent="Objects/corridor_box_a11"]
+position = Vector2(-2, 13)
+collision_layer = 8
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Objects/corridor_box_a11/StaticBody2D"]
+position = Vector2(2, -20.5)
+shape = SubResource("RectangleShape2D_7ystk")
+one_way_collision = true
+
 [node name="corridor_box_a12" type="Sprite2D" parent="Objects"]
 position = Vector2(1361.6, 120.498)
 texture = ExtResource("20_i7cyh")
 
+[node name="StaticBody2D" type="StaticBody2D" parent="Objects/corridor_box_a12"]
+position = Vector2(-2, 13)
+collision_layer = 8
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Objects/corridor_box_a12/StaticBody2D"]
+position = Vector2(2, -20.5)
+shape = SubResource("RectangleShape2D_7ystk")
+one_way_collision = true
+
 [node name="corridor_box_a13" type="Sprite2D" parent="Objects"]
 position = Vector2(1352.6, 104.498)
 texture = ExtResource("20_i7cyh")
+
+[node name="StaticBody2D" type="StaticBody2D" parent="Objects/corridor_box_a13"]
+position = Vector2(-2, 13)
+collision_layer = 8
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Objects/corridor_box_a13/StaticBody2D"]
+position = Vector2(2, -20.5)
+shape = SubResource("RectangleShape2D_7ystk")
+one_way_collision = true
 
 [node name="corridor_box_a14" type="Sprite2D" parent="Objects"]
 position = Vector2(1338, 91)
 rotation = -0.389395
 texture = ExtResource("20_i7cyh")
 
+[node name="StaticBody2D" type="StaticBody2D" parent="Objects/corridor_box_a14"]
+position = Vector2(-2, 13)
+collision_layer = 8
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Objects/corridor_box_a14/StaticBody2D"]
+position = Vector2(2, -20.5)
+shape = SubResource("RectangleShape2D_7ystk")
+one_way_collision = true
+
 [node name="corridor_box_b5" type="Sprite2D" parent="Objects"]
 position = Vector2(1328.5, 129.5)
 scale = Vector2(1.8125, 1.8125)
 texture = ExtResource("21_g5hnq")
 
+[node name="StaticBody2D" type="StaticBody2D" parent="Objects/corridor_box_b5"]
+position = Vector2(-2, 13)
+collision_layer = 8
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Objects/corridor_box_b5/StaticBody2D"]
+position = Vector2(2, -20.5)
+shape = SubResource("RectangleShape2D_yx8mi")
+one_way_collision = true
+
 [node name="corridor_box_a15" type="Sprite2D" parent="Objects"]
 position = Vector2(1336, 107)
 texture = ExtResource("20_i7cyh")
+
+[node name="StaticBody2D" type="StaticBody2D" parent="Objects/corridor_box_a15"]
+position = Vector2(-2, 13)
+collision_layer = 8
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Objects/corridor_box_a15/StaticBody2D"]
+position = Vector2(2, -20.5)
+shape = SubResource("RectangleShape2D_7ystk")
+one_way_collision = true
 
 [node name="corridor_box_a16" type="Sprite2D" parent="Objects"]
 position = Vector2(1354.6, 136.498)
 texture = ExtResource("20_i7cyh")
 
+[node name="StaticBody2D" type="StaticBody2D" parent="Objects/corridor_box_a16"]
+position = Vector2(-2, 13)
+collision_layer = 8
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Objects/corridor_box_a16/StaticBody2D"]
+position = Vector2(2, -20.5)
+shape = SubResource("RectangleShape2D_7ystk")
+one_way_collision = true
+
 [node name="corridor_box_a17" type="Sprite2D" parent="Objects"]
 position = Vector2(1372.6, 136.498)
 texture = ExtResource("20_i7cyh")
+
+[node name="StaticBody2D" type="StaticBody2D" parent="Objects/corridor_box_a17"]
+position = Vector2(-2, 13)
+collision_layer = 8
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Objects/corridor_box_a17/StaticBody2D"]
+position = Vector2(2, -20.5)
+shape = SubResource("RectangleShape2D_7ystk")
+one_way_collision = true
 
 [node name="corridor_box_a18" type="Sprite2D" parent="Objects"]
 position = Vector2(1361.6, 120.498)
 texture = ExtResource("20_i7cyh")
 
+[node name="StaticBody2D" type="StaticBody2D" parent="Objects/corridor_box_a18"]
+position = Vector2(-2, 13)
+collision_layer = 8
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Objects/corridor_box_a18/StaticBody2D"]
+position = Vector2(2, -20.5)
+shape = SubResource("RectangleShape2D_7ystk")
+one_way_collision = true
+
 [node name="corridor_box_a19" type="Sprite2D" parent="Objects"]
 position = Vector2(1352.6, 104.498)
 texture = ExtResource("20_i7cyh")
+
+[node name="StaticBody2D" type="StaticBody2D" parent="Objects/corridor_box_a19"]
+position = Vector2(-2, 13)
+collision_layer = 8
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Objects/corridor_box_a19/StaticBody2D"]
+position = Vector2(2, -20.5)
+shape = SubResource("RectangleShape2D_7ystk")
+one_way_collision = true
 
 [node name="corridor_box_a20" type="Sprite2D" parent="Objects"]
 position = Vector2(1338, 91)
 rotation = -0.389395
 texture = ExtResource("20_i7cyh")
 
+[node name="StaticBody2D" type="StaticBody2D" parent="Objects/corridor_box_a20"]
+position = Vector2(-2, 13)
+collision_layer = 8
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Objects/corridor_box_a20/StaticBody2D"]
+position = Vector2(2, -20.5)
+shape = SubResource("RectangleShape2D_7ystk")
+one_way_collision = true
+
 [node name="corridor_box_b6" type="Sprite2D" parent="Objects"]
 position = Vector2(1328.5, 129.5)
 scale = Vector2(1.8125, 1.8125)
 texture = ExtResource("21_g5hnq")
 
+[node name="StaticBody2D" type="StaticBody2D" parent="Objects/corridor_box_b6"]
+position = Vector2(-2, 13)
+collision_layer = 8
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Objects/corridor_box_b6/StaticBody2D"]
+position = Vector2(2, -20.5)
+shape = SubResource("RectangleShape2D_yx8mi")
+one_way_collision = true
+
 [node name="corridor_box_a21" type="Sprite2D" parent="Objects"]
 position = Vector2(1336, 107)
 texture = ExtResource("20_i7cyh")
+
+[node name="StaticBody2D" type="StaticBody2D" parent="Objects/corridor_box_a21"]
+position = Vector2(-2, 13)
+collision_layer = 8
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Objects/corridor_box_a21/StaticBody2D"]
+position = Vector2(2, -20.5)
+shape = SubResource("RectangleShape2D_7ystk")
+one_way_collision = true
 
 [node name="corridor_box_a22" type="Sprite2D" parent="Objects"]
 position = Vector2(1354.6, 136.498)
 texture = ExtResource("20_i7cyh")
 
+[node name="StaticBody2D" type="StaticBody2D" parent="Objects/corridor_box_a22"]
+position = Vector2(-2, 13)
+collision_layer = 8
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Objects/corridor_box_a22/StaticBody2D"]
+position = Vector2(2, -20.5)
+shape = SubResource("RectangleShape2D_7ystk")
+one_way_collision = true
+
 [node name="corridor_box_a23" type="Sprite2D" parent="Objects"]
 position = Vector2(1372.6, 136.498)
 texture = ExtResource("20_i7cyh")
+
+[node name="StaticBody2D" type="StaticBody2D" parent="Objects/corridor_box_a23"]
+position = Vector2(-2, 13)
+collision_layer = 8
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Objects/corridor_box_a23/StaticBody2D"]
+position = Vector2(2, -20.5)
+shape = SubResource("RectangleShape2D_7ystk")
+one_way_collision = true
 
 [node name="corridor_box_a24" type="Sprite2D" parent="Objects"]
 position = Vector2(1361.6, 120.498)
 texture = ExtResource("20_i7cyh")
 
+[node name="StaticBody2D" type="StaticBody2D" parent="Objects/corridor_box_a24"]
+position = Vector2(-2, 13)
+collision_layer = 8
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Objects/corridor_box_a24/StaticBody2D"]
+position = Vector2(2, -20.5)
+shape = SubResource("RectangleShape2D_7ystk")
+one_way_collision = true
+
 [node name="corridor_box_a25" type="Sprite2D" parent="Objects"]
 position = Vector2(1352.6, 104.498)
 texture = ExtResource("20_i7cyh")
+
+[node name="StaticBody2D" type="StaticBody2D" parent="Objects/corridor_box_a25"]
+position = Vector2(-2, 13)
+collision_layer = 8
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Objects/corridor_box_a25/StaticBody2D"]
+position = Vector2(2, -20.5)
+shape = SubResource("RectangleShape2D_7ystk")
+one_way_collision = true
 
 [node name="corridor_box_a26" type="Sprite2D" parent="Objects"]
 position = Vector2(1338, 91)
 rotation = -0.389395
 texture = ExtResource("20_i7cyh")
 
+[node name="StaticBody2D" type="StaticBody2D" parent="Objects/corridor_box_a26"]
+position = Vector2(-2, 13)
+collision_layer = 8
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Objects/corridor_box_a26/StaticBody2D"]
+position = Vector2(2, -20.5)
+shape = SubResource("RectangleShape2D_7ystk")
+one_way_collision = true
+
 [node name="corridor_box_b7" type="Sprite2D" parent="Objects"]
 position = Vector2(1328.5, 129.5)
 scale = Vector2(1.8125, 1.8125)
 texture = ExtResource("21_g5hnq")
 
+[node name="StaticBody2D" type="StaticBody2D" parent="Objects/corridor_box_b7"]
+position = Vector2(-2, 13)
+collision_layer = 8
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Objects/corridor_box_b7/StaticBody2D"]
+position = Vector2(2, -20.5)
+shape = SubResource("RectangleShape2D_yx8mi")
+one_way_collision = true
+
 [node name="corridor_box_a27" type="Sprite2D" parent="Objects"]
 position = Vector2(1436, 137.628)
 texture = ExtResource("20_i7cyh")
+
+[node name="StaticBody2D" type="StaticBody2D" parent="Objects/corridor_box_a27"]
+position = Vector2(-2, 13)
+collision_layer = 8
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Objects/corridor_box_a27/StaticBody2D"]
+position = Vector2(2, -20.5)
+shape = SubResource("RectangleShape2D_7ystk")
+one_way_collision = true
 
 [node name="corridor_box_a28" type="Sprite2D" parent="Objects"]
 position = Vector2(1454.6, 167.126)
 texture = ExtResource("20_i7cyh")
 
+[node name="StaticBody2D" type="StaticBody2D" parent="Objects/corridor_box_a28"]
+position = Vector2(-2, 13)
+collision_layer = 8
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Objects/corridor_box_a28/StaticBody2D"]
+position = Vector2(2, -20.5)
+shape = SubResource("RectangleShape2D_7ystk")
+one_way_collision = true
+
 [node name="corridor_box_a29" type="Sprite2D" parent="Objects"]
 position = Vector2(1472.6, 167.126)
 texture = ExtResource("20_i7cyh")
+
+[node name="StaticBody2D" type="StaticBody2D" parent="Objects/corridor_box_a29"]
+position = Vector2(-2, 13)
+collision_layer = 8
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Objects/corridor_box_a29/StaticBody2D"]
+position = Vector2(2, -20.5)
+shape = SubResource("RectangleShape2D_7ystk")
+one_way_collision = true
 
 [node name="corridor_box_a30" type="Sprite2D" parent="Objects"]
 position = Vector2(1461.6, 151.126)
 texture = ExtResource("20_i7cyh")
 
+[node name="StaticBody2D" type="StaticBody2D" parent="Objects/corridor_box_a30"]
+position = Vector2(-2, 13)
+collision_layer = 8
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Objects/corridor_box_a30/StaticBody2D"]
+position = Vector2(2, -20.5)
+shape = SubResource("RectangleShape2D_7ystk")
+one_way_collision = true
+
 [node name="corridor_box_a31" type="Sprite2D" parent="Objects"]
 position = Vector2(1452.6, 135.126)
 texture = ExtResource("20_i7cyh")
+
+[node name="StaticBody2D" type="StaticBody2D" parent="Objects/corridor_box_a31"]
+position = Vector2(-2, 13)
+collision_layer = 8
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Objects/corridor_box_a31/StaticBody2D"]
+position = Vector2(2, -20.5)
+shape = SubResource("RectangleShape2D_7ystk")
+one_way_collision = true
 
 [node name="corridor_box_a32" type="Sprite2D" parent="Objects"]
 position = Vector2(1438, 121.628)
 rotation = -0.389395
 texture = ExtResource("20_i7cyh")
 
+[node name="StaticBody2D" type="StaticBody2D" parent="Objects/corridor_box_a32"]
+position = Vector2(-2, 13)
+collision_layer = 8
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Objects/corridor_box_a32/StaticBody2D"]
+position = Vector2(2, -20.5)
+shape = SubResource("RectangleShape2D_7ystk")
+one_way_collision = true
+
 [node name="corridor_box_b8" type="Sprite2D" parent="Objects"]
 position = Vector2(1428.5, 160.128)
 scale = Vector2(1.8125, 1.8125)
 texture = ExtResource("21_g5hnq")
 
+[node name="StaticBody2D" type="StaticBody2D" parent="Objects/corridor_box_b8"]
+position = Vector2(-2, 13)
+collision_layer = 8
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Objects/corridor_box_b8/StaticBody2D"]
+position = Vector2(2, -20.5)
+shape = SubResource("RectangleShape2D_yx8mi")
+one_way_collision = true
+
 [node name="corridor_box_a59" type="Sprite2D" parent="Objects"]
 position = Vector2(1890, 107.628)
 texture = ExtResource("20_i7cyh")
+
+[node name="StaticBody2D" type="StaticBody2D" parent="Objects/corridor_box_a59"]
+position = Vector2(-2, 13)
+collision_layer = 8
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Objects/corridor_box_a59/StaticBody2D"]
+position = Vector2(2, -20.5)
+shape = SubResource("RectangleShape2D_7ystk")
+one_way_collision = true
 
 [node name="corridor_box_a60" type="Sprite2D" parent="Objects"]
 position = Vector2(1908.6, 137.126)
 texture = ExtResource("20_i7cyh")
 
+[node name="StaticBody2D" type="StaticBody2D" parent="Objects/corridor_box_a60"]
+position = Vector2(-2, 13)
+collision_layer = 8
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Objects/corridor_box_a60/StaticBody2D"]
+position = Vector2(2, -20.5)
+shape = SubResource("RectangleShape2D_7ystk")
+one_way_collision = true
+
 [node name="corridor_box_a61" type="Sprite2D" parent="Objects"]
 position = Vector2(1926.6, 137.126)
 texture = ExtResource("20_i7cyh")
+
+[node name="StaticBody2D" type="StaticBody2D" parent="Objects/corridor_box_a61"]
+position = Vector2(-2, 13)
+collision_layer = 8
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Objects/corridor_box_a61/StaticBody2D"]
+position = Vector2(2, -20.5)
+shape = SubResource("RectangleShape2D_7ystk")
+one_way_collision = true
 
 [node name="corridor_box_a62" type="Sprite2D" parent="Objects"]
 position = Vector2(1915.6, 121.126)
 texture = ExtResource("20_i7cyh")
 
+[node name="StaticBody2D" type="StaticBody2D" parent="Objects/corridor_box_a62"]
+position = Vector2(-2, 13)
+collision_layer = 8
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Objects/corridor_box_a62/StaticBody2D"]
+position = Vector2(2, -20.5)
+shape = SubResource("RectangleShape2D_7ystk")
+one_way_collision = true
+
 [node name="corridor_box_a65" type="Sprite2D" parent="Objects"]
 position = Vector2(1960.5, 167)
 texture = ExtResource("20_i7cyh")
+
+[node name="StaticBody2D" type="StaticBody2D" parent="Objects/corridor_box_a65"]
+position = Vector2(-2, 13)
+collision_layer = 8
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Objects/corridor_box_a65/StaticBody2D"]
+position = Vector2(2, -20.5)
+shape = SubResource("RectangleShape2D_7ystk")
+one_way_collision = true
 
 [node name="corridor_box_a66" type="Sprite2D" parent="Objects"]
 position = Vector2(1978.5, 167)
 texture = ExtResource("20_i7cyh")
 
+[node name="StaticBody2D" type="StaticBody2D" parent="Objects/corridor_box_a66"]
+position = Vector2(-2, 13)
+collision_layer = 8
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Objects/corridor_box_a66/StaticBody2D"]
+position = Vector2(2, -20.5)
+shape = SubResource("RectangleShape2D_7ystk")
+one_way_collision = true
+
 [node name="corridor_box_a67" type="Sprite2D" parent="Objects"]
 position = Vector2(1967.5, 151)
 texture = ExtResource("20_i7cyh")
 
+[node name="StaticBody2D" type="StaticBody2D" parent="Objects/corridor_box_a67"]
+position = Vector2(-2, 13)
+collision_layer = 8
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Objects/corridor_box_a67/StaticBody2D"]
+position = Vector2(2, -20.5)
+shape = SubResource("RectangleShape2D_7ystk")
+one_way_collision = true
+
 [node name="corridor_box_a63" type="Sprite2D" parent="Objects"]
 position = Vector2(1906.6, 105.126)
 texture = ExtResource("20_i7cyh")
+
+[node name="StaticBody2D" type="StaticBody2D" parent="Objects/corridor_box_a63"]
+position = Vector2(-2, 13)
+collision_layer = 8
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Objects/corridor_box_a63/StaticBody2D"]
+position = Vector2(2, -20.5)
+shape = SubResource("RectangleShape2D_7ystk")
+one_way_collision = true
 
 [node name="corridor_box_a64" type="Sprite2D" parent="Objects"]
 position = Vector2(1892, 91.628)
 rotation = -0.389395
 texture = ExtResource("20_i7cyh")
 
+[node name="StaticBody2D" type="StaticBody2D" parent="Objects/corridor_box_a64"]
+position = Vector2(-2, 13)
+collision_layer = 8
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Objects/corridor_box_a64/StaticBody2D"]
+position = Vector2(2, -20.5)
+shape = SubResource("RectangleShape2D_7ystk")
+one_way_collision = true
+
 [node name="corridor_box_b10" type="Sprite2D" parent="Objects"]
 position = Vector2(1882.5, 130.128)
 scale = Vector2(1.8125, 1.8125)
 texture = ExtResource("21_g5hnq")
 
+[node name="StaticBody2D" type="StaticBody2D" parent="Objects/corridor_box_b10"]
+position = Vector2(-2, 13)
+collision_layer = 8
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Objects/corridor_box_b10/StaticBody2D"]
+position = Vector2(2, -20.5)
+shape = SubResource("RectangleShape2D_yx8mi")
+one_way_collision = true
+
 [node name="corridor_box_a33" type="Sprite2D" parent="Objects"]
 position = Vector2(1517, 108.628)
 texture = ExtResource("20_i7cyh")
+
+[node name="StaticBody2D" type="StaticBody2D" parent="Objects/corridor_box_a33"]
+position = Vector2(-2, 13)
+collision_layer = 8
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Objects/corridor_box_a33/StaticBody2D"]
+position = Vector2(2, -20.5)
+shape = SubResource("RectangleShape2D_7ystk")
+one_way_collision = true
 
 [node name="corridor_box_a34" type="Sprite2D" parent="Objects"]
 position = Vector2(1535.6, 138.126)
 texture = ExtResource("20_i7cyh")
 
+[node name="StaticBody2D" type="StaticBody2D" parent="Objects/corridor_box_a34"]
+position = Vector2(-2, 13)
+collision_layer = 8
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Objects/corridor_box_a34/StaticBody2D"]
+position = Vector2(2, -20.5)
+shape = SubResource("RectangleShape2D_7ystk")
+one_way_collision = true
+
 [node name="corridor_box_a35" type="Sprite2D" parent="Objects"]
 position = Vector2(1553.6, 138.126)
 texture = ExtResource("20_i7cyh")
+
+[node name="StaticBody2D" type="StaticBody2D" parent="Objects/corridor_box_a35"]
+position = Vector2(-2, 13)
+collision_layer = 8
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Objects/corridor_box_a35/StaticBody2D"]
+position = Vector2(2, -20.5)
+shape = SubResource("RectangleShape2D_7ystk")
+one_way_collision = true
 
 [node name="corridor_box_a36" type="Sprite2D" parent="Objects"]
 position = Vector2(1542.6, 122.126)
 texture = ExtResource("20_i7cyh")
 
+[node name="StaticBody2D" type="StaticBody2D" parent="Objects/corridor_box_a36"]
+position = Vector2(-2, 13)
+collision_layer = 8
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Objects/corridor_box_a36/StaticBody2D"]
+position = Vector2(2, -20.5)
+shape = SubResource("RectangleShape2D_7ystk")
+one_way_collision = true
+
 [node name="corridor_box_a39" type="Sprite2D" parent="Objects"]
 position = Vector2(1686.5, 137)
 texture = ExtResource("20_i7cyh")
+
+[node name="StaticBody2D" type="StaticBody2D" parent="Objects/corridor_box_a39"]
+position = Vector2(-2, 13)
+collision_layer = 8
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Objects/corridor_box_a39/StaticBody2D"]
+position = Vector2(2, -20.5)
+shape = SubResource("RectangleShape2D_7ystk")
+one_way_collision = true
 
 [node name="corridor_box_a40" type="Sprite2D" parent="Objects"]
 position = Vector2(1704.5, 137)
 texture = ExtResource("20_i7cyh")
 
+[node name="StaticBody2D" type="StaticBody2D" parent="Objects/corridor_box_a40"]
+position = Vector2(-2, 13)
+collision_layer = 8
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Objects/corridor_box_a40/StaticBody2D"]
+position = Vector2(2, -20.5)
+shape = SubResource("RectangleShape2D_7ystk")
+one_way_collision = true
+
 [node name="corridor_box_a41" type="Sprite2D" parent="Objects"]
 position = Vector2(1693.5, 121)
 texture = ExtResource("20_i7cyh")
+
+[node name="StaticBody2D" type="StaticBody2D" parent="Objects/corridor_box_a41"]
+position = Vector2(-2, 13)
+collision_layer = 8
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Objects/corridor_box_a41/StaticBody2D"]
+position = Vector2(2, -20.5)
+shape = SubResource("RectangleShape2D_7ystk")
+one_way_collision = true
 
 [node name="corridor_box_a42" type="Sprite2D" parent="Objects"]
 position = Vector2(1727.5, 137)
 texture = ExtResource("20_i7cyh")
 
+[node name="StaticBody2D" type="StaticBody2D" parent="Objects/corridor_box_a42"]
+position = Vector2(-2, 13)
+collision_layer = 8
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Objects/corridor_box_a42/StaticBody2D"]
+position = Vector2(2, -20.5)
+shape = SubResource("RectangleShape2D_7ystk")
+one_way_collision = true
+
 [node name="corridor_box_a43" type="Sprite2D" parent="Objects"]
 position = Vector2(1745.5, 137)
 texture = ExtResource("20_i7cyh")
+
+[node name="StaticBody2D" type="StaticBody2D" parent="Objects/corridor_box_a43"]
+position = Vector2(-2, 13)
+collision_layer = 8
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Objects/corridor_box_a43/StaticBody2D"]
+position = Vector2(2, -20.5)
+shape = SubResource("RectangleShape2D_7ystk")
+one_way_collision = true
 
 [node name="corridor_box_a44" type="Sprite2D" parent="Objects"]
 position = Vector2(1734.5, 121)
 texture = ExtResource("20_i7cyh")
 
+[node name="StaticBody2D" type="StaticBody2D" parent="Objects/corridor_box_a44"]
+position = Vector2(-2, 13)
+collision_layer = 8
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Objects/corridor_box_a44/StaticBody2D"]
+position = Vector2(2, -20.5)
+shape = SubResource("RectangleShape2D_7ystk")
+one_way_collision = true
+
 [node name="corridor_box_a45" type="Sprite2D" parent="Objects"]
 position = Vector2(1704.5, 105)
 texture = ExtResource("20_i7cyh")
+
+[node name="StaticBody2D" type="StaticBody2D" parent="Objects/corridor_box_a45"]
+position = Vector2(-2, 13)
+collision_layer = 8
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Objects/corridor_box_a45/StaticBody2D"]
+position = Vector2(2, -20.5)
+shape = SubResource("RectangleShape2D_7ystk")
+one_way_collision = true
 
 [node name="corridor_box_a46" type="Sprite2D" parent="Objects"]
 position = Vector2(1722.5, 105)
 texture = ExtResource("20_i7cyh")
 
+[node name="StaticBody2D" type="StaticBody2D" parent="Objects/corridor_box_a46"]
+position = Vector2(-2, 13)
+collision_layer = 8
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Objects/corridor_box_a46/StaticBody2D"]
+position = Vector2(2, -20.5)
+shape = SubResource("RectangleShape2D_7ystk")
+one_way_collision = true
+
 [node name="corridor_box_a47" type="Sprite2D" parent="Objects"]
 position = Vector2(1711.5, 89)
 texture = ExtResource("20_i7cyh")
+
+[node name="StaticBody2D" type="StaticBody2D" parent="Objects/corridor_box_a47"]
+position = Vector2(-2, 13)
+collision_layer = 8
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Objects/corridor_box_a47/StaticBody2D"]
+position = Vector2(2, -20.5)
+shape = SubResource("RectangleShape2D_7ystk")
+one_way_collision = true
 
 [node name="corridor_box_a48" type="Sprite2D" parent="Objects"]
 position = Vector2(1715, 121)
 texture = ExtResource("20_i7cyh")
 
+[node name="StaticBody2D" type="StaticBody2D" parent="Objects/corridor_box_a48"]
+position = Vector2(-2, 13)
+collision_layer = 8
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Objects/corridor_box_a48/StaticBody2D"]
+position = Vector2(2, -20.5)
+shape = SubResource("RectangleShape2D_7ystk")
+one_way_collision = true
+
 [node name="corridor_box_a49" type="Sprite2D" parent="Objects"]
 position = Vector2(2013.5, 138)
 texture = ExtResource("20_i7cyh")
+
+[node name="StaticBody2D" type="StaticBody2D" parent="Objects/corridor_box_a49"]
+position = Vector2(-2, 13)
+collision_layer = 8
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Objects/corridor_box_a49/StaticBody2D"]
+position = Vector2(2, -20.5)
+shape = SubResource("RectangleShape2D_7ystk")
+one_way_collision = true
 
 [node name="corridor_box_a50" type="Sprite2D" parent="Objects"]
 position = Vector2(2031.5, 138)
 texture = ExtResource("20_i7cyh")
 
+[node name="StaticBody2D" type="StaticBody2D" parent="Objects/corridor_box_a50"]
+position = Vector2(-2, 13)
+collision_layer = 8
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Objects/corridor_box_a50/StaticBody2D"]
+position = Vector2(2, -20.5)
+shape = SubResource("RectangleShape2D_7ystk")
+one_way_collision = true
+
 [node name="corridor_box_a51" type="Sprite2D" parent="Objects"]
 position = Vector2(2020.5, 122)
 texture = ExtResource("20_i7cyh")
+
+[node name="StaticBody2D" type="StaticBody2D" parent="Objects/corridor_box_a51"]
+position = Vector2(-2, 13)
+collision_layer = 8
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Objects/corridor_box_a51/StaticBody2D"]
+position = Vector2(2, -20.5)
+shape = SubResource("RectangleShape2D_7ystk")
+one_way_collision = true
 
 [node name="corridor_box_a52" type="Sprite2D" parent="Objects"]
 position = Vector2(2054.5, 138)
 texture = ExtResource("20_i7cyh")
 
+[node name="StaticBody2D" type="StaticBody2D" parent="Objects/corridor_box_a52"]
+position = Vector2(-2, 13)
+collision_layer = 8
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Objects/corridor_box_a52/StaticBody2D"]
+position = Vector2(2, -20.5)
+shape = SubResource("RectangleShape2D_7ystk")
+one_way_collision = true
+
 [node name="corridor_box_a53" type="Sprite2D" parent="Objects"]
 position = Vector2(2072.5, 138)
 texture = ExtResource("20_i7cyh")
+
+[node name="StaticBody2D" type="StaticBody2D" parent="Objects/corridor_box_a53"]
+position = Vector2(-2, 13)
+collision_layer = 8
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Objects/corridor_box_a53/StaticBody2D"]
+position = Vector2(2, -20.5)
+shape = SubResource("RectangleShape2D_7ystk")
+one_way_collision = true
 
 [node name="corridor_box_a54" type="Sprite2D" parent="Objects"]
 position = Vector2(2061.5, 122)
 texture = ExtResource("20_i7cyh")
 
+[node name="StaticBody2D" type="StaticBody2D" parent="Objects/corridor_box_a54"]
+position = Vector2(-2, 13)
+collision_layer = 8
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Objects/corridor_box_a54/StaticBody2D"]
+position = Vector2(2, -20.5)
+shape = SubResource("RectangleShape2D_7ystk")
+one_way_collision = true
+
 [node name="corridor_box_a55" type="Sprite2D" parent="Objects"]
 position = Vector2(2031.5, 106)
 texture = ExtResource("20_i7cyh")
+
+[node name="StaticBody2D" type="StaticBody2D" parent="Objects/corridor_box_a55"]
+position = Vector2(-2, 13)
+collision_layer = 8
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Objects/corridor_box_a55/StaticBody2D"]
+position = Vector2(2, -20.5)
+shape = SubResource("RectangleShape2D_7ystk")
+one_way_collision = true
 
 [node name="corridor_box_a56" type="Sprite2D" parent="Objects"]
 position = Vector2(2049.5, 106)
 texture = ExtResource("20_i7cyh")
 
+[node name="StaticBody2D" type="StaticBody2D" parent="Objects/corridor_box_a56"]
+position = Vector2(-2, 13)
+collision_layer = 8
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Objects/corridor_box_a56/StaticBody2D"]
+position = Vector2(2, -20.5)
+shape = SubResource("RectangleShape2D_7ystk")
+one_way_collision = true
+
 [node name="corridor_box_a57" type="Sprite2D" parent="Objects"]
 position = Vector2(2038.5, 90)
 texture = ExtResource("20_i7cyh")
+
+[node name="StaticBody2D" type="StaticBody2D" parent="Objects/corridor_box_a57"]
+position = Vector2(-2, 13)
+collision_layer = 8
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Objects/corridor_box_a57/StaticBody2D"]
+position = Vector2(2, -20.5)
+shape = SubResource("RectangleShape2D_7ystk")
+one_way_collision = true
 
 [node name="corridor_box_a58" type="Sprite2D" parent="Objects"]
 position = Vector2(2042, 122)
 texture = ExtResource("20_i7cyh")
 
+[node name="StaticBody2D" type="StaticBody2D" parent="Objects/corridor_box_a58"]
+position = Vector2(-2, 13)
+collision_layer = 8
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Objects/corridor_box_a58/StaticBody2D"]
+position = Vector2(2, -20.5)
+shape = SubResource("RectangleShape2D_7ystk")
+one_way_collision = true
+
 [node name="corridor_box_a37" type="Sprite2D" parent="Objects"]
 position = Vector2(1533.6, 106.126)
 texture = ExtResource("20_i7cyh")
+
+[node name="StaticBody2D" type="StaticBody2D" parent="Objects/corridor_box_a37"]
+position = Vector2(-2, 13)
+collision_layer = 8
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Objects/corridor_box_a37/StaticBody2D"]
+position = Vector2(2, -20.5)
+shape = SubResource("RectangleShape2D_7ystk")
+one_way_collision = true
 
 [node name="corridor_box_a38" type="Sprite2D" parent="Objects"]
 position = Vector2(1519, 92.628)
 rotation = -0.389395
 texture = ExtResource("20_i7cyh")
 
+[node name="StaticBody2D" type="StaticBody2D" parent="Objects/corridor_box_a38"]
+position = Vector2(-2, 13)
+collision_layer = 8
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Objects/corridor_box_a38/StaticBody2D"]
+position = Vector2(2, -20.5)
+shape = SubResource("RectangleShape2D_7ystk")
+one_way_collision = true
+
 [node name="corridor_box_b9" type="Sprite2D" parent="Objects"]
 position = Vector2(1509.5, 131.128)
 scale = Vector2(1.8125, 1.8125)
 texture = ExtResource("21_g5hnq")
+
+[node name="StaticBody2D" type="StaticBody2D" parent="Objects/corridor_box_b9"]
+position = Vector2(-2, 13)
+collision_layer = 8
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Objects/corridor_box_b9/StaticBody2D"]
+position = Vector2(2, -20.5)
+shape = SubResource("RectangleShape2D_yx8mi")
+one_way_collision = true
 
 [node name="corridor_trial_painting" type="Sprite2D" parent="Objects"]
 z_index = -1
 position = Vector2(1291, 48)
 texture = ExtResource("8_d8h2g")
 
+[node name="StaticBody2D" type="StaticBody2D" parent="Objects/corridor_trial_painting"]
+collision_layer = 8
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Objects/corridor_trial_painting/StaticBody2D"]
+position = Vector2(0, -18)
+shape = SubResource("RectangleShape2D_7mjtc")
+one_way_collision = true
+
+[node name="StaticBody2D2" type="StaticBody2D" parent="Objects/corridor_trial_painting"]
+position = Vector2(-1, 51)
+collision_layer = 8
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Objects/corridor_trial_painting/StaticBody2D2"]
+position = Vector2(0, -18)
+shape = SubResource("RectangleShape2D_7mjtc")
+one_way_collision = true
+
 [node name="corridor_trial_painting2" type="Sprite2D" parent="Objects"]
 z_index = -1
 position = Vector2(1592, 77)
 texture = ExtResource("8_d8h2g")
+
+[node name="StaticBody2D" type="StaticBody2D" parent="Objects/corridor_trial_painting2"]
+collision_layer = 8
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Objects/corridor_trial_painting2/StaticBody2D"]
+position = Vector2(0, -18)
+shape = SubResource("RectangleShape2D_7mjtc")
+one_way_collision = true
+
+[node name="StaticBody2D2" type="StaticBody2D" parent="Objects/corridor_trial_painting2"]
+position = Vector2(-1, 51)
+collision_layer = 8
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Objects/corridor_trial_painting2/StaticBody2D2"]
+position = Vector2(0, -18)
+shape = SubResource("RectangleShape2D_7mjtc")
+one_way_collision = true
 
 [node name="corridor_trial_painting3" type="Sprite2D" parent="Objects"]
 z_index = -1
 position = Vector2(2109, 78)
 texture = ExtResource("8_d8h2g")
 
+[node name="StaticBody2D" type="StaticBody2D" parent="Objects/corridor_trial_painting3"]
+collision_layer = 8
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Objects/corridor_trial_painting3/StaticBody2D"]
+position = Vector2(0, -18)
+shape = SubResource("RectangleShape2D_7mjtc")
+one_way_collision = true
+
+[node name="StaticBody2D2" type="StaticBody2D" parent="Objects/corridor_trial_painting3"]
+position = Vector2(-1, 51)
+collision_layer = 8
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Objects/corridor_trial_painting3/StaticBody2D2"]
+position = Vector2(0, -18)
+shape = SubResource("RectangleShape2D_7mjtc")
+one_way_collision = true
+
 [node name="corridor_trial_painting4" type="Sprite2D" parent="Objects"]
 z_index = -1
 position = Vector2(1848, 50)
 texture = ExtResource("8_d8h2g")
+
+[node name="StaticBody2D" type="StaticBody2D" parent="Objects/corridor_trial_painting4"]
+collision_layer = 8
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Objects/corridor_trial_painting4/StaticBody2D"]
+position = Vector2(0, -18)
+shape = SubResource("RectangleShape2D_7mjtc")
+one_way_collision = true
+
+[node name="StaticBody2D2" type="StaticBody2D" parent="Objects/corridor_trial_painting4"]
+position = Vector2(-1, 51)
+collision_layer = 8
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Objects/corridor_trial_painting4/StaticBody2D2"]
+position = Vector2(0, -18)
+shape = SubResource("RectangleShape2D_7mjtc")
+one_way_collision = true
 
 [node name="corridor_trophy" type="Sprite2D" parent="Objects"]
 position = Vector2(1128, 164)
@@ -946,15 +1977,63 @@ texture = ExtResource("22_t82kl")
 position = Vector2(2363, 135)
 texture = ExtResource("23_s0b7w")
 
+[node name="StaticBody2D" type="StaticBody2D" parent="Objects/fedor_office_table"]
+position = Vector2(-2, 13)
+collision_layer = 8
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Objects/fedor_office_table/StaticBody2D"]
+position = Vector2(2, -16)
+shape = SubResource("RectangleShape2D_rnt4n")
+one_way_collision = true
+
 [node name="fedor_office_painting" type="Sprite2D" parent="Objects"]
 z_index = -1
 position = Vector2(2271, 49)
 texture = ExtResource("8_d8h2g")
 
+[node name="StaticBody2D" type="StaticBody2D" parent="Objects/fedor_office_painting"]
+collision_layer = 8
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Objects/fedor_office_painting/StaticBody2D"]
+position = Vector2(0, -18)
+shape = SubResource("RectangleShape2D_7mjtc")
+one_way_collision = true
+
+[node name="StaticBody2D2" type="StaticBody2D" parent="Objects/fedor_office_painting"]
+position = Vector2(-1, 51)
+collision_layer = 8
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Objects/fedor_office_painting/StaticBody2D2"]
+position = Vector2(0, -18)
+shape = SubResource("RectangleShape2D_7mjtc")
+one_way_collision = true
+
 [node name="fedor_office_painting2" type="Sprite2D" parent="Objects"]
 z_index = -1
 position = Vector2(2445, 49)
 texture = ExtResource("8_d8h2g")
+
+[node name="StaticBody2D" type="StaticBody2D" parent="Objects/fedor_office_painting2"]
+collision_layer = 8
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Objects/fedor_office_painting2/StaticBody2D"]
+position = Vector2(0, -18)
+shape = SubResource("RectangleShape2D_7mjtc")
+one_way_collision = true
+
+[node name="StaticBody2D2" type="StaticBody2D" parent="Objects/fedor_office_painting2"]
+position = Vector2(-1, 51)
+collision_layer = 8
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Objects/fedor_office_painting2/StaticBody2D2"]
+position = Vector2(0, -18)
+shape = SubResource("RectangleShape2D_7mjtc")
+one_way_collision = true
 
 [editable path="Room"]
 [editable path="Room2"]

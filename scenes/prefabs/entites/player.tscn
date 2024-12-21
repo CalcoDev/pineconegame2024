@@ -1,10 +1,10 @@
-[gd_scene load_steps=8 format=3 uid="uid://vpcg1kgktd14"]
+[gd_scene load_steps=10 format=3 uid="uid://vpcg1kgktd14"]
 
 [ext_resource type="Texture2D" uid="uid://dx6tocvike34w" path="res://assets/art/entities/player/player.png" id="1_mdjh7"]
 [ext_resource type="Script" path="res://scripts/entities/player.gd" id="1_n2bhu"]
+[ext_resource type="Script" path="res://scripts/interactions/interactor.gd" id="3_2ocu5"]
 
 [sub_resource type="PhysicsMaterial" id="PhysicsMaterial_gf8kh"]
-friction = 0.4
 bounce = 0.4
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_ote4v"]
@@ -28,13 +28,20 @@ animations = [{
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_scgxt"]
 size = Vector2(9, 3)
 
-[node name="Player" type="RigidBody2D" node_paths=PackedStringArray("_visuals", "_line", "_gc")]
+[sub_resource type="CircleShape2D" id="CircleShape2D_71q4l"]
+radius = 14.0
+
+[node name="Player" type="RigidBody2D" node_paths=PackedStringArray("_visuals", "_line", "_gc", "_interactor")]
 collision_layer = 2
+collision_mask = 9
 physics_material_override = SubResource("PhysicsMaterial_gf8kh")
 script = ExtResource("1_n2bhu")
 _visuals = NodePath("Visuals")
 _line = NodePath("Line2D")
 _gc = NodePath("Area2D")
+_interactor = NodePath("Interactor")
+roll_speed = 0.5
+jump_force = 100.0
 yeet_max_dist = 200.0
 yeet_max_force = 100.0
 
@@ -58,7 +65,22 @@ end_cap_mode = 2
 
 [node name="Area2D" type="Area2D" parent="."]
 collision_layer = 0
+collision_mask = 9
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D"]
-position = Vector2(-0.5, -0.5)
+position = Vector2(0, 3.5)
 shape = SubResource("RectangleShape2D_scgxt")
+
+[node name="RayCast2D" type="RayCast2D" parent="."]
+target_position = Vector2(0, 5)
+collision_mask = 0
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+
+[node name="Interactor" type="Area2D" parent="."]
+collision_layer = 512
+collision_mask = 512
+script = ExtResource("3_2ocu5")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Interactor"]
+shape = SubResource("CircleShape2D_71q4l")

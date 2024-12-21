@@ -1,0 +1,22 @@
+title: elevator_entrance
+---
+Narrator: This is an elevator.
+Narrator: The peak of IBP-an engineering.
+Narrator: Allows you to go UP.
+Narrator: AND DOWN.
+Narrator: Wild, I know.
+===
+
+title: fedor_painting_1
+---
+Narrator: Fedor...
+Narrator: Love the guy.
+===
+
+title: chairs
+---
+Narrator: Some cool funky ahhh chairs.
+Narrator: Wish to sit?
+    -> Yes
+    -> No
+===
