@@ -46,7 +46,8 @@ func remove_command_handler(command: String, handler: Callable) -> void:
 
 # loads all nodes from a dialogue and prepares them for being ran.
 var _f: Dictionary = {}
-func prepare_dialogue(filepath: String) -> void:
+var _n: Dictionary = {}
+func prepare_dialogue(filepath: String) -> Array:
 	var file := FileAccess.open(filepath, FileAccess.READ)
 	assert(file != null, "Could not open filepath for dialogue!")
 	var raw_file := file.get_as_text()
@@ -59,6 +60,12 @@ func prepare_dialogue(filepath: String) -> void:
 		_dialogue_nodes_tokens[node.title] = parsed_dict["tokens"]
 		_f[filepath].append(node.title)
 	file.close()
+
+	_n[filepath] = lexed_nodes_dict.keys()
+	return get_prepared_dialogue_nodes(filepath)
+
+func get_prepared_dialogue_nodes(filepath: String) -> Array:
+	return _n[filepath]
 
 func unprepare_undialogue(filepath: String) -> void:
 	for f in _f[filepath]:
@@ -73,7 +80,7 @@ func node_exists(title: String) -> bool:
 	return title in _dialogue_nodes_tokens
 
 # starts playing a node from the loaded list
-func start_dialogue(node_title: String = "main") -> void:
+func start_dialogue(node_title: String) -> void:
 	if not is_running:
 		is_running = true
 		_start_dialogue()
@@ -116,7 +123,8 @@ func _start_node_coro(node_title: String) -> void:
 				var cmd := instr.dia_command
 				on_command.emit(cmd)
 				if cmd.cmd in _command_handlers:
-					_command_handlers[cmd.cmd].call(cmd)
+					for handler in _command_handlers[cmd.cmd]:
+						handler.call(cmd)
 				match cmd.cmd:
 					"jump":
 						var node := cmd.args[0]
@@ -124,6 +132,7 @@ func _start_node_coro(node_title: String) -> void:
 						var prev_node := current_node_name
 						await _start_node_coro(node)
 						current_node_name = prev_node
+					# "speed":
 			DialogueParser.Token.CODE:
 				var code := current as DialogueParser.TokenCode
 				print("code: ", code.value)
@@ -145,7 +154,7 @@ func _views_run_line(line: DialogueLine, on_finished: Callable) -> int:
 	var s: int = 0
 	for view in dialogue_views:
 		if view.can_handle_line():
-			view.run_line.emit(line, on_finished)
+			view.on_run_line.emit(line, on_finished)
 			s += 1
 	return s
 
@@ -153,7 +162,7 @@ func _views_run_options(options: Array[DialogueOption], on_selected: Callable) -
 	var s: int = 0
 	for view in dialogue_views:
 		if view.can_handle_options():
-			view.run_options.emit(options, on_selected)
+			view.on_run_options.emit(options, on_selected)
 			s += 1
 	return s
 

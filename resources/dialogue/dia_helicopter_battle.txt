@@ -1,0 +1,9 @@
+# narrator = display in bottom box
+# helicopter = display at helicopter thing
+# kongle = display at kongle thing
+
+title: helicopter_0
+---
+Narrator: I am a helicopter.
+Narrator: I am now going to attack you.
+===

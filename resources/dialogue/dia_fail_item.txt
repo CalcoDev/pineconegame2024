@@ -1,0 +1,8 @@
+# narrator = display in bottom box
+# helicopter = display at helicopter thing
+# kongle = display at kongle thing
+
+title: try_item_0
+---
+Narrator: Instant noodles yum yum.
+===

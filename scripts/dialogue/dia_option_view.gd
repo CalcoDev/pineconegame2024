@@ -42,7 +42,7 @@ var _active_options_grid_size: Vector2i = options_grid_size
 var _selected_option_idx: int = 0
 
 func _enter_tree() -> void:
-    self.run_options.connect(_run_options)
+    self.on_run_options.connect(_run_options)
 
     var opts := options_node.find_children("*", "HBoxContainer", true)
     _option_nodes = []

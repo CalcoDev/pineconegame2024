@@ -76,6 +76,9 @@ static func lex_node(data: String) -> NodeData:
 			continue
 		if line.begins_with("->"):
 			tokens.append(Token.new(indent, Token.OPTION, line))
+		elif line.begins_with("#"):
+			# line is a comment, move on
+			continue
 		elif line.begins_with("<<"):
 			tokens.append(Token.new(indent, Token.INSTRUCTION, line))
 		elif line.begins_with("$"):

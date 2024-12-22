@@ -24,6 +24,9 @@ static var instance: Player = null
 @export var limit_fall: bool = false
 @export var max_fall: float = 20
 
+@export_group("States")
+@export var locked: bool = false
+
 var is_ground: bool = false
 var was_ground: bool = false
 
@@ -50,89 +53,89 @@ func _ready() -> void:
 	_visuals.scale = Vector2.ONE * 0.75
 
 func _process(_detal: float) -> void:
-	# _gc.global_position = self.global_position
-	_gc.global_rotation = 0.0
-	
-	was_ground = is_ground
-	is_ground = _is_ground_coll
-	
-	var _rb = self
-	_line.global_rotation = 0.0
-	
-	if has_yeet and Input.is_action_just_pressed("yeet"):
-			_is_yeet = true
-			_yeet_drag_start = get_global_mouse_position()
-			# TODO(calco): Enable visuals
-	
-	if not _was_yeet and _is_yeet:
-		_line.visible = true
-	if not _is_yeet and _was_yeet:
-		_line.visible = false
+	if not locked:
+		_gc.global_rotation = 0.0
+		
+		was_ground = is_ground
+		is_ground = _is_ground_coll
+		
+		var _rb = self
+		_line.global_rotation = 0.0
+		
+		if has_yeet and Input.is_action_just_pressed("yeet"):
+				_is_yeet = true
+				_yeet_drag_start = get_global_mouse_position()
+				# TODO(calco): Enable visuals
+		
+		if not _was_yeet and _is_yeet:
+			_line.visible = true
+		if not _is_yeet and _was_yeet:
+			_line.visible = false
 
-	# $"Visuals".rotation = linear_velocity.angle()
-	if _is_yeet:
-		_yeet_drag_end = get_global_mouse_position()
-		var offset = _yeet_drag_end - _yeet_drag_start
-		
-		var angle = -offset.angle_to(Vector2.RIGHT) - PI / 2.0
-		self._visuals.global_rotation = angle
-		# TODO(calco): update visuals angle accordingly
-		
-		var dist = offset.length()
-		var t = minf(dist / yeet_max_dist, 1.0)
-		var display_dist = 8.0 + t * yeet_display_max_dist
-		# TODO(calco): Update visuals distance accordingly
-		
-		_line.set_point_position(0, _yeet_drag_start)
-		_line.set_point_position(1, _yeet_drag_end)
-		if Input.is_action_just_released("yeet"):
-			_was_yeet = true
-			_is_yeet = false
-			var dir = -offset.normalized()
-			# TODO(calco): Disable visuals
-			# TODO(calco): Apply force and stuff
-			_rb.linear_velocity = Vector2.ZERO
-			_rb.apply_impulse(dir * t * yeet_max_force)
-
-			_yeeted = true
-		else:
+		# $"Visuals".rotation = linear_velocity.angle()
+		if _is_yeet:
+			_yeet_drag_end = get_global_mouse_position()
+			var offset = _yeet_drag_end - _yeet_drag_start
+			
+			var angle = -offset.angle_to(Vector2.RIGHT) - PI / 2.0
+			self._visuals.global_rotation = angle
+			# TODO(calco): update visuals angle accordingly
+			
+			var dist = offset.length()
+			var t = minf(dist / yeet_max_dist, 1.0)
+			var display_dist = 8.0 + t * yeet_display_max_dist
+			# TODO(calco): Update visuals distance accordingly
+			
+			_line.set_point_position(0, _yeet_drag_start)
+			_line.set_point_position(1, _yeet_drag_end)
+			if Input.is_action_just_released("yeet"):
 				_was_yeet = true
-	else:
-		_was_yeet = _is_yeet
-		if is_ground:
-			_yeeted = false
+				_is_yeet = false
+				var dir = -offset.normalized()
+				# TODO(calco): Disable visuals
+				# TODO(calco): Apply force and stuff
+				_rb.linear_velocity = Vector2.ZERO
+				_rb.apply_impulse(dir * t * yeet_max_force)
+
+				_yeeted = true
+			else:
+					_was_yeet = true
+		else:
+			_was_yeet = _is_yeet
+			if is_ground:
+				_yeeted = false
+		
+		if _yeeted:
+			var angle = self.linear_velocity.angle_to(Vector2.RIGHT)
+			self._visuals.global_rotation = angle
+		else:
+			if not _is_yeet:
+				self._visuals.rotation = 0.0
+		
+		if Input.is_action_just_pressed("interact"):
+			_interactor.try_interact()
 	
-	if _yeeted:
-		var angle = self.linear_velocity.angle_to(Vector2.RIGHT)
-		self._visuals.global_rotation = angle
-	else:
-		if not _is_yeet:
-			self._visuals.rotation = 0.0
-	
-	if Input.is_action_just_pressed("interact"):
-		_interactor.try_interact()
-	
-	print(self.linear_velocity)
 	if self.linear_velocity.y > max_fall:
 		self.linear_velocity.y = max_fall
 
 func _physics_process(delta: float) -> void:
-	if is_ground:
-		var inp_x := Input.get_axis("walk_left", "walk_right")
-		if abs(inp_x) > 0.02:
-			self.linear_velocity.x = move_toward(self.linear_velocity.x, inp_x * roll_speed / delta, 20)
+	if not locked:
+		if is_ground:
+			var inp_x := Input.get_axis("walk_left", "walk_right")
+			if abs(inp_x) > 0.02:
+				self.linear_velocity.x = move_toward(self.linear_velocity.x, inp_x * roll_speed / delta, 20)
+			else:
+				self.linear_velocity.x = move_toward(self.linear_velocity.x, 0.0, 0.2)
+			if Input.is_action_just_pressed("jump"):
+				self.global_position.y -= 1
+				self.linear_velocity.y = 0.0
+				self.apply_impulse(Vector2.UP * jump_force)
+		if Input.is_action_pressed("fall"):
+			if self.collision_mask & 8:
+				self.collision_mask = self.collision_mask & 0xFFFFFFF7
 		else:
-			self.linear_velocity.x = move_toward(self.linear_velocity.x, 0.0, 0.2)
-		if Input.is_action_just_pressed("jump"):
-			self.global_position.y -= 1
-			self.linear_velocity.y = 0.0
-			self.apply_impulse(Vector2.UP * jump_force)
-	if Input.is_action_pressed("fall"):
-		if self.collision_mask & 8:
-			self.collision_mask = self.collision_mask & 0xFFFFFFF7
-	else:
-		if not self.collision_mask & 8:
-			self.collision_mask = self.collision_mask | 0x8
+			if not self.collision_mask & 8:
+				self.collision_mask = self.collision_mask | 0x8
 
 var _is_ground_coll := false
 var _grounds: Array = [] # faster for smaller values lmfao

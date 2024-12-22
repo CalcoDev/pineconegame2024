@@ -136,6 +136,7 @@ shape = SubResource("RectangleShape2D_05nic")
 physics_interpolation_mode = 1
 position = Vector2(160, 90)
 zoom = Vector2(2, 2)
+process_callback = 0
 limit_left = 0
 limit_top = 0
 limit_right = 597
@@ -152,7 +153,6 @@ yeet_max_force = 350.0
 
 [node name="Room" parent="." instance=ExtResource("3_ppyem")]
 position = Vector2(160, 90)
-clamp_to_coll = null
 
 [node name="CollisionShape2D" parent="Room" index="0"]
 position = Vector2(138.5, 0)
@@ -164,7 +164,6 @@ follow_target = NodePath("../../Player")
 
 [node name="Room2" parent="." instance=ExtResource("3_ppyem")]
 position = Vector2(757, 90)
-clamp_to_coll = null
 
 [node name="CollisionShape2D" parent="Room2" index="0"]
 position = Vector2(60.5, 0)
@@ -175,7 +174,6 @@ position = Vector2(757, 90)
 
 [node name="Room3" parent="." instance=ExtResource("3_ppyem")]
 position = Vector2(1198, 90)
-clamp_to_coll = null
 
 [node name="CollisionShape2D" parent="Room3" index="0"]
 position = Vector2(413, 0)
@@ -187,7 +185,6 @@ position = Vector2(1210, 90)
 
 [node name="Room4" parent="." instance=ExtResource("3_ppyem")]
 position = Vector2(2320, 90)
-clamp_to_coll = null
 
 [node name="CollisionShape2D" parent="Room4" index="0"]
 position = Vector2(43, 0)

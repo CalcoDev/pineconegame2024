@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="DialogueSpeakerRes" load_steps=3 format=3 uid="uid://c5rldtvpk2lxi"]
+
+[ext_resource type="Script" path="res://scripts/dialogue/dialogue_speaker_res.gd" id="1_c4ohf"]
+[ext_resource type="FontFile" uid="uid://3vpul48sh4mo" path="res://resources/fonts/m5x7.ttf" id="1_lpp2o"]
+
+[resource]
+script = ExtResource("1_c4ohf")
+name = "Kongle"
+font = ExtResource("1_lpp2o")
+sound_effects = Array[String]([])

@@ -1,0 +1,14 @@
+# narrator = display in bottom box
+# helicopter = display at helicopter thing
+# kongle = display at kongle thing
+
+title: try_fight_0
+---
+<<speed 20>>
+Helicopter: Bro, you can't fight a Helicopter.
+Kongle: unprepare_undialogue()
+<<speed 40>>
+Helicopter: Exception in thread "main" java.lang.StringIndexOutOfBoundsException: String index out of range: 9\n    at java.base/java.lang.StringLatin1.charAt(StringLatin1.java:48)\n    at java.base/java.lang.String.charAt(String.java:711)\n    at StringIndexOutOfBoundsExceptionExample.main(dialogue.java:4)\n
+Kongle: Exception in thread "main" java.lang.StringIndexOutOfBoundsException: String index out of range: 9\n    at java.base/java.lang.StringLatin1.charAt(StringLatin1.java:48)\n    at java.base/java.lang.String.charAt(String.java:711)\n    at StringIndexOutOfBoundsExceptionExample.main(dialogue.java:4)\n
+<<speed 10>>
+===

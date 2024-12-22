@@ -1,7 +1,7 @@
-[gd_scene load_steps=43 format=3 uid="uid://bibnnx0f2gujq"]
+[gd_scene load_steps=69 format=3 uid="uid://bibnnx0f2gujq"]
 
 [ext_resource type="Texture2D" uid="uid://inioqa4vbrxk" path="res://assets/art/helicopter_chase/background_0.png" id="1_fj7ae"]
-[ext_resource type="Script" path="res://scripts/scenes/helicopter_fight_scene.gd" id="1_o6ho3"]
+[ext_resource type="Script" path="res://scripts/scenes/helicopter_fight_scene/helicopter_fight_scene.gd" id="1_o6ho3"]
 [ext_resource type="Texture2D" uid="uid://dpj85gmrluwxp" path="res://assets/art/helicopter_chase/background_1.png" id="2_kh0hi"]
 [ext_resource type="Texture2D" uid="uid://csk0372xi26mg" path="res://assets/art/helicopter_chase/background_2.png" id="3_n18pk"]
 [ext_resource type="Texture2D" uid="uid://cjb84m4nuw2xs" path="res://assets/art/helicopter_chase/background_3.png" id="4_oqm6o"]
@@ -26,6 +26,13 @@
 [ext_resource type="Texture2D" uid="uid://dbpvrx7a5sdxw" path="res://assets/art/helicopter_chase/battle_ui/battle_ui_itemt_btn.png" id="24_jxfei"]
 [ext_resource type="Texture2D" uid="uid://bjh6af562hxla" path="res://assets/art/helicopter_chase/battle_ui/battle_ui_act_btn.png" id="25_k2547"]
 [ext_resource type="Texture2D" uid="uid://c17sg10nvya63" path="res://assets/art/helicopter_chase/battle_ui/battle_ui_mercy_btn.png" id="26_h6nqk"]
+[ext_resource type="Texture2D" uid="uid://d1ee684wdym1l" path="res://assets/art/helicopter_chase/battle_ui/battle_ui_kongle_select.png" id="27_6it1k"]
+[ext_resource type="Script" path="res://scripts/dialogue/dialogue_runner.gd" id="28_n5t40"]
+[ext_resource type="Script" path="res://scripts/dialogue/dia_box_view.gd" id="29_xaxkb"]
+[ext_resource type="Texture2D" uid="uid://d1iikfwdreks" path="res://assets/art/dialogue/dialogue_box_nineslice.png" id="29_xp8d7"]
+[ext_resource type="FontFile" uid="uid://3vpul48sh4mo" path="res://resources/fonts/m5x7.ttf" id="30_2dp06"]
+[ext_resource type="Script" path="res://scripts/dialogue/dia_line_view.gd" id="30_jhb5k"]
+[ext_resource type="Texture2D" uid="uid://b5nq8s3tchcfk" path="res://assets/art/dialogue/dialogue_box_notch.png" id="31_f07sf"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_610fm"]
 size = Vector2(2086, 832)
@@ -97,35 +104,6 @@ animations = [{
 [sub_resource type="CircleShape2D" id="CircleShape2D_3snxs"]
 radius = 19.0
 
-[sub_resource type="Animation" id="Animation_bjdst"]
-resource_name = "battle_screen_enter"
-length = 0.3
-step = 0.05
-tracks/0/type = "value"
-tracks/0/imported = false
-tracks/0/enabled = true
-tracks/0/path = NodePath("TopBar:position")
-tracks/0/interp = 2
-tracks/0/loop_wrap = true
-tracks/0/keys = {
-"times": PackedFloat32Array(0, 0.2, 0.3),
-"transitions": PackedFloat32Array(1, 1, 1),
-"update": 0,
-"values": [Vector2(0, -80), Vector2(0, 40), Vector2(0, 0)]
-}
-tracks/1/type = "value"
-tracks/1/imported = false
-tracks/1/enabled = true
-tracks/1/path = NodePath("BottomBar:position")
-tracks/1/interp = 1
-tracks/1/loop_wrap = true
-tracks/1/keys = {
-"times": PackedFloat32Array(0, 0.2, 0.3),
-"transitions": PackedFloat32Array(1, 1, 1),
-"update": 0,
-"values": [Vector2(0, 360), Vector2(0, 240), Vector2(0, 280)]
-}
-
 [sub_resource type="Animation" id="Animation_d0abb"]
 length = 0.001
 tracks/0/type = "value"
@@ -152,11 +130,471 @@ tracks/1/keys = {
 "update": 0,
 "values": [Vector2(0, 280)]
 }
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("TopBar/MarginContainer/HBoxContainer:theme_override_constants/separation")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [0]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("BottomBar/CenterContainer/HBoxContainer:theme_override_constants/separation")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [8]
+}
+
+[sub_resource type="Animation" id="Animation_1nxm8"]
+resource_name = "battle_begin"
+length = 0.2
+
+[sub_resource type="Animation" id="Animation_kln8e"]
+resource_name = "battle_end"
+
+[sub_resource type="Animation" id="Animation_bjdst"]
+resource_name = "battle_screen_enter"
+length = 0.6
+step = 0.05
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("TopBar:position")
+tracks/0/interp = 2
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.2, 0.3),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [Vector2(0, -80), Vector2(0, 40), Vector2(0, 0)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("BottomBar:position")
+tracks/1/interp = 2
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.2, 0.3),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [Vector2(0, 360), Vector2(0, 240), Vector2(0, 280)]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("TopBar/MarginContainer/HBoxContainer:theme_override_constants/separation")
+tracks/2/interp = 2
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0, 0.35, 0.6),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [280, 280, 0]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("BottomBar/CenterContainer/HBoxContainer:theme_override_constants/separation")
+tracks/3/interp = 2
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0, 0.35, 0.6),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [640, 640, 8]
+}
+
+[sub_resource type="Animation" id="Animation_le50p"]
+resource_name = "battle_screen_exit"
+length = 0.6
+step = 0.05
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("TopBar:position")
+tracks/0/interp = 2
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(-0.00167772, 0.120796, 0.323469, 0.6),
+"transitions": PackedFloat32Array(284.05, 1, 1, 1),
+"update": 0,
+"values": [Vector2(0, 0), Vector2(0, 0), Vector2(0, 40), Vector2(0, -80)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("BottomBar:position")
+tracks/1/interp = 2
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(-0.00167772, 0.120796, 0.323469, 0.6),
+"transitions": PackedFloat32Array(284.05, 1, 1, 1),
+"update": 0,
+"values": [Vector2(0, 280), Vector2(0, 280), Vector2(0, 240), Vector2(0, 360)]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("TopBar/MarginContainer/HBoxContainer:theme_override_constants/separation")
+tracks/2/interp = 2
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0, 0.267109),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [108, 280]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("BottomBar/CenterContainer/HBoxContainer:theme_override_constants/separation")
+tracks/3/interp = 2
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0, 0.267109),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [8, 640]
+}
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_kui7q"]
 _data = {
 "RESET": SubResource("Animation_d0abb"),
-"battle_screen_enter": SubResource("Animation_bjdst")
+"battle_begin": SubResource("Animation_1nxm8"),
+"battle_end": SubResource("Animation_kln8e"),
+"battle_screen_enter": SubResource("Animation_bjdst"),
+"battle_screen_exit": SubResource("Animation_le50p")
+}
+
+[sub_resource type="Animation" id="Animation_uxack"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("DialogueBox:visible")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [true]
+}
+
+[sub_resource type="Animation" id="Animation_q3wu0"]
+resource_name = "hide"
+length = 0.1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("DialogueBox:visible")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [false]
+}
+
+[sub_resource type="Animation" id="Animation_mdu4j"]
+resource_name = "show"
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("DialogueBox:visible")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [true]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_cax7c"]
+_data = {
+"RESET": SubResource("Animation_uxack"),
+"hide": SubResource("Animation_q3wu0"),
+"show": SubResource("Animation_mdu4j")
+}
+
+[sub_resource type="Animation" id="Animation_sxtiw"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("DialogueBox/NinePatchRect/LineView:visible")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [true]
+}
+
+[sub_resource type="Animation" id="Animation_3rqg7"]
+resource_name = "hide_lineview"
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("DialogueBox/NinePatchRect/LineView:visible")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [false]
+}
+
+[sub_resource type="Animation" id="Animation_f2td1"]
+resource_name = "hide_speaker"
+length = 0.001
+
+[sub_resource type="Animation" id="Animation_s731c"]
+resource_name = "show_lineview"
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("DialogueBox/NinePatchRect/LineView:visible")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [true]
+}
+
+[sub_resource type="Animation" id="Animation_imvc7"]
+resource_name = "show_speaker"
+length = 0.001
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_wpjok"]
+_data = {
+"RESET": SubResource("Animation_sxtiw"),
+"hide_lineview": SubResource("Animation_3rqg7"),
+"hide_speaker": SubResource("Animation_f2td1"),
+"show_lineview": SubResource("Animation_s731c"),
+"show_speaker": SubResource("Animation_imvc7")
+}
+
+[sub_resource type="Animation" id="Animation_qyao6"]
+resource_name = "Kongle"
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("DialogueBox:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(25, 97)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("DialogueBox/TextureRect:position")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(13, -14)]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("DialogueBox/TextureRect:visible")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [true]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("DialogueBox/TextureRect:flip_h")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [false]
+}
+
+[sub_resource type="Animation" id="Animation_44c20"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("DialogueBox:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(25, 97)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("DialogueBox/TextureRect:position")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(13, -14)]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("DialogueBox/TextureRect:visible")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [true]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("DialogueBox/TextureRect:flip_h")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [false]
+}
+
+[sub_resource type="Animation" id="Animation_dti6q"]
+resource_name = "Helicopter"
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("DialogueBox:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(429, 97)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("DialogueBox/TextureRect:position")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(165, -14)]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("DialogueBox/TextureRect:visible")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [true]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("DialogueBox/TextureRect:flip_h")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [true]
+}
+
+[sub_resource type="Animation" id="Animation_28ax4"]
+resource_name = "Narrator"
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("DialogueBox:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(227, 153)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("DialogueBox/TextureRect:visible")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [false]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("DialogueBox/TextureRect:flip_h")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [false]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_60gcr"]
+_data = {
+"Helicopter": SubResource("Animation_dti6q"),
+"Kongle": SubResource("Animation_qyao6"),
+"Narrator": SubResource("Animation_28ax4"),
+"RESET": SubResource("Animation_44c20")
 }
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_fusqc"]
@@ -165,11 +603,20 @@ bg_color = Color(0.309804, 0.113725, 0.298039, 1)
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_wu27c"]
 bg_color = Color(0.901961, 0.270588, 0.223529, 1)
 
-[node name="HelicopterFightScene" type="Node2D" node_paths=PackedStringArray("player", "camera", "parallax_layers")]
+[sub_resource type="SpriteFrames" id="SpriteFrames_xfssf"]
+
+[node name="HelicopterFightScene" type="Node2D" node_paths=PackedStringArray("player", "camera", "parallax", "dialogue", "dia_view", "dia_view_pos_anim", "anim", "kongle_select_opt", "options")]
 script = ExtResource("1_o6ho3")
 player = NodePath("Player")
 camera = NodePath("Camera2D")
-parallax_layers = [NodePath("ParallaxBackground/0"), NodePath("ParallaxBackground/1"), NodePath("ParallaxBackground/2"), NodePath("ParallaxBackground/3"), NodePath("ParallaxBackground/4"), NodePath("ParallaxBackground/5")]
+parallax = NodePath("ParallaxBackground")
+dialogue = NodePath("BattleUI/DialogueRunner")
+dia_view = NodePath("BattleUI/DiaLineView")
+dia_view_pos_anim = NodePath("BattleUI/ViewPositionAnimator")
+anim = NodePath("BattleUI/AnimationPlayer")
+kongle_select_opt = NodePath("BattleUI/BottomBar/KongleOptionSelect")
+options = [NodePath("BattleUI/BottomBar/CenterContainer/HBoxContainer/Fight"), NodePath("BattleUI/BottomBar/CenterContainer/HBoxContainer/Item"), NodePath("BattleUI/BottomBar/CenterContainer/HBoxContainer/Act"), NodePath("BattleUI/BottomBar/CenterContainer/HBoxContainer/Mercy")]
+parallax_add_speed = Vector2(500, 0)
 
 [node name="ParallaxBackground" type="ParallaxBackground" parent="."]
 
@@ -232,7 +679,7 @@ process_physics_priority = 300
 script = ExtResource("8_n12ig")
 
 [node name="Player" parent="." instance=ExtResource("9_geojq")]
-position = Vector2(146, 85)
+position = Vector2(166, 127)
 yeet_max_force = 350.0
 limit_fall = true
 max_fall = 300.0
@@ -271,6 +718,21 @@ libraries = {
 "": SubResource("AnimationLibrary_kui7q")
 }
 
+[node name="BoxAnimator" type="AnimationPlayer" parent="BattleUI"]
+libraries = {
+"": SubResource("AnimationLibrary_cax7c")
+}
+
+[node name="ViewAnimator" type="AnimationPlayer" parent="BattleUI"]
+libraries = {
+"": SubResource("AnimationLibrary_wpjok")
+}
+
+[node name="ViewPositionAnimator" type="AnimationPlayer" parent="BattleUI"]
+libraries = {
+"": SubResource("AnimationLibrary_60gcr")
+}
+
 [node name="TopBar" type="TextureRect" parent="BattleUI"]
 anchors_preset = 5
 anchor_left = 0.5
@@ -279,6 +741,12 @@ offset_left = -320.0
 offset_right = 320.0
 offset_bottom = 80.0
 grow_horizontal = 2
+texture = ExtResource("14_8o7lo")
+
+[node name="TextureRect" type="TextureRect" parent="BattleUI/TopBar"]
+layout_mode = 0
+offset_top = -80.0
+offset_right = 640.0
 texture = ExtResource("14_8o7lo")
 
 [node name="MarginContainer" type="MarginContainer" parent="BattleUI/TopBar"]
@@ -295,6 +763,7 @@ theme_override_constants/margin_bottom = 8
 
 [node name="HBoxContainer" type="HBoxContainer" parent="BattleUI/TopBar/MarginContainer"]
 layout_mode = 2
+theme_override_constants/separation = 0
 
 [node name="KongleDisplay" type="HBoxContainer" parent="BattleUI/TopBar/MarginContainer/HBoxContainer"]
 layout_mode = 2
@@ -497,6 +966,13 @@ grow_horizontal = 2
 grow_vertical = 0
 texture = ExtResource("14_8o7lo")
 
+[node name="TextureRect" type="TextureRect" parent="BattleUI/BottomBar"]
+layout_mode = 0
+offset_top = 80.0
+offset_right = 640.0
+offset_bottom = 160.0
+texture = ExtResource("14_8o7lo")
+
 [node name="CenterContainer" type="CenterContainer" parent="BattleUI/BottomBar"]
 layout_mode = 1
 anchors_preset = 15
@@ -507,21 +983,137 @@ grow_vertical = 2
 
 [node name="HBoxContainer" type="HBoxContainer" parent="BattleUI/BottomBar/CenterContainer"]
 layout_mode = 2
+theme_override_constants/separation = 8
 
 [node name="Fight" type="TextureRect" parent="BattleUI/BottomBar/CenterContainer/HBoxContainer"]
+modulate = Color(0.85, 0, 0.0141665, 1)
 layout_mode = 2
 texture = ExtResource("23_5queh")
+
+[node name="Marker2D" type="Marker2D" parent="BattleUI/BottomBar/CenterContainer/HBoxContainer/Fight"]
+position = Vector2(13, 16)
 
 [node name="Item" type="TextureRect" parent="BattleUI/BottomBar/CenterContainer/HBoxContainer"]
 layout_mode = 2
 texture = ExtResource("24_jxfei")
 
+[node name="Marker2D" type="Marker2D" parent="BattleUI/BottomBar/CenterContainer/HBoxContainer/Item"]
+position = Vector2(14, 16)
+
 [node name="Act" type="TextureRect" parent="BattleUI/BottomBar/CenterContainer/HBoxContainer"]
 layout_mode = 2
 texture = ExtResource("25_k2547")
 
+[node name="Marker2D" type="Marker2D" parent="BattleUI/BottomBar/CenterContainer/HBoxContainer/Act"]
+position = Vector2(15, 16)
+
 [node name="Mercy" type="TextureRect" parent="BattleUI/BottomBar/CenterContainer/HBoxContainer"]
 layout_mode = 2
 texture = ExtResource("26_h6nqk")
+
+[node name="Marker2D" type="Marker2D" parent="BattleUI/BottomBar/CenterContainer/HBoxContainer/Mercy"]
+position = Vector2(12, 16)
+
+[node name="KongleOptionSelect" type="Control" parent="BattleUI/BottomBar"]
+layout_mode = 3
+anchors_preset = 0
+offset_left = 165.0
+offset_top = 39.0
+offset_right = 165.0
+offset_bottom = 39.0
+
+[node name="TextureRect" type="TextureRect" parent="BattleUI/BottomBar/KongleOptionSelect"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -10.0
+offset_top = -10.0
+offset_right = 10.0
+offset_bottom = 10.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("27_6it1k")
+stretch_mode = 2
+
+[node name="DialogueRunner" type="Node" parent="BattleUI" node_paths=PackedStringArray("dialogue_views")]
+script = ExtResource("28_n5t40")
+dialogue_views = [NodePath("../DiaBoxView"), NodePath("../DiaLineView")]
+speakers_directory = "res://resources/dialogue/speakers"
+
+[node name="DiaBoxView" type="Node" parent="BattleUI" node_paths=PackedStringArray("box_animator", "view_animator")]
+script = ExtResource("29_xaxkb")
+box_animator = NodePath("../BoxAnimator")
+view_animator = NodePath("../ViewAnimator")
+
+[node name="DiaLineView" type="Node" parent="BattleUI" node_paths=PackedStringArray("text_lbl", "speaker_sprite", "dia_box")]
+script = ExtResource("30_jhb5k")
+text_lbl = NodePath("../DialogueBox/NinePatchRect/LineView/Control/RichTextLabel")
+speaker_sprite = NodePath("../DialogueBox/NinePatchRect/LineView/AnimatedSprite2D")
+dia_box = NodePath("../DiaBoxView")
+
+[node name="DialogueBox" type="Control" parent="BattleUI"]
+layout_mode = 3
+anchors_preset = 0
+offset_left = 25.0
+offset_top = 97.0
+offset_right = 25.0
+offset_bottom = 97.0
+
+[node name="NinePatchRect" type="NinePatchRect" parent="BattleUI/DialogueBox"]
+layout_mode = 1
+offset_right = 186.0
+offset_bottom = 54.0
+texture = ExtResource("29_xp8d7")
+patch_margin_left = 8
+patch_margin_top = 8
+patch_margin_right = 8
+patch_margin_bottom = 8
+axis_stretch_horizontal = 1
+axis_stretch_vertical = 1
+
+[node name="LineView" type="MarginContainer" parent="BattleUI/DialogueBox/NinePatchRect"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 4
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 8
+
+[node name="Control" type="Control" parent="BattleUI/DialogueBox/NinePatchRect/LineView"]
+layout_mode = 2
+
+[node name="RichTextLabel" type="RichTextLabel" parent="BattleUI/DialogueBox/NinePatchRect/LineView/Control"]
+layout_mode = 2
+offset_right = 170.0
+offset_bottom = 104.0
+size_flags_horizontal = 3
+size_flags_vertical = 0
+theme_override_fonts/normal_font = ExtResource("30_2dp06")
+theme_override_font_sizes/normal_font_size = 16
+bbcode_enabled = true
+text = "an you... be careful around town
+they're a bunch of downright animals out there
+this is some more text aaaaaaaaaaahhhhhhhhhhhhh
+aaaaaaaaaaaa hhhhhhhhhhhadaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaw"
+fit_content = true
+scroll_active = false
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="BattleUI/DialogueBox/NinePatchRect/LineView"]
+sprite_frames = SubResource("SpriteFrames_xfssf")
+
+[node name="TextureRect" type="TextureRect" parent="BattleUI/DialogueBox"]
+layout_mode = 1
+offset_left = 13.0
+offset_top = -14.0
+offset_right = 22.0
+offset_bottom = 3.0
+texture = ExtResource("31_f07sf")
 
 [editable path="Room"]

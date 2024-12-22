@@ -20,7 +20,7 @@ var _speed: float = 10.0:
 var _characters: float = 0.0
 
 func _enter_tree() -> void:
-    self.run_line.connect(_run_line)
+    self.on_run_line.connect(_run_line)
 
 func _ready() -> void:
     if not _is_running:
@@ -45,9 +45,11 @@ func _process(delta: float) -> void:
 
 func dialogue_started() -> void:
     _is_started = true
+    self._runner.add_command_handler("speed", _handle_speed)
 
 func dialogue_completed() -> void:
     _is_started = false
+    self._runner.remove_command_handler("speed", _handle_speed)
 
 func _run_line(line: DialogueLine, on_finished: Callable) -> void:
     _is_running = true
@@ -69,3 +71,10 @@ func _run_line(line: DialogueLine, on_finished: Callable) -> void:
         dia_box.play_animation("show_speaker", 999.0, true)
         speaker_sprite.sprite_frames = _speaker.sprite_frames
         speaker_sprite.play("talk")
+
+func _handle_speed(cmd: DialogueCommand) -> void:
+    var si := cmd.args[0]
+    var i := int(si)
+    if i == 0 and si != "0":
+        assert(false, "Shouldn't happen lmfao.")
+    self._speed = i

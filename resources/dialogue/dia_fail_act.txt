@@ -1,0 +1,8 @@
+# narrator = display in bottom box
+# helicopter = display at helicopter thing
+# kongle = display at kongle thing
+
+title: try_act_0
+---
+Helicopter: you cannot act.
+===
