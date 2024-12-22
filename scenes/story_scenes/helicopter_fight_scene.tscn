@@ -1,0 +1,527 @@
+[gd_scene load_steps=43 format=3 uid="uid://bibnnx0f2gujq"]
+
+[ext_resource type="Texture2D" uid="uid://inioqa4vbrxk" path="res://assets/art/helicopter_chase/background_0.png" id="1_fj7ae"]
+[ext_resource type="Script" path="res://scripts/scenes/helicopter_fight_scene.gd" id="1_o6ho3"]
+[ext_resource type="Texture2D" uid="uid://dpj85gmrluwxp" path="res://assets/art/helicopter_chase/background_1.png" id="2_kh0hi"]
+[ext_resource type="Texture2D" uid="uid://csk0372xi26mg" path="res://assets/art/helicopter_chase/background_2.png" id="3_n18pk"]
+[ext_resource type="Texture2D" uid="uid://cjb84m4nuw2xs" path="res://assets/art/helicopter_chase/background_3.png" id="4_oqm6o"]
+[ext_resource type="Texture2D" uid="uid://bluf8smud7tws" path="res://assets/art/helicopter_chase/background_4.png" id="5_pnuq2"]
+[ext_resource type="Texture2D" uid="uid://7xkuoyggyrpi" path="res://assets/art/helicopter_chase/background_5.png" id="6_ou833"]
+[ext_resource type="Script" path="res://scripts/game_camera.gd" id="7_vnrcs"]
+[ext_resource type="Script" path="res://addons/phantom_camera/scripts/phantom_camera_host/phantom_camera_host.gd" id="8_n12ig"]
+[ext_resource type="PackedScene" uid="uid://vpcg1kgktd14" path="res://scenes/prefabs/entites/player.tscn" id="9_geojq"]
+[ext_resource type="PackedScene" uid="uid://emwqen5qql6a" path="res://scenes/components/room.tscn" id="10_8epur"]
+[ext_resource type="Texture2D" uid="uid://b7pts00w8wfg3" path="res://assets/art/helicopter_chase/helicopter.png" id="12_3ofe7"]
+[ext_resource type="Script" path="res://scripts/entities/helicopter.gd" id="12_g2so6"]
+[ext_resource type="Texture2D" uid="uid://wi2voliuoxbd" path="res://assets/art/helicopter_chase/battle_ui/battle_ui_topdown_rects.png" id="14_8o7lo"]
+[ext_resource type="Texture2D" uid="uid://b3rm6g0jgqslg" path="res://assets/art/helicopter_chase/battle_ui/battle_ui_character_frame.png" id="15_rx6rq"]
+[ext_resource type="Texture2D" uid="uid://b6w4i6pp70c4q" path="res://assets/art/helicopter_chase/battle_ui/battle_ui_character_icon_kongle.png" id="16_li2yu"]
+[ext_resource type="Texture2D" uid="uid://du3mrtb76nlxy" path="res://assets/art/helicopter_chase/battle_ui/battle_ui_kongle_text.png" id="17_xmaoh"]
+[ext_resource type="Texture2D" uid="uid://tmr5msdiaba4" path="res://assets/art/helicopter_chase/battle_ui/battle_ui_character_health_frame.png" id="18_fu06r"]
+[ext_resource type="Texture2D" uid="uid://dtct35xqvqnuc" path="res://assets/art/helicopter_chase/battle_ui/battle_ui_character_ability_charge_full.png" id="19_smgjl"]
+[ext_resource type="Texture2D" uid="uid://c53hcmvu7bpih" path="res://assets/art/helicopter_chase/battle_ui/battle_ui_character_ability_charge_empty.png" id="20_g11js"]
+[ext_resource type="Texture2D" uid="uid://fkf38vg88o2q" path="res://assets/art/helicopter_chase/battle_ui/battle_ui_helicopter_text.png" id="21_ms7wk"]
+[ext_resource type="Texture2D" uid="uid://dfypof33c5fnm" path="res://assets/art/helicopter_chase/battle_ui/battle_ui_character_icon_helicopter.png" id="22_bnikb"]
+[ext_resource type="Texture2D" uid="uid://buucwohy44e6g" path="res://assets/art/helicopter_chase/battle_ui/battle_ui_fight_btn.png" id="23_5queh"]
+[ext_resource type="Texture2D" uid="uid://dbpvrx7a5sdxw" path="res://assets/art/helicopter_chase/battle_ui/battle_ui_itemt_btn.png" id="24_jxfei"]
+[ext_resource type="Texture2D" uid="uid://bjh6af562hxla" path="res://assets/art/helicopter_chase/battle_ui/battle_ui_act_btn.png" id="25_k2547"]
+[ext_resource type="Texture2D" uid="uid://c17sg10nvya63" path="res://assets/art/helicopter_chase/battle_ui/battle_ui_mercy_btn.png" id="26_h6nqk"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_610fm"]
+size = Vector2(2086, 832)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_5f0ba"]
+atlas = ExtResource("12_3ofe7")
+region = Rect2(0, 0, 174, 48)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_g0pae"]
+atlas = ExtResource("12_3ofe7")
+region = Rect2(174, 0, 174, 48)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_8y3ic"]
+atlas = ExtResource("12_3ofe7")
+region = Rect2(348, 0, 174, 48)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_au7x8"]
+atlas = ExtResource("12_3ofe7")
+region = Rect2(522, 0, 174, 48)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_4kbcn"]
+atlas = ExtResource("12_3ofe7")
+region = Rect2(696, 0, 174, 48)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_mx47a"]
+atlas = ExtResource("12_3ofe7")
+region = Rect2(870, 0, 174, 48)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ujjqs"]
+atlas = ExtResource("12_3ofe7")
+region = Rect2(1044, 0, 174, 48)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_mk88i"]
+atlas = ExtResource("12_3ofe7")
+region = Rect2(1218, 0, 174, 48)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_v48xr"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_5f0ba")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_g0pae")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_8y3ic")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_au7x8")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_4kbcn")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_mx47a")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ujjqs")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_mk88i")
+}],
+"loop": true,
+"name": &"idle",
+"speed": 10.0
+}]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_3snxs"]
+radius = 19.0
+
+[sub_resource type="Animation" id="Animation_bjdst"]
+resource_name = "battle_screen_enter"
+length = 0.3
+step = 0.05
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("TopBar:position")
+tracks/0/interp = 2
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.2, 0.3),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [Vector2(0, -80), Vector2(0, 40), Vector2(0, 0)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("BottomBar:position")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.2, 0.3),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [Vector2(0, 360), Vector2(0, 240), Vector2(0, 280)]
+}
+
+[sub_resource type="Animation" id="Animation_d0abb"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("TopBar:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(0, 0)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("BottomBar:position")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(0, 280)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_kui7q"]
+_data = {
+"RESET": SubResource("Animation_d0abb"),
+"battle_screen_enter": SubResource("Animation_bjdst")
+}
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_fusqc"]
+bg_color = Color(0.309804, 0.113725, 0.298039, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_wu27c"]
+bg_color = Color(0.901961, 0.270588, 0.223529, 1)
+
+[node name="HelicopterFightScene" type="Node2D" node_paths=PackedStringArray("player", "camera", "parallax_layers")]
+script = ExtResource("1_o6ho3")
+player = NodePath("Player")
+camera = NodePath("Camera2D")
+parallax_layers = [NodePath("ParallaxBackground/0"), NodePath("ParallaxBackground/1"), NodePath("ParallaxBackground/2"), NodePath("ParallaxBackground/3"), NodePath("ParallaxBackground/4"), NodePath("ParallaxBackground/5")]
+
+[node name="ParallaxBackground" type="ParallaxBackground" parent="."]
+
+[node name="0" type="ParallaxLayer" parent="ParallaxBackground"]
+motion_scale = Vector2(0, 0)
+motion_mirroring = Vector2(480, 180)
+
+[node name="Sprite2D" type="Sprite2D" parent="ParallaxBackground/0"]
+texture = ExtResource("1_fj7ae")
+centered = false
+
+[node name="1" type="ParallaxLayer" parent="ParallaxBackground"]
+motion_scale = Vector2(0.1, 0.1)
+motion_mirroring = Vector2(480, 180)
+
+[node name="Sprite2D" type="Sprite2D" parent="ParallaxBackground/1"]
+texture = ExtResource("2_kh0hi")
+centered = false
+
+[node name="2" type="ParallaxLayer" parent="ParallaxBackground"]
+motion_scale = Vector2(0.3, 0.3)
+motion_mirroring = Vector2(480, 180)
+
+[node name="Sprite2D" type="Sprite2D" parent="ParallaxBackground/2"]
+texture = ExtResource("3_n18pk")
+centered = false
+
+[node name="3" type="ParallaxLayer" parent="ParallaxBackground"]
+motion_scale = Vector2(0.5, 0.5)
+motion_mirroring = Vector2(480, 180)
+
+[node name="Sprite2D" type="Sprite2D" parent="ParallaxBackground/3"]
+texture = ExtResource("4_oqm6o")
+centered = false
+
+[node name="4" type="ParallaxLayer" parent="ParallaxBackground"]
+motion_scale = Vector2(0.65, 0.65)
+motion_mirroring = Vector2(480, 180)
+
+[node name="Sprite2D" type="Sprite2D" parent="ParallaxBackground/4"]
+texture = ExtResource("5_pnuq2")
+centered = false
+
+[node name="5" type="ParallaxLayer" parent="ParallaxBackground"]
+motion_scale = Vector2(0.8, 0.8)
+motion_mirroring = Vector2(480, 180)
+
+[node name="Sprite2D" type="Sprite2D" parent="ParallaxBackground/5"]
+texture = ExtResource("6_ou833")
+centered = false
+
+[node name="Camera2D" type="Camera2D" parent="."]
+zoom = Vector2(2, 2)
+script = ExtResource("7_vnrcs")
+set_instance = true
+
+[node name="PhantomCameraHost" type="Node" parent="Camera2D"]
+process_priority = 300
+process_physics_priority = 300
+script = ExtResource("8_n12ig")
+
+[node name="Player" parent="." instance=ExtResource("9_geojq")]
+position = Vector2(146, 85)
+yeet_max_force = 350.0
+limit_fall = true
+max_fall = 300.0
+
+[node name="Room" parent="." instance=ExtResource("10_8epur")]
+clamp_to_coll = false
+
+[node name="CollisionShape2D" parent="Room" index="0"]
+visible = false
+shape = SubResource("RectangleShape2D_610fm")
+
+[node name="PhantomCamera2D" parent="Room" index="1"]
+limit_target = NodePath("")
+
+[node name="Helicopter" type="CharacterBody2D" parent="." node_paths=PackedStringArray("scene")]
+position = Vector2(35, 29)
+script = ExtResource("12_g2so6")
+scene = NodePath("..")
+player_offset = Vector2(120, 0)
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="Helicopter"]
+position = Vector2(19, -13)
+sprite_frames = SubResource("SpriteFrames_v48xr")
+animation = &"idle"
+autoplay = "idle"
+frame_progress = 0.185262
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Helicopter"]
+position = Vector2(4, -9)
+shape = SubResource("CircleShape2D_3snxs")
+
+[node name="BattleUI" type="CanvasLayer" parent="."]
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="BattleUI"]
+libraries = {
+"": SubResource("AnimationLibrary_kui7q")
+}
+
+[node name="TopBar" type="TextureRect" parent="BattleUI"]
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -320.0
+offset_right = 320.0
+offset_bottom = 80.0
+grow_horizontal = 2
+texture = ExtResource("14_8o7lo")
+
+[node name="MarginContainer" type="MarginContainer" parent="BattleUI/TopBar"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 8
+
+[node name="HBoxContainer" type="HBoxContainer" parent="BattleUI/TopBar/MarginContainer"]
+layout_mode = 2
+
+[node name="KongleDisplay" type="HBoxContainer" parent="BattleUI/TopBar/MarginContainer/HBoxContainer"]
+layout_mode = 2
+
+[node name="Frame" type="TextureRect" parent="BattleUI/TopBar/MarginContainer/HBoxContainer/KongleDisplay"]
+layout_mode = 2
+texture = ExtResource("15_rx6rq")
+
+[node name="Icon" type="TextureRect" parent="BattleUI/TopBar/MarginContainer/HBoxContainer/KongleDisplay/Frame"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -31.0
+offset_top = -31.0
+offset_right = 31.0
+offset_bottom = 31.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("16_li2yu")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="BattleUI/TopBar/MarginContainer/HBoxContainer/KongleDisplay"]
+layout_mode = 2
+
+[node name="Name" type="TextureRect" parent="BattleUI/TopBar/MarginContainer/HBoxContainer/KongleDisplay/VBoxContainer"]
+layout_mode = 2
+texture = ExtResource("17_xmaoh")
+stretch_mode = 2
+
+[node name="Control" type="Control" parent="BattleUI/TopBar/MarginContainer/HBoxContainer/KongleDisplay/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="HealthFrame" type="TextureRect" parent="BattleUI/TopBar/MarginContainer/HBoxContainer/KongleDisplay/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 0
+texture = ExtResource("18_fu06r")
+stretch_mode = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="BattleUI/TopBar/MarginContainer/HBoxContainer/KongleDisplay/VBoxContainer/HealthFrame"]
+show_behind_parent = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 2
+theme_override_constants/margin_top = 2
+theme_override_constants/margin_right = 2
+theme_override_constants/margin_bottom = 2
+
+[node name="Health" type="ProgressBar" parent="BattleUI/TopBar/MarginContainer/HBoxContainer/KongleDisplay/VBoxContainer/HealthFrame/MarginContainer"]
+show_behind_parent = true
+layout_mode = 2
+size_flags_vertical = 1
+theme_override_styles/background = SubResource("StyleBoxFlat_fusqc")
+theme_override_styles/fill = SubResource("StyleBoxFlat_wu27c")
+max_value = 1.0
+value = 1.0
+show_percentage = false
+
+[node name="HBoxContainer" type="HBoxContainer" parent="BattleUI/TopBar/MarginContainer/HBoxContainer/KongleDisplay/VBoxContainer"]
+layout_mode = 2
+
+[node name="0_full" type="TextureRect" parent="BattleUI/TopBar/MarginContainer/HBoxContainer/KongleDisplay/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+texture = ExtResource("19_smgjl")
+
+[node name="1_full" type="TextureRect" parent="BattleUI/TopBar/MarginContainer/HBoxContainer/KongleDisplay/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+texture = ExtResource("19_smgjl")
+
+[node name="2_full" type="TextureRect" parent="BattleUI/TopBar/MarginContainer/HBoxContainer/KongleDisplay/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+texture = ExtResource("19_smgjl")
+
+[node name="0_full2" type="TextureRect" parent="BattleUI/TopBar/MarginContainer/HBoxContainer/KongleDisplay/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+texture = ExtResource("20_g11js")
+
+[node name="1_full2" type="TextureRect" parent="BattleUI/TopBar/MarginContainer/HBoxContainer/KongleDisplay/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+texture = ExtResource("20_g11js")
+
+[node name="2_full2" type="TextureRect" parent="BattleUI/TopBar/MarginContainer/HBoxContainer/KongleDisplay/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+texture = ExtResource("20_g11js")
+
+[node name="Control" type="Control" parent="BattleUI/TopBar/MarginContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="EnemyDisplay" type="HBoxContainer" parent="BattleUI/TopBar/MarginContainer/HBoxContainer"]
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="BattleUI/TopBar/MarginContainer/HBoxContainer/EnemyDisplay"]
+layout_mode = 2
+
+[node name="Name" type="TextureRect" parent="BattleUI/TopBar/MarginContainer/HBoxContainer/EnemyDisplay/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 8
+texture = ExtResource("21_ms7wk")
+stretch_mode = 2
+
+[node name="Control" type="Control" parent="BattleUI/TopBar/MarginContainer/HBoxContainer/EnemyDisplay/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="HealthFrame" type="TextureRect" parent="BattleUI/TopBar/MarginContainer/HBoxContainer/EnemyDisplay/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 8
+texture = ExtResource("18_fu06r")
+stretch_mode = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="BattleUI/TopBar/MarginContainer/HBoxContainer/EnemyDisplay/VBoxContainer/HealthFrame"]
+show_behind_parent = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 2
+theme_override_constants/margin_top = 2
+theme_override_constants/margin_right = 2
+theme_override_constants/margin_bottom = 2
+
+[node name="Health" type="ProgressBar" parent="BattleUI/TopBar/MarginContainer/HBoxContainer/EnemyDisplay/VBoxContainer/HealthFrame/MarginContainer"]
+show_behind_parent = true
+layout_mode = 2
+size_flags_vertical = 1
+theme_override_styles/background = SubResource("StyleBoxFlat_fusqc")
+theme_override_styles/fill = SubResource("StyleBoxFlat_wu27c")
+max_value = 1.0
+value = 1.0
+show_percentage = false
+
+[node name="HBoxContainer" type="HBoxContainer" parent="BattleUI/TopBar/MarginContainer/HBoxContainer/EnemyDisplay/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 8
+
+[node name="0_full" type="TextureRect" parent="BattleUI/TopBar/MarginContainer/HBoxContainer/EnemyDisplay/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+texture = ExtResource("19_smgjl")
+
+[node name="1_full" type="TextureRect" parent="BattleUI/TopBar/MarginContainer/HBoxContainer/EnemyDisplay/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+texture = ExtResource("19_smgjl")
+
+[node name="2_full" type="TextureRect" parent="BattleUI/TopBar/MarginContainer/HBoxContainer/EnemyDisplay/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+texture = ExtResource("19_smgjl")
+
+[node name="0_full2" type="TextureRect" parent="BattleUI/TopBar/MarginContainer/HBoxContainer/EnemyDisplay/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+texture = ExtResource("20_g11js")
+
+[node name="1_full2" type="TextureRect" parent="BattleUI/TopBar/MarginContainer/HBoxContainer/EnemyDisplay/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+texture = ExtResource("20_g11js")
+
+[node name="2_full2" type="TextureRect" parent="BattleUI/TopBar/MarginContainer/HBoxContainer/EnemyDisplay/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+texture = ExtResource("20_g11js")
+
+[node name="Frame" type="TextureRect" parent="BattleUI/TopBar/MarginContainer/HBoxContainer/EnemyDisplay"]
+layout_mode = 2
+texture = ExtResource("15_rx6rq")
+
+[node name="Icon" type="TextureRect" parent="BattleUI/TopBar/MarginContainer/HBoxContainer/EnemyDisplay/Frame"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -31.0
+offset_top = -31.0
+offset_right = 31.0
+offset_bottom = 31.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("22_bnikb")
+
+[node name="BottomBar" type="TextureRect" parent="BattleUI"]
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -320.0
+offset_top = -80.0
+offset_right = 320.0
+grow_horizontal = 2
+grow_vertical = 0
+texture = ExtResource("14_8o7lo")
+
+[node name="CenterContainer" type="CenterContainer" parent="BattleUI/BottomBar"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="BattleUI/BottomBar/CenterContainer"]
+layout_mode = 2
+
+[node name="Fight" type="TextureRect" parent="BattleUI/BottomBar/CenterContainer/HBoxContainer"]
+layout_mode = 2
+texture = ExtResource("23_5queh")
+
+[node name="Item" type="TextureRect" parent="BattleUI/BottomBar/CenterContainer/HBoxContainer"]
+layout_mode = 2
+texture = ExtResource("24_jxfei")
+
+[node name="Act" type="TextureRect" parent="BattleUI/BottomBar/CenterContainer/HBoxContainer"]
+layout_mode = 2
+texture = ExtResource("25_k2547")
+
+[node name="Mercy" type="TextureRect" parent="BattleUI/BottomBar/CenterContainer/HBoxContainer"]
+layout_mode = 2
+texture = ExtResource("26_h6nqk")
+
+[editable path="Room"]

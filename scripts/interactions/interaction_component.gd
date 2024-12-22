@@ -32,7 +32,9 @@ func _on_area_entered(body: Node2D) -> void:
 	if body is not Interactor:
 		return
 	is_displayed = true
-	itm = InteractionManager.instance.reserve_item()
+	itm = InteractionManager.instance.reserve_item(itm)
+	if itm == -1:
+		print("gosh oh golly")
 	should_show_popup = true
 	show_popup()
 	body.on_try_interact.connect(_on_interact)

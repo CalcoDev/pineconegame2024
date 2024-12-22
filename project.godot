@@ -28,8 +28,8 @@ DialogueManager="res://scenes/autoloads/dialogue_manager.tscn"
 
 window/size/viewport_width=640
 window/size/viewport_height=360
-window/size/window_width_override=960
-window/size/window_height_override=540
+window/size/window_width_override=1280
+window/size/window_height_override=720
 window/stretch/mode="viewport"
 window/vsync/vsync_mode=0
 
@@ -119,7 +119,9 @@ interact={
 
 [physics]
 
+common/physics_jitter_fix=0.0
 2d/default_gravity=490.0
+common/physics_interpolation=true
 
 [rendering]
 

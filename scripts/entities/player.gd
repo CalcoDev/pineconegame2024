@@ -20,6 +20,10 @@ static var instance: Player = null
 @export var yeet_display_max_dist: float = 25.0
 @export var yeet_max_force: float = 300.0
 
+@export_group("Fall")
+@export var limit_fall: bool = false
+@export var max_fall: float = 20
+
 var is_ground: bool = false
 var was_ground: bool = false
 
@@ -107,6 +111,10 @@ func _process(_detal: float) -> void:
 	
 	if Input.is_action_just_pressed("interact"):
 		_interactor.try_interact()
+	
+	print(self.linear_velocity)
+	if self.linear_velocity.y > max_fall:
+		self.linear_velocity.y = max_fall
 
 func _physics_process(delta: float) -> void:
 	if is_ground:

@@ -14,13 +14,13 @@ func _ready() -> void:
 	for itmidx in items.size():
 		hide_item(itmidx)
 
-func reserve_item() -> int:
+func reserve_item(prev: int) -> int:
 	for itmidx in items.size():
 		if items[itmidx] not in _used_items:
 			_used_items.append(items[itmidx])
 			return itmidx
-	assert(false, "No more free items damn.")
-	return -1
+	#assert(false, "No more free items damn.")
+	return prev
 
 func free_item(item: int) -> void:
 	var idx := _used_items.find(items[item])

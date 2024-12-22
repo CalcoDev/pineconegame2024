@@ -4,6 +4,10 @@ extends Area2D
 #@export var coll: CollisionShape2D
 #@export var camera: PhantomCamera2D
 
+@export var clamp_to_coll: bool = true:
+    set(value):
+        clamp_to_coll = value
+        _setup()
 @export var coll: CollisionShape2D:
     get():
         if _coll != null and is_instance_valid(_coll):
@@ -57,7 +61,7 @@ func area_body_exited(body) -> void:
         return
     # print("Player left room: ", self.name)
     camera.priority = _old_priority
-    if auto_set_follow_target:
+    if auto_set_follow_target and clamp_to_coll:
         camera.follow_target = null
 
 func _get_configuration_warnings() -> PackedStringArray:
@@ -72,4 +76,7 @@ func _get_configuration_warnings() -> PackedStringArray:
     return warnings
 
 func _setup() -> void:
-    camera.limit_target = camera.get_path_to(coll)
+    if clamp_to_coll:
+        camera.limit_target = camera.get_path_to(coll)
+    else:
+        camera.limit_target = ""
