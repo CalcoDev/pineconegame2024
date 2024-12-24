@@ -190,7 +190,7 @@ func _load_speakers() -> void:
 				dir_q.append([DirAccess.open(full_path), full_path])
 				file_path = dir.get_next()
 				continue
-			var res = ResourceLoader.load(full_path)
+			var res = load(full_path)
 			if res is DialogueSpeakerRes:
 				_speakers[res.name] = res
 			file_path = dir.get_next()

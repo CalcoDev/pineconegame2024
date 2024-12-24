@@ -5,3 +5,5 @@ signal on_try_interact(interactor: Interactor)
 
 func try_interact() -> void:
     on_try_interact.emit(self)
+
+var has_interaction := false

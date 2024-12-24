@@ -1,0 +1,18 @@
+[gd_resource type="SpriteFrames" load_steps=3 format=3 uid="uid://b3ymjov0d5iyx"]
+
+[ext_resource type="Texture2D" uid="uid://7vejhxoimq4f" path="res://assets/art/dialogue/speakers/dia_spkr_chase.png" id="1_bsqyx"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_kttu8"]
+atlas = ExtResource("1_bsqyx")
+region = Rect2(0, 0, 64, 64)
+
+[resource]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_kttu8")
+}],
+"loop": true,
+"name": &"talk",
+"speed": 5.0
+}]

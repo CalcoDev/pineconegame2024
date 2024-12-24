@@ -5,4 +5,4 @@ extends Resource
 @export var font: Font
 @export var sprite_frames: SpriteFrames
 # TODO(calco): Figure out
-@export var sound_effects: Array[String]
+# @export var sound_effects: Array[AudioStream]

@@ -64,7 +64,7 @@ func _enter_tree() -> void:
 func _ready() -> void:
 	_visuals.scale = Vector2.ONE * 0.75
 
-func _process(_detal: float) -> void:
+func _process(delta: float) -> void:
 	if not locked:
 		_gc.global_rotation = 0.0
 		
@@ -103,6 +103,7 @@ func _process(_detal: float) -> void:
 			if Input.is_action_just_released("yeet"):
 				_was_yeet = true
 				_is_yeet = false
+				Audio.map["kongle_yeet"].play()
 				var dir = -offset.normalized()
 				dir = dir * Vector2(1.0, 1.25)
 				# TODO(calco): Disable visuals
@@ -130,8 +131,21 @@ func _process(_detal: float) -> void:
 	
 	if self.linear_velocity.y > max_fall:
 		self.linear_velocity.y = max_fall
+	
+	# _walk_t += delta
+	# if is_ground and _walk_t > walk_t and abs(self.linear_velocity.x) > 20.0:
+	# 	_walk_t = 0.0
+	# 	Audio.map["kongle_walk"].play()
+
+	# if not is_ground and not Audio.map["kongle_ambiance_wind"].playing:
+	# 	Audio.map["kongle_ambiance_wind"].play()
+	# if is_ground and Audio.map["kongle_ambiance_wind"].playing:
+	# 	Audio.map["kongle_ambiance_wind"].stop()
+var _walk_t := 0.0
+const walk_t := 0.5
 
 func _on_hit(_damage: float, _by: Node2D) -> void:
+	print(_by.name)
 	var t := create_tween().set_ease(Tween.EASE_IN_OUT)
 	t.tween_property(shader, "shader_parameter/solid_color", Color.WHITE, 0.05)
 	t.parallel().tween_property(shader, "shader_parameter/outline_color", Color.RED, 0.05)
@@ -144,8 +158,23 @@ func _on_hit(_damage: float, _by: Node2D) -> void:
 	t.play()
 	GameCamera.instance.shake(5.0, 50.0, 15.0, 0.25)
 	Game.instance.hitstop(0.1)
+	Audio.map["player_hurt"].play()
+
+	if is_instance_valid(get_tree()):
+		if get_tree().current_scene == HelicopterFightScene.instance:
+			var bullets := HelicopterFightScene.instance.find_children("*", "HelicopterBullet", true, false)
+			for b: HelicopterBullet in bullets:
+				if b.global_position.distance_to(self.global_position) < 30.0:
+					b.queue_free()
+	else:
+		return
+
 	self.linear_velocity = Vector2.ZERO
 	await t.finished
+
+func freeze_forever(v: bool) -> void:
+	freeze = v
+	locked = v
 
 func _physics_process(delta: float) -> void:
 	if not locked:
@@ -155,10 +184,10 @@ func _physics_process(delta: float) -> void:
 				self.linear_velocity.x = move_toward(self.linear_velocity.x, inp_x * roll_speed / delta, 20)
 			else:
 				self.linear_velocity.x = move_toward(self.linear_velocity.x, 0.0, 0.2)
-			if Input.is_action_just_pressed("jump"):
-				self.global_position.y -= 1
-				self.linear_velocity.y = 0.0
-				self.apply_impulse(Vector2.UP * jump_force)
+		if Input.is_action_just_pressed("jump"):
+			self.global_position.y -= 1
+			self.linear_velocity.y = 0.0
+			self.apply_impulse(Vector2.UP * jump_force)
 		if Input.is_action_pressed("fall"):
 			if self.collision_mask & 8:
 				self.collision_mask = self.collision_mask & 0xFFFFFFF7

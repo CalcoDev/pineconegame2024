@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="DialogueSpeakerRes" load_steps=4 format=3 uid="uid://d0068qb27s52o"]
+
+[ext_resource type="FontFile" uid="uid://dpk4r84bel6r1" path="res://resources/fonts/MartianMono-NrMd.ttf" id="1_skw70"]
+[ext_resource type="Script" path="res://scripts/dialogue/dialogue_speaker_res.gd" id="1_vcyc3"]
+[ext_resource type="SpriteFrames" uid="uid://b3ymjov0d5iyx" path="res://resources/dialogue/speakers/chase/res_dia_spkr_chase_anim.tres" id="3_kafxp"]
+
+[resource]
+script = ExtResource("1_vcyc3")
+name = "Chase"
+font = ExtResource("1_skw70")
+sprite_frames = ExtResource("3_kafxp")

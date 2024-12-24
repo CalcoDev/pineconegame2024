@@ -24,6 +24,7 @@ script = ExtResource("3_d7q6o")
 hitbox_owner = NodePath("..")
 faction = NodePath("../FactionComponent")
 default_responder = NodePath(".")
+damage = 10.0
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="HitboxComponent"]
 shape = SubResource("RectangleShape2D_agmjc")

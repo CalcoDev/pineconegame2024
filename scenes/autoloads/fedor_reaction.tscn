@@ -1,0 +1,23 @@
+[gd_scene load_steps=2 format=3 uid="uid://ch1mvpaaci4xn"]
+
+[ext_resource type="Texture2D" uid="uid://esvc8rvorrud" path="res://assets/art/fedor_office/live_fedor_reaction.png" id="1_irig0"]
+
+[node name="Node2D" type="Node2D"]
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+layer = 128
+
+[node name="TextureRect" type="TextureRect" parent="CanvasLayer"]
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -70.0
+offset_top = -58.0
+offset_right = 53.0
+offset_bottom = 44.0
+grow_horizontal = 0
+grow_vertical = 0
+scale = Vector2(0.570234, 0.570234)
+texture = ExtResource("1_irig0")

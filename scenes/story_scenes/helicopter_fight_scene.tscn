@@ -1,4 +1,4 @@
-[gd_scene load_steps=104 format=3 uid="uid://bibnnx0f2gujq"]
+[gd_scene load_steps=108 format=3 uid="uid://bibnnx0f2gujq"]
 
 [ext_resource type="Texture2D" uid="uid://inioqa4vbrxk" path="res://assets/art/helicopter_chase/background_0.png" id="1_fj7ae"]
 [ext_resource type="Script" path="res://scripts/scenes/helicopter_fight_scene/helicopter_fight_scene.gd" id="1_o6ho3"]
@@ -22,6 +22,7 @@
 [ext_resource type="Texture2D" uid="uid://b3rm6g0jgqslg" path="res://assets/art/helicopter_chase/battle_ui/battle_ui_character_frame.png" id="15_rx6rq"]
 [ext_resource type="Script" path="res://scripts/scenes/helicopter_fight_scene/player_velocity_wobbler.gd" id="15_tnns4"]
 [ext_resource type="Script" path="res://scripts/health/hitbox_component.gd" id="16_66mf3"]
+[ext_resource type="Script" path="res://scripts/health/health_component.gd" id="16_elods"]
 [ext_resource type="Texture2D" uid="uid://b6w4i6pp70c4q" path="res://assets/art/helicopter_chase/battle_ui/battle_ui_character_icon_kongle.png" id="16_li2yu"]
 [ext_resource type="Texture2D" uid="uid://du3mrtb76nlxy" path="res://assets/art/helicopter_chase/battle_ui/battle_ui_kongle_text.png" id="17_xmaoh"]
 [ext_resource type="Texture2D" uid="uid://tmr5msdiaba4" path="res://assets/art/helicopter_chase/battle_ui/battle_ui_character_health_frame.png" id="18_fu06r"]
@@ -30,6 +31,7 @@
 [ext_resource type="Texture2D" uid="uid://fkf38vg88o2q" path="res://assets/art/helicopter_chase/battle_ui/battle_ui_helicopter_text.png" id="21_ms7wk"]
 [ext_resource type="Texture2D" uid="uid://dfypof33c5fnm" path="res://assets/art/helicopter_chase/battle_ui/battle_ui_character_icon_helicopter.png" id="22_bnikb"]
 [ext_resource type="Texture2D" uid="uid://buucwohy44e6g" path="res://assets/art/helicopter_chase/battle_ui/battle_ui_fight_btn.png" id="23_5queh"]
+[ext_resource type="Script" path="res://scripts/scenes/helicopter_fight_scene/health_display.gd" id="23_v3s0s"]
 [ext_resource type="Texture2D" uid="uid://dbpvrx7a5sdxw" path="res://assets/art/helicopter_chase/battle_ui/battle_ui_itemt_btn.png" id="24_jxfei"]
 [ext_resource type="Texture2D" uid="uid://bjh6af562hxla" path="res://assets/art/helicopter_chase/battle_ui/battle_ui_act_btn.png" id="25_k2547"]
 [ext_resource type="Texture2D" uid="uid://c17sg10nvya63" path="res://assets/art/helicopter_chase/battle_ui/battle_ui_mercy_btn.png" id="26_h6nqk"]
@@ -356,6 +358,9 @@ animations = [{
 "speed": 10.0
 }]
 
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_8h077"]
+size = Vector2(108, 28)
+
 [sub_resource type="Animation" id="Animation_5w7sq"]
 length = 0.001
 tracks/0/type = "value"
@@ -406,6 +411,30 @@ tracks/3/keys = {
 "update": 0,
 "values": [0.0]
 }
+tracks/4/type = "value"
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/path = NodePath("Node2D/AnimatedSprite2D/HitboxComponent:collision_layer")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [0]
+}
+tracks/5/type = "value"
+tracks/5/imported = false
+tracks/5/enabled = true
+tracks/5/path = NodePath("Node2D/AnimatedSprite2D/HitboxComponent:collision_mask")
+tracks/5/interp = 1
+tracks/5/loop_wrap = true
+tracks/5/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [0]
+}
 
 [sub_resource type="Animation" id="Animation_q8hpn"]
 resource_name = "enter"
@@ -435,6 +464,30 @@ tracks/1/keys = {
 "update": 0,
 "values": [Vector2(0, 0), Vector2(1.25, 1.25), Vector2(1, 1)]
 }
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("Node2D/AnimatedSprite2D/HitboxComponent:collision_layer")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [64]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("Node2D/AnimatedSprite2D/HitboxComponent:collision_mask")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [64]
+}
 
 [sub_resource type="Animation" id="Animation_qele3"]
 resource_name = "exit"
@@ -463,6 +516,30 @@ tracks/1/keys = {
 "transitions": PackedFloat32Array(1, 1, 1.68179),
 "update": 0,
 "values": [Vector2(1, 1), Vector2(1.25, 1.25), Vector2(0, 0)]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("Node2D/AnimatedSprite2D/HitboxComponent:collision_layer")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [0]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("Node2D/AnimatedSprite2D/HitboxComponent:collision_mask")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [0]
 }
 
 [sub_resource type="Animation" id="Animation_08oih"]
@@ -505,6 +582,37 @@ tracks/2/keys = {
 "update": 0,
 "values": [Vector2(1, 1), Vector2(1.2, 0.7), Vector2(1, 1), Vector2(1.2, 0.7), Vector2(1, 1)]
 }
+tracks/3/type = "method"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("..")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0, 3.1),
+"transitions": PackedFloat32Array(1, 1),
+"values": [{
+"args": ["propeller_yeet"],
+"method": &"_play_audio"
+}, {
+"args": ["propeller_yeet"],
+"method": &"_play_audio"
+}]
+}
+tracks/4/type = "method"
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/path = NodePath("..")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/keys = {
+"times": PackedFloat32Array(1.7),
+"transitions": PackedFloat32Array(1),
+"values": [{
+"args": ["propeller_yeet"],
+"method": &"_play_audio"
+}]
+}
 
 [sub_resource type="Animation" id="Animation_wevp3"]
 resource_name = "spinny_boi_1"
@@ -546,6 +654,62 @@ tracks/2/keys = {
 "update": 0,
 "values": [Vector2(1, 1), Vector2(1.2, 0.9), Vector2(1, 1), Vector2(0.8, 1.2), Vector2(1, 1), Vector2(1, 1), Vector2(0.8, 1.2), Vector2(1, 1), Vector2(1.2, 0.9), Vector2(1, 1)]
 }
+tracks/3/type = "method"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("..")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"values": [{
+"args": ["propeller_yeet"],
+"method": &"_play_audio"
+}]
+}
+tracks/4/type = "method"
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/path = NodePath("..")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/keys = {
+"times": PackedFloat32Array(0.8),
+"transitions": PackedFloat32Array(1),
+"values": [{
+"args": ["propeller_yeet"],
+"method": &"_play_audio"
+}]
+}
+tracks/5/type = "method"
+tracks/5/imported = false
+tracks/5/enabled = true
+tracks/5/path = NodePath("..")
+tracks/5/interp = 1
+tracks/5/loop_wrap = true
+tracks/5/keys = {
+"times": PackedFloat32Array(1.5),
+"transitions": PackedFloat32Array(1),
+"values": [{
+"args": ["propeller_yeet"],
+"method": &"_play_audio"
+}]
+}
+tracks/6/type = "method"
+tracks/6/imported = false
+tracks/6/enabled = true
+tracks/6/path = NodePath("..")
+tracks/6/interp = 1
+tracks/6/loop_wrap = true
+tracks/6/keys = {
+"times": PackedFloat32Array(2.4),
+"transitions": PackedFloat32Array(1),
+"values": [{
+"args": ["propeller_yeet"],
+"method": &"_play_audio"
+}]
+}
 
 [sub_resource type="Animation" id="Animation_avaqp"]
 resource_name = "spinny_boi_2"
@@ -586,6 +750,37 @@ tracks/2/keys = {
 "transitions": PackedFloat32Array(1, 1, 1, 1, 1),
 "update": 0,
 "values": [Vector2(1, 1), Vector2(1.2, 0.7), Vector2(1, 1), Vector2(1.2, 0.7), Vector2(1, 1)]
+}
+tracks/3/type = "method"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("..")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0, 3.4),
+"transitions": PackedFloat32Array(1, 1),
+"values": [{
+"args": ["propeller_yeet"],
+"method": &"_play_audio"
+}, {
+"args": ["propeller_yeet"],
+"method": &"_play_audio"
+}]
+}
+tracks/4/type = "method"
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/path = NodePath("..")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/keys = {
+"times": PackedFloat32Array(1.8),
+"transitions": PackedFloat32Array(1),
+"values": [{
+"args": ["propeller_yeet"],
+"method": &"_play_audio"
+}]
 }
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_osmke"]
@@ -662,6 +857,9 @@ animations = [{
 "name": &"default",
 "speed": 10.0
 }]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_eafwr"]
+size = Vector2(289, 10)
 
 [sub_resource type="Animation" id="Animation_d0abb"]
 length = 0.001
@@ -966,7 +1164,7 @@ tracks/0/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
 "update": 0,
-"values": [Vector2(429, 97)]
+"values": [Vector2(390, 97)]
 }
 tracks/1/type = "value"
 tracks/1/imported = false
@@ -978,7 +1176,7 @@ tracks/1/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
 "update": 0,
-"values": [Vector2(165, -14)]
+"values": [Vector2(204, -14)]
 }
 tracks/2/type = "value"
 tracks/2/imported = false
@@ -1070,7 +1268,7 @@ tracks/0/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
 "update": 0,
-"values": [Vector2(227, 153)]
+"values": [Vector2(208, 145)]
 }
 tracks/1/type = "value"
 tracks/1/imported = false
@@ -1274,15 +1472,18 @@ notify_left_area = false
 shape = SubResource("RectangleShape2D_610fm")
 
 [node name="PhantomCamera2D" parent="Room" index="1"]
+top_level = false
+follow_mode = 0
 tween_resource = SubResource("Resource_vcs1b")
 follow_damping_value = Vector2(0.2, 0.2)
 noise = SubResource("Resource_xxdsv")
 
-[node name="Helicopter" type="Node2D" parent="." node_paths=PackedStringArray("scene", "charge_warn_display", "anim", "propeller", "propeller_fire_spot", "propeller_anim", "touhou_bullet_spawn")]
+[node name="Helicopter" type="Node2D" parent="." node_paths=PackedStringArray("scene", "health", "charge_warn_display", "anim", "propeller", "propeller_fire_spot", "propeller_anim", "touhou_bullet_spawn", "hitbox")]
 position = Vector2(105, 2)
 script = ExtResource("12_g2so6")
 scene = NodePath("..")
 player_offset = Vector2(120, 0)
+health = NodePath("HealthComponent")
 charge_warn_display = [NodePath("../HelicopterChargeDisplay/Top"), NodePath("../HelicopterChargeDisplay/Middle"), NodePath("../HelicopterChargeDisplay/Bottom")]
 anim = NodePath("AnimationPlayer")
 propeller = NodePath("../Propeller")
@@ -1293,6 +1494,10 @@ touhou_bullet_count = 4
 touhou_bullet_prefab = ExtResource("13_pgsmi")
 touhou_bullet_spawn = NodePath("AnimatedSprite2D/BulletSpawn")
 touhou_bullet_speed = 70.0
+hitbox = NodePath("AnimatedSprite2D/HitboxComponent")
+
+[node name="HealthComponent" type="Node" parent="Helicopter"]
+script = ExtResource("16_elods")
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="Helicopter"]
 libraries = {
@@ -1313,6 +1518,19 @@ position = Vector2(-87, 16)
 [node name="BulletSpawn" type="Marker2D" parent="Helicopter/AnimatedSprite2D"]
 position = Vector2(-83, 16)
 
+[node name="HitboxComponent" type="Area2D" parent="Helicopter/AnimatedSprite2D" node_paths=PackedStringArray("hitbox_owner", "faction")]
+collision_layer = 64
+collision_mask = 64
+script = ExtResource("16_66mf3")
+hitbox_owner = NodePath("../../../Propeller")
+faction = NodePath("../../../Propeller/FactionComponent")
+default_responder = NodePath(".")
+damage = 10.0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Helicopter/AnimatedSprite2D/HitboxComponent"]
+position = Vector2(-19, 6)
+shape = SubResource("RectangleShape2D_8h077")
+
 [node name="Propeller" type="Node2D" parent="."]
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="Propeller"]
@@ -1327,8 +1545,8 @@ scale = Vector2(0.75, 0.75)
 sprite_frames = SubResource("SpriteFrames_7td7i")
 
 [node name="HitboxComponent" type="Area2D" parent="Propeller/Node2D/AnimatedSprite2D" node_paths=PackedStringArray("hitbox_owner", "faction")]
-collision_layer = 64
-collision_mask = 64
+collision_layer = 0
+collision_mask = 0
 script = ExtResource("16_66mf3")
 hitbox_owner = NodePath("../../..")
 faction = NodePath("../../../FactionComponent")
@@ -1342,7 +1560,6 @@ polygon = PackedVector2Array(6, -1, 44, -40, 45, -46, 40, -43, 0, -5, -43, -44, 
 script = ExtResource("14_pqxh1")
 
 [node name="HelicopterChargeDisplay" type="Node2D" parent="."]
-visible = false
 position = Vector2(35, -90)
 
 [node name="Top" type="AnimatedSprite2D" parent="HelicopterChargeDisplay"]
@@ -1356,6 +1573,19 @@ script = ExtResource("15_tnns4")
 [node name="Marker2D" type="Marker2D" parent="HelicopterChargeDisplay/Top"]
 position = Vector2(316, 38)
 
+[node name="HitboxComponent" type="Area2D" parent="HelicopterChargeDisplay/Top" node_paths=PackedStringArray("hitbox_owner", "faction")]
+collision_layer = 64
+collision_mask = 64
+script = ExtResource("16_66mf3")
+hitbox_owner = NodePath("../../../Propeller")
+faction = NodePath("../../../Propeller/FactionComponent")
+default_responder = NodePath(".")
+damage = 20.0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="HelicopterChargeDisplay/Top/HitboxComponent"]
+position = Vector2(-7.5, 0)
+shape = SubResource("RectangleShape2D_eafwr")
+
 [node name="Middle" type="AnimatedSprite2D" parent="HelicopterChargeDisplay"]
 position = Vector2(-201, 90)
 sprite_frames = SubResource("SpriteFrames_6oqvh")
@@ -1365,6 +1595,19 @@ script = ExtResource("15_tnns4")
 
 [node name="Marker2D" type="Marker2D" parent="HelicopterChargeDisplay/Middle"]
 position = Vector2(316, 38)
+
+[node name="HitboxComponent" type="Area2D" parent="HelicopterChargeDisplay/Middle" node_paths=PackedStringArray("hitbox_owner", "faction")]
+collision_layer = 64
+collision_mask = 64
+script = ExtResource("16_66mf3")
+hitbox_owner = NodePath("../../../Propeller")
+faction = NodePath("../../../Propeller/FactionComponent")
+default_responder = NodePath(".")
+damage = 20.0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="HelicopterChargeDisplay/Middle/HitboxComponent"]
+position = Vector2(-7.5, 0)
+shape = SubResource("RectangleShape2D_eafwr")
 
 [node name="Bottom" type="AnimatedSprite2D" parent="HelicopterChargeDisplay"]
 position = Vector2(-201, 149)
@@ -1376,8 +1619,20 @@ script = ExtResource("15_tnns4")
 [node name="Marker2D" type="Marker2D" parent="HelicopterChargeDisplay/Bottom"]
 position = Vector2(316, 38)
 
+[node name="HitboxComponent" type="Area2D" parent="HelicopterChargeDisplay/Bottom" node_paths=PackedStringArray("hitbox_owner", "faction")]
+collision_layer = 64
+collision_mask = 64
+script = ExtResource("16_66mf3")
+hitbox_owner = NodePath("../../../Propeller")
+faction = NodePath("../../../Propeller/FactionComponent")
+default_responder = NodePath(".")
+damage = 20.0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="HelicopterChargeDisplay/Bottom/HitboxComponent"]
+position = Vector2(-7.5, 0)
+shape = SubResource("RectangleShape2D_eafwr")
+
 [node name="BattleUI" type="CanvasLayer" parent="."]
-visible = false
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="BattleUI"]
 libraries = {
@@ -1431,8 +1686,11 @@ theme_override_constants/margin_bottom = 8
 layout_mode = 2
 theme_override_constants/separation = 0
 
-[node name="KongleDisplay" type="HBoxContainer" parent="BattleUI/TopBar/MarginContainer/HBoxContainer"]
+[node name="KongleDisplay" type="HBoxContainer" parent="BattleUI/TopBar/MarginContainer/HBoxContainer" node_paths=PackedStringArray("bar", "health")]
 layout_mode = 2
+script = ExtResource("23_v3s0s")
+bar = NodePath("VBoxContainer/HealthFrame/MarginContainer/Health")
+health = NodePath("../../../../../Player/HealthComponent")
 
 [node name="Frame" type="TextureRect" parent="BattleUI/TopBar/MarginContainer/HBoxContainer/KongleDisplay"]
 layout_mode = 2
@@ -1492,7 +1750,6 @@ size_flags_vertical = 1
 theme_override_styles/background = SubResource("StyleBoxFlat_fusqc")
 theme_override_styles/fill = SubResource("StyleBoxFlat_wu27c")
 max_value = 1.0
-value = 1.0
 show_percentage = false
 
 [node name="HBoxContainer" type="HBoxContainer" parent="BattleUI/TopBar/MarginContainer/HBoxContainer/KongleDisplay/VBoxContainer"]
@@ -1526,8 +1783,11 @@ texture = ExtResource("20_g11js")
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="EnemyDisplay" type="HBoxContainer" parent="BattleUI/TopBar/MarginContainer/HBoxContainer"]
+[node name="EnemyDisplay" type="HBoxContainer" parent="BattleUI/TopBar/MarginContainer/HBoxContainer" node_paths=PackedStringArray("bar", "health")]
 layout_mode = 2
+script = ExtResource("23_v3s0s")
+bar = NodePath("VBoxContainer/HealthFrame/MarginContainer/Health")
+health = NodePath("../../../../../Helicopter/HealthComponent")
 
 [node name="VBoxContainer" type="VBoxContainer" parent="BattleUI/TopBar/MarginContainer/HBoxContainer/EnemyDisplay"]
 layout_mode = 2
@@ -1714,24 +1974,28 @@ script = ExtResource("29_xaxkb")
 box_animator = NodePath("../BoxAnimator")
 view_animator = NodePath("../ViewAnimator")
 
-[node name="DiaLineView" type="Node" parent="BattleUI" node_paths=PackedStringArray("text_lbl", "speaker_sprite", "dia_box")]
+[node name="DiaLineView" type="Node" parent="BattleUI" node_paths=PackedStringArray("text_lbl", "speaker_sprite", "dia_box", "audio")]
 script = ExtResource("30_jhb5k")
 text_lbl = NodePath("../DialogueBox/NinePatchRect/LineView/Control/RichTextLabel")
 speaker_sprite = NodePath("../DialogueBox/NinePatchRect/LineView/AnimatedSprite2D")
 dia_box = NodePath("../DiaBoxView")
+audio = NodePath("AudioStreamPlayer")
+
+[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="BattleUI/DiaLineView"]
+volume_db = -5.055
 
 [node name="DialogueBox" type="Control" parent="BattleUI"]
 layout_mode = 3
 anchors_preset = 0
-offset_left = 429.0
+offset_left = 25.0
 offset_top = 97.0
-offset_right = 429.0
+offset_right = 25.0
 offset_bottom = 97.0
 
 [node name="NinePatchRect" type="NinePatchRect" parent="BattleUI/DialogueBox"]
 layout_mode = 1
-offset_right = 186.0
-offset_bottom = 54.0
+offset_right = 225.0
+offset_bottom = 70.0
 texture = ExtResource("29_xp8d7")
 patch_margin_left = 8
 patch_margin_top = 8
@@ -1776,18 +2040,18 @@ sprite_frames = SubResource("SpriteFrames_xfssf")
 
 [node name="TextureRect" type="TextureRect" parent="BattleUI/DialogueBox"]
 layout_mode = 1
-offset_left = 165.0
+offset_left = 13.0
 offset_top = -14.0
-offset_right = 174.0
+offset_right = 22.0
 offset_bottom = 3.0
 texture = ExtResource("31_f07sf")
 
 [node name="SpeedLines" type="ColorRect" parent="."]
-visible = false
 material = SubResource("ShaderMaterial_tivdn")
 offset_left = -199.0
 offset_top = -110.0
 offset_right = 199.0
 offset_bottom = 110.0
 
+[editable path="Player"]
 [editable path="Room"]

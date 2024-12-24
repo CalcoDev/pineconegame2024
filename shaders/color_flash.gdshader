@@ -9,7 +9,7 @@ void fragment() {
 	float pixel_size_x = 1.0/float(textureSize(TEXTURE,0).x);
 	float pixel_size_y = 1.0/float(textureSize(TEXTURE,0).y);
 	vec2 pixel_size = vec2(pixel_size_x, pixel_size_y);
-	if (texture(TEXTURE, UV).a == 0.) { 
+	if (texture(TEXTURE, UV).a == 0.) {
 		for(int x = -width; x <= width; x++) {
 			for(int y = -width; y <= width; y++) {
 				vec2 pixel_offset = vec2(float(x),float(y));
@@ -21,6 +21,6 @@ void fragment() {
 		}
 	} else {
 		vec4 texture_color = texture(TEXTURE, UV);
-    	COLOR = vec4(mix(texture_color.rgb, solid_color.rgb, solid_color.a), texture_color.a);	
+    	COLOR = vec4(mix(texture_color.rgb, solid_color.rgb, solid_color.a), texture_color.a);
 	}
 }

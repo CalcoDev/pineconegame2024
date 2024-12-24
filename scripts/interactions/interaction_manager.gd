@@ -14,25 +14,40 @@ func _ready() -> void:
 	for itmidx in items.size():
 		hide_item(itmidx)
 
-func reserve_item(prev: int) -> int:
+var _reservations: Dictionary = {}
+
+func _hide_all() -> void:
+	for itmidx in items.size():
+		await hide_item(itmidx)
+		_used_items.clear()
+
+func reserve_item(prev: int, taker) -> int:
 	for itmidx in items.size():
 		if items[itmidx] not in _used_items:
 			_used_items.append(items[itmidx])
+			if taker in _reservations:
+				hide_item(_reservations[taker])
+				free_item(_reservations[taker], taker)
+			_reservations[taker] = itmidx
 			return itmidx
 	#assert(false, "No more free items damn.")
 	return prev
 
-func free_item(item: int) -> void:
+func free_item(item: int, taker) -> void:
 	var idx := _used_items.find(items[item])
 	if idx == -1:
 		return
 	_used_items.remove_at(idx)
+	if taker in _reservations:
+		_reservations.erase(taker)
 
 func display_item(item: int) -> void:
+	if item < 0:
+		return
 	items[item].visible = true
-	if item <= _item_tweens.size():
+	if item >= _item_tweens.size():
 		_item_tweens.resize(item + 1)
-	if is_instance_valid(_item_tweens[item]):
+	if item >= 0 and item < _item_tweens.size() and is_instance_valid(_item_tweens[item]):
 		_item_tweens[item].kill()
 		_item_tweens[item] = null
 	_item_tweens[item] = get_tree().create_tween()
@@ -45,9 +60,11 @@ func display_item(item: int) -> void:
 	await t.finished
 
 func hide_item(item: int) -> void:
+	if item < 0:
+		return
 	if item <= _item_tweens.size():
 		_item_tweens.resize(item + 1)
-	if is_instance_valid(_item_tweens[item]):
+	if item >= 0 and item < _item_tweens.size() and is_instance_valid(_item_tweens[item]):
 		_item_tweens[item].kill()
 		_item_tweens[item] = null
 	_item_tweens[item] = get_tree().create_tween()

@@ -4,5 +4,30 @@
 
 title: try_item_0
 ---
-Narrator: Instant noodles yum yum.
+Narrator: Kongle opens their bag, only to find all their valuables stolen by the IBP.
+===
+
+title: try_item_1
+---
+Narrator: Kongle salvages a pack of instant noodles.
+Narrator: They are very yummy and under normal conditions would have a healing effect ...
+Narrator: But now, the developer forgot to add that!
+===
+
+title: try_item_2
+---
+Narrator: Kongle puts a bandaid on himself.
+Narrator: The spikes end up tearing through the band aid!
+Narrator: Kongle gets 0 healing...
+===
+
+title: try_item_3
+---
+Narrator: Kongle casts "Greater Healing"
+Narrator: The spell doesn't work, as Kongle hasn't reached Wizard level 8 yet.
+===
+
+title: try_item_4
+---
+Narrator: Kongle's goodie bag was stolen by the IBP!
 ===

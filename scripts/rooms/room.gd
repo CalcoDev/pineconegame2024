@@ -5,6 +5,9 @@ extends Area2D
 #@export var coll: CollisionShape2D
 #@export var camera: PhantomCamera2D
 
+signal on_enter_room()
+signal on_exit_room()
+
 @export var notify_left_area := true
 
 @export var clamp_to_coll: bool = true:
@@ -54,6 +57,7 @@ func area_body_entered(body) -> void:
 	if body != Player.instance:
 		return
 	# print("Player entered room: ", self.name)
+	on_enter_room.emit()
 	_old_priority = camera.priority
 	GameCamera.instance.phantom_camera = camera
 	camera.priority = 1
@@ -64,6 +68,7 @@ func area_body_exited(body) -> void:
 	if body != Player.instance:
 		return
 	# print("Player left room: ", self.name)
+	on_exit_room.emit()
 	camera.priority = _old_priority
 	# TODO(calco): Maybe remove this
 	if notify_left_area:

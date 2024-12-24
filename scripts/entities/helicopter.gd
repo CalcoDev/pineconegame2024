@@ -5,6 +5,8 @@ extends Node2D
 @export var scene: HelicopterFightScene
 @export var player_offset: Vector2 = Vector2(180, 0)
 
+@export var health: HealthComponent
+
 @export var charge_warn_display: Array[AnimatedSprite2D] = []
 
 @export var anim: AnimationPlayer
@@ -20,6 +22,8 @@ extends Node2D
 @export var touhou_bullet_spawn: Marker2D
 @export var touhou_bullet_speed: float = 20.0
 @export var touhou_bullet_max_fan: float = 30.0
+
+@export var hitbox: HitboxComponent
 
 # different attacks
 # const ST_IDLE := 1 # just move around, waiting for thing, also used in battle mode
@@ -38,9 +42,20 @@ func _enter_tree() -> void:
 	for c in charge_warn_display:
 		c.visible = false
 		c.stop()
+	Audio.map["helicopter"].play()
+	Audio.map["kongle_ambiance_wind"].play()
+	Audio.map["helicopter_pandora_palace"].play()
+
+func _exit_tree() -> void:
+	Audio.map["helicopter"].stop()
+	Audio.map["kongle_ambiance_wind"].stop()
+	Audio.map["helicopter_pandora_palace"].stop()
 
 func _ready() -> void:
 	global_position = player_offset
+	hitbox.enabled = false
+	for d in charge_warn_display:
+		(d.get_child(1) as HitboxComponent).enabled = false
 
 # var base := Vector2.ZERO
 func _process(_delta: float) -> void:
@@ -48,13 +63,13 @@ func _process(_delta: float) -> void:
 	# self.global_position = scene.camera.global_position + player_offset + pos_offset
 	pass
 
-const _attacks := ["attack_charge", "attack_propeller_throw", "attack_touhou", "attack_vbrs"]
+const _attacks := ["attack_charge", "attack_propeller_throw", "attack_touhou"]
 func attack() -> void:
-	# var idx := randi() % _attacks.size()
-	# await self.get(_attacks[idx]).call()
+	var idx := randi() % _attacks.size()
+	await self.get(_attacks[idx]).call()
 	# await attack_charge()
 	# await attack_propeller_throw()
-	await attack_touhou()
+	# await attack_touhou()
 
 func attack_charge() -> void:
 	var lane := randi() % 3
@@ -78,8 +93,10 @@ func attack_charge() -> void:
 	t.tween_property(d, "scale", Vector2(1.0, 1.0), 0.75)
 	d.scale = Vector2(0.0, 1.0)
 	d.visible = true
+	(d.get_child(1) as HitboxComponent).enabled = true
 	d.get_parent().global_position.x = self.global_position.x
 	d.play("default")
+	Audio.map["explosion_laser"].play()
 	t.play()
 	await t.finished
 	await get_tree().create_timer(randf_range(2.5, 4.5)).timeout
@@ -89,9 +106,13 @@ func attack_charge() -> void:
 	var curr_y := global_position.y
 	t.parallel().tween_property(self, "global_position", Vector2(-288.0, curr_y), 1.0)
 	t.play()
+	Audio.map["helicopter_charge"].play()
+	hitbox.enabled = true
 	await t.finished
-	d.position = Vector2(-353.0, y)
+	hitbox.enabled = false
+	d.position = Vector2(-201.0, y)
 	d.visible = false
+	(d.get_child(1) as HitboxComponent).enabled = false
 
 	t = create_tween().set_ease(Tween.EASE_IN_OUT)
 	self.global_position = Vector2(240.0, curr_y)
@@ -164,6 +185,7 @@ func attack_touhou() -> void:
 				rot += touhou_bullet_max_fan * float(signed_i) / float(touhou_bullet_count / 2)
 				b.global_rotation = rot
 				b.velocity = Vector2.RIGHT.rotated(rot) * touhou_bullet_speed
+				Audio.map["helicopter_pewpew"].play()
 				# add_child(b)
 				scene.add_child(b)
 	anim.speed_scale = 1.0

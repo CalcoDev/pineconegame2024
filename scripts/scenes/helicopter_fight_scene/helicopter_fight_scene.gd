@@ -39,7 +39,7 @@ const ST_ENEMY_ATK := 1
 var state: int = ST_PLAYER
 var turn_count: int = 0
 
-var is_over: bool = false
+# var is_over: bool = false
 
 var is_paused: bool = false
 
@@ -73,9 +73,7 @@ func _load_and_save_toks(filepath: String) -> int:
 func _ready() -> void:
 	anim.play("battle_screen_exit")
 	anim.seek(999.9, true)
-	# start_battle()
-	await get_tree().create_timer(1).timeout
-	_enemy_attack()
+	start_battle()
 	dia_view.on_run_line.connect(_run_dialogue_line)
 
 var __offset_sin := 0.0
@@ -113,24 +111,56 @@ func _run_dialogue_line(line: DialogueLine, _on_finished: Callable) -> void:
 	dia_view_pos_anim.play(line.speaker_name)
 
 func start_battle() -> void:
-	is_over = false
+	var is_over := {"value": false}
 	state = ST_PLAYER
 	turn_count = 0
-	while not is_over:
+	player.heatlh.on_died.connect(
+		func():
+			get_tree().change_scene_to_file("res://scenes/story_scenes/death.tscn")
+	)
+	while not is_over["value"]:
 		turn_count += 1
-		await do_turn()
-	anim.play("battle_end")
+		var a := func():
+			is_over["value"] = await do_turn()
+		await a.call()
+	if player.heatlh.is_dead():
+		get_tree().change_scene_to_file("res://scenes/story_scenes/death.tscn")
+	elif helicopter.health.is_dead():
+		get_tree().change_scene_to_file("res://scenes/story_scenes/win.tscn")
+		anim.play("battle_end_helicopter_die")
 	await anim.animation_finished
 
-func do_turn() -> void:
+func do_turn() -> bool:
+	var hit_count := {"cnt": 0}
+	var a := func(_damage: float, _by: Node2D):
+			hit_count["cnt"] += 1
+	player.hurtbox.on_hit.connect(a)
 	if not is_paused:
 		_pause_world()
+	if player.heatlh.is_dead():
+		return true
 	await _show_player_ui()
+	if player.heatlh.is_dead():
+		return true
 	await _player_do_action()
+	if player.heatlh.is_dead():
+		return true
 	await _enemy_say_lines()
+	if player.heatlh.is_dead():
+		return true
+	player.hurtbox.enabled = true
 	await _enemy_attack()
+	player.hurtbox.enabled = false
+	if player.heatlh.is_dead():
+		return true
+	if hit_count["cnt"] == 0:
+		if randf() < 0.5:
+			helicopter.health.take_damage(helicopter.health.max_health / 4 + 1)
 	player.global_position = Vector2.ZERO
 	player.rotation = 0.0
+	if helicopter.health.is_dead() or player.heatlh.is_dead():
+		return true
+	return false
 
 func _pause_world() -> void:
 	player.locked = true
@@ -141,7 +171,7 @@ func _pause_world() -> void:
 func _unpause_world() -> void:
 	player.locked = false
 	player.freeze = false
-	speed_lines.visible = true
+	speed_lines.visible = false
 
 func _show_player_ui() -> void:
 	if turn_count == 1:
@@ -224,3 +254,6 @@ func _enemy_attack() -> void:
 	await anim.animation_finished
 	_unpause_world()
 	await helicopter.attack()
+
+func _play_audio(nam: String) -> void:
+	Audio.map[nam].play()

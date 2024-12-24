@@ -1,0 +1,9 @@
+[gd_resource type="ShaderMaterial" load_steps=2 format=3 uid="uid://do1sgtsoslp5d"]
+
+[ext_resource type="Shader" path="res://shaders/color_flash.gdshader" id="1_46hau"]
+
+[resource]
+shader = ExtResource("1_46hau")
+shader_parameter/solid_color = Color(0.7, 0, 0, 0.568627)
+shader_parameter/width = 2
+shader_parameter/outline_color = Color(0.76, 0, 0, 1)

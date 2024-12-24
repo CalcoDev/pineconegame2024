@@ -7,4 +7,3 @@
 script = ExtResource("1_k0iu6")
 name = "Helicopter"
 font = ExtResource("1_tovod")
-sound_effects = Array[String]([])

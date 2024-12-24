@@ -251,6 +251,7 @@ _data = {
 [sub_resource type="SpriteFrames" id="SpriteFrames_d3knr"]
 
 [node name="DialogueManager" type="Node2D" node_paths=PackedStringArray("runner")]
+process_mode = 3
 script = ExtResource("1_4s0db")
 runner = NodePath("CanvasLayer/DialogueRunner")
 autoloads = Array[String](["res://resources/dialogue/dia_fedor_office.txt"])
@@ -267,11 +268,16 @@ script = ExtResource("2_foav0")
 box_animator = NodePath("../BoxAnimator")
 view_animator = NodePath("../ViewAnimator")
 
-[node name="DialogueLineView" type="Node" parent="CanvasLayer" node_paths=PackedStringArray("text_lbl", "speaker_sprite", "dia_box")]
+[node name="DialogueLineView" type="Node" parent="CanvasLayer" node_paths=PackedStringArray("text_lbl", "speaker_sprite", "dia_box", "audio")]
 script = ExtResource("3_fqjon")
 text_lbl = NodePath("../DialogueDisplay/NinePatchRect/LineView/HSplitContainer/RichTextLabel")
 speaker_sprite = NodePath("../DialogueDisplay/NinePatchRect/LineView/HSplitContainer/AnimatedSprite2D")
 dia_box = NodePath("../DiaBoxView")
+audio = NodePath("AudioStreamPlayer")
+
+[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="CanvasLayer/DialogueLineView"]
+volume_db = -80.0
+bus = &"SFX"
 
 [node name="DiaOptionView" type="Node" parent="CanvasLayer" node_paths=PackedStringArray("options_node", "dia_box")]
 script = ExtResource("4_tu7hx")
