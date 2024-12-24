@@ -10,6 +10,16 @@ static var instance: Player = null
 @export var _gc: Area2D
 @export var _interactor: Interactor
 
+# @export var shader: ShaderMaterial
+@export var sprite: AnimatedSprite2D
+var shader: ShaderMaterial:
+	get():
+		return sprite.material
+
+@export_group("Health")
+@export var heatlh: HealthComponent
+@export var hurtbox: HurtboxComponent
+
 @export_group("Movement")
 @export var roll_speed: float = 2.0
 @export var jump_force: float = 2.0
@@ -48,6 +58,8 @@ func _enter_tree() -> void:
 	_gc.body_entered.connect(_entered_ground)
 	_gc.body_exited.connect(_exited_ground)
 	#_rb.top_level = true
+
+	hurtbox.on_hit.connect(_on_hit)
 
 func _ready() -> void:
 	_visuals.scale = Vector2.ONE * 0.75
@@ -92,6 +104,7 @@ func _process(_detal: float) -> void:
 				_was_yeet = true
 				_is_yeet = false
 				var dir = -offset.normalized()
+				dir = dir * Vector2(1.0, 1.25)
 				# TODO(calco): Disable visuals
 				# TODO(calco): Apply force and stuff
 				_rb.linear_velocity = Vector2.ZERO
@@ -117,6 +130,22 @@ func _process(_detal: float) -> void:
 	
 	if self.linear_velocity.y > max_fall:
 		self.linear_velocity.y = max_fall
+
+func _on_hit(_damage: float, _by: Node2D) -> void:
+	var t := create_tween().set_ease(Tween.EASE_IN_OUT)
+	t.tween_property(shader, "shader_parameter/solid_color", Color.WHITE, 0.05)
+	t.parallel().tween_property(shader, "shader_parameter/outline_color", Color.RED, 0.05)
+	t.tween_property(shader, "shader_parameter/solid_color", Color.TRANSPARENT, 0.05)
+	t.parallel().tween_property(shader, "shader_parameter/outline_color", Color.TRANSPARENT, 0.05)
+	t.tween_property(shader, "shader_parameter/solid_color", Color.WHITE, 0.05)
+	t.parallel().tween_property(shader, "shader_parameter/outline_color", Color.RED, 0.05)
+	t.tween_property(shader, "shader_parameter/solid_color", Color.TRANSPARENT, 0.05)
+	t.parallel().tween_property(shader, "shader_parameter/outline_color", Color.TRANSPARENT, 0.05)
+	t.play()
+	GameCamera.instance.shake(5.0, 50.0, 15.0, 0.25)
+	Game.instance.hitstop(0.1)
+	self.linear_velocity = Vector2.ZERO
+	await t.finished
 
 func _physics_process(delta: float) -> void:
 	if not locked:

@@ -1,0 +1,29 @@
+[gd_scene load_steps=6 format=3 uid="uid://ir4pxk0oiekd"]
+
+[ext_resource type="Script" path="res://scripts/autoload/audio.gd" id="1_23ahu"]
+[ext_resource type="AudioStream" uid="uid://mdctrjxb3kqj" path="res://assets/sounds/sfx/elevator_noise.mp3" id="2_47o7w"]
+[ext_resource type="AudioStream" uid="uid://blkw5lklyvm4" path="res://assets/sounds/sfx/intro_elevator_ding.wav" id="3_140b3"]
+[ext_resource type="AudioStream" uid="uid://b3c64b67tejc7" path="res://assets/sounds/sfx/intro_chatter_noise.wav" id="4_alowo"]
+[ext_resource type="AudioStream" uid="uid://bkaa1g1jgupod" path="res://assets/sounds/sfx/intro_kongle_slide.mp3" id="5_1880g"]
+
+[node name="Audio" type="Node"]
+script = ExtResource("1_23ahu")
+
+[node name="intro_elevator_noise" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("2_47o7w")
+bus = &"SFX"
+
+[node name="intro_elevator_ding" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("3_140b3")
+bus = &"SFX"
+
+[node name="intro_chatter" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("4_alowo")
+volume_db = -10.0
+bus = &"SFX"
+
+[node name="intro_kongle_slide" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("5_1880g")
+volume_db = -10.0
+bus = &"SFX"
+parameters/looping = true

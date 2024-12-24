@@ -1,8 +1,12 @@
-[gd_scene load_steps=10 format=3 uid="uid://vpcg1kgktd14"]
+[gd_scene load_steps=16 format=3 uid="uid://vpcg1kgktd14"]
 
 [ext_resource type="Texture2D" uid="uid://dx6tocvike34w" path="res://assets/art/entities/player/player.png" id="1_mdjh7"]
 [ext_resource type="Script" path="res://scripts/entities/player.gd" id="1_n2bhu"]
+[ext_resource type="Shader" path="res://shaders/color_flash.gdshader" id="2_olyj7"]
 [ext_resource type="Script" path="res://scripts/interactions/interactor.gd" id="3_2ocu5"]
+[ext_resource type="Script" path="res://scripts/health/hurtbox_component.gd" id="4_lu3pa"]
+[ext_resource type="Script" path="res://scripts/health/health_component.gd" id="5_gujf2"]
+[ext_resource type="Script" path="res://scripts/health/faction_component.gd" id="5_pneij"]
 
 [sub_resource type="PhysicsMaterial" id="PhysicsMaterial_gf8kh"]
 bounce = 0.4
@@ -10,15 +14,21 @@ bounce = 0.4
 [sub_resource type="CircleShape2D" id="CircleShape2D_ote4v"]
 radius = 4.0
 
-[sub_resource type="AtlasTexture" id="AtlasTexture_d4cu6"]
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_k3yvl"]
+shader = ExtResource("2_olyj7")
+shader_parameter/solid_color = Color(1, 1, 1, 0)
+shader_parameter/width = 1
+shader_parameter/outline_color = Color(0, 0, 0, 0)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_mik4e"]
 atlas = ExtResource("1_mdjh7")
-region = Rect2(0, 0, 9, 11)
+region = Rect2(0, 0, 17, 19)
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_uj0g6"]
 animations = [{
 "frames": [{
 "duration": 1.0,
-"texture": SubResource("AtlasTexture_d4cu6")
+"texture": SubResource("AtlasTexture_mik4e")
 }],
 "loop": true,
 "name": &"default",
@@ -31,7 +41,10 @@ size = Vector2(9, 3)
 [sub_resource type="CircleShape2D" id="CircleShape2D_71q4l"]
 radius = 14.0
 
-[node name="Player" type="RigidBody2D" node_paths=PackedStringArray("_visuals", "_line", "_gc", "_interactor")]
+[sub_resource type="CircleShape2D" id="CircleShape2D_cbumu"]
+radius = 4.0
+
+[node name="Player" type="RigidBody2D" node_paths=PackedStringArray("_visuals", "_line", "_gc", "_interactor", "sprite", "heatlh", "hurtbox")]
 collision_layer = 2
 collision_mask = 9
 physics_material_override = SubResource("PhysicsMaterial_gf8kh")
@@ -40,6 +53,9 @@ _visuals = NodePath("Visuals")
 _line = NodePath("Line2D")
 _gc = NodePath("Area2D")
 _interactor = NodePath("Interactor")
+sprite = NodePath("Visuals/AnimatedSprite2D")
+heatlh = NodePath("HealthComponent")
+hurtbox = NodePath("HurtboxComponent")
 roll_speed = 0.5
 jump_force = 100.0
 yeet_max_dist = 200.0
@@ -52,7 +68,8 @@ shape = SubResource("CircleShape2D_ote4v")
 z_index = 1
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="Visuals"]
-position = Vector2(-5, -7)
+material = SubResource("ShaderMaterial_k3yvl")
+position = Vector2(-8, -10)
 sprite_frames = SubResource("SpriteFrames_uj0g6")
 centered = false
 
@@ -85,3 +102,20 @@ script = ExtResource("3_2ocu5")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Interactor"]
 shape = SubResource("CircleShape2D_71q4l")
+
+[node name="FactionComponent" type="Node" parent="."]
+script = ExtResource("5_pneij")
+faction = 0
+
+[node name="HealthComponent" type="Node" parent="."]
+script = ExtResource("5_gujf2")
+
+[node name="HurtboxComponent" type="Area2D" parent="." node_paths=PackedStringArray("health", "faction")]
+collision_layer = 64
+collision_mask = 64
+script = ExtResource("4_lu3pa")
+health = NodePath("../HealthComponent")
+faction = NodePath("../FactionComponent")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="HurtboxComponent"]
+shape = SubResource("CircleShape2D_cbumu")

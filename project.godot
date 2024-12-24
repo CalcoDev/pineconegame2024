@@ -13,7 +13,7 @@ config_version=5
 config/name="pineconegame"
 config/description="Pine Cone Game 2024"
 config/version="25.12.2024"
-run/main_scene="res://scenes/story_scenes/fedor_office_scene.tscn"
+run/main_scene="res://scenes/story_scenes/made_with_kongle.tscn"
 config/features=PackedStringArray("4.3", "Forward Plus")
 run/max_fps=240
 config/icon="res://assets/art/icon.png"
@@ -23,6 +23,8 @@ config/icon="res://assets/art/icon.png"
 PhantomCameraManager="*res://addons/phantom_camera/scripts/managers/phantom_camera_manager.gd"
 InteractionManager="res://scenes/autoloads/interaction_manager.tscn"
 DialogueManager="res://scenes/autoloads/dialogue_manager.tscn"
+Game="res://scenes/autoloads/game.tscn"
+Audio="res://scenes/autoloads/audio.tscn"
 
 [display]
 
@@ -114,14 +116,13 @@ interact={
 2d_physics/layer_1="World"
 2d_physics/layer_2="Entities"
 2d_physics/layer_4="WorldOneWay"
+2d_physics/layer_7="hitbox_hurtbox"
 2d_physics/layer_10="Interaction"
 2d_physics/layer_32="mouse_area_detect"
 
 [physics]
 
-common/physics_jitter_fix=0.0
 2d/default_gravity=490.0
-common/physics_interpolation=true
 
 [rendering]
 

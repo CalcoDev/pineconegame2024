@@ -1,13 +1,22 @@
 class_name HelicopterFightScene
 extends Node2D
 
+static var instance: HelicopterFightScene
+
 @export_group("Scene Refs")
 @export var player: Player
+@export var helicopter: Helicopter
+@export var room: Room
 @export var camera: GameCamera
 @export var parallax: ParallaxBackground
 # @export var parallax: Array[ParallaxLayer] = []
 
+@export var speed_lines: ColorRect
+
 @export_group("Battle System")
+# @export_subgroup("Screen")
+# @export var 
+
 @export_subgroup("Dialogue")
 @export var dialogue: DialogueRunner
 @export var dia_view: DialogueView
@@ -48,8 +57,7 @@ func _enter_tree() -> void:
 	_max_tok_act = _load_and_save_toks("res://resources/dialogue/dia_fail_act.txt")
 	_max_tok_mercy = _load_and_save_toks("res://resources/dialogue/dia_fail_mercy.txt")
 
-	anim.play("battle_screen_exit")
-	anim.seek(999.9, true)
+	instance = self
 
 func _load_and_save_toks(filepath: String) -> int:
 	var toks := dialogue.prepare_dialogue(filepath)
@@ -63,8 +71,43 @@ func _load_and_save_toks(filepath: String) -> int:
 	return tok_max
 
 func _ready() -> void:
-	start_battle()
+	anim.play("battle_screen_exit")
+	anim.seek(999.9, true)
+	# start_battle()
+	await get_tree().create_timer(1).timeout
+	_enemy_attack()
 	dia_view.on_run_line.connect(_run_dialogue_line)
+
+var __offset_sin := 0.0
+var __base_offset := Vector2.ZERO
+var __offset := Vector2.ZERO
+var __player_offset := Vector2.ZERO
+func _process(delta: float) -> void:
+	if not is_paused:
+		var wrapped := _wrap_around_bounds(player.global_position, 4.0)
+		if not player.global_position.is_equal_approx(wrapped):
+			player.global_position = wrapped
+		__offset_sin += delta * parallax_sin_freq
+		__base_offset += delta * parallax_add_speed * (-1.0 if player.linear_velocity.x > 0 else 1.0)
+		__offset.y = sin(__offset_sin) * parallax_sin_ampl
+		__player_offset -= player.linear_velocity * delta
+		parallax.scroll_base_offset = __base_offset + __offset + __player_offset
+
+func _wrap_around_bounds(vec: Vector2, epsilon: float = 2.0) -> Vector2:
+	var size = room.coll.shape.size * 0.5
+	var pos = global_position
+
+	if vec.x < pos.x - size.x - epsilon:
+		vec.x = pos.x + size.x + epsilon * 0.75
+	elif vec.x > pos.x + size.x + epsilon:
+		vec.x = pos.x - size.x - epsilon * 0.75
+
+	if vec.y < pos.y - size.y - epsilon:
+		vec.y = pos.y + size.y + epsilon * 0.75
+	elif vec.y > pos.y + size.y + epsilon:
+		vec.y = pos.y - size.y - epsilon * 0.75
+
+	return vec
 
 func _run_dialogue_line(line: DialogueLine, _on_finished: Callable) -> void:
 	dia_view_pos_anim.play(line.speaker_name)
@@ -86,15 +129,19 @@ func do_turn() -> void:
 	await _player_do_action()
 	await _enemy_say_lines()
 	await _enemy_attack()
+	player.global_position = Vector2.ZERO
+	player.rotation = 0.0
 
 func _pause_world() -> void:
 	player.locked = true
 	player.freeze = true
 	player.global_position = player.global_position.round()
+	speed_lines.visible = false
 
 func _unpause_world() -> void:
 	player.locked = false
 	player.freeze = false
+	speed_lines.visible = true
 
 func _show_player_ui() -> void:
 	if turn_count == 1:
@@ -176,4 +223,4 @@ func _enemy_attack() -> void:
 	anim.play("battle_screen_exit")
 	await anim.animation_finished
 	_unpause_world()
-	await get_tree().create_timer(2).timeout
+	await helicopter.attack()
