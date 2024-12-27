@@ -573,7 +573,7 @@ color = Color(0.00159779, 0.00208778, 0.00627486, 1)
 [node name="Camera2D" type="Camera2D" parent="."]
 process_mode = 3
 physics_interpolation_mode = 1
-position = Vector2(340.684, 70.1637)
+position = Vector2(160, 90)
 zoom = Vector2(2, 2)
 limit_left = 0
 limit_top = 0
@@ -637,7 +637,7 @@ shape = SubResource("RectangleShape2D_05nic")
 [node name="ParallaxLayer" type="ParallaxLayer" parent="ParallaxBackground"]
 
 [node name="Player" parent="." instance=ExtResource("3_nu6kr")]
-position = Vector2(2369, 83)
+position = Vector2(115, 49)
 rotation = 1.00061
 scale = Vector2(1.58658, 1.11936)
 yeet_max_force = 250.0
@@ -651,7 +651,7 @@ position = Vector2(138.5, 0)
 shape = SubResource("RectangleShape2D_r41x7")
 
 [node name="PhantomCamera2D" parent="Room" index="1" node_paths=PackedStringArray("follow_target")]
-position = Vector2(437, 90)
+position = Vector2(160, 90)
 follow_target = NodePath("../../Player")
 tween_resource = SubResource("Resource_4hces")
 

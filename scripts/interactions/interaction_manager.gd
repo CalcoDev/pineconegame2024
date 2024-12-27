@@ -4,80 +4,67 @@ extends Node2D
 static var instance: InteractionManager = null
 
 @export var items: Array[Node] = []
-var _used_items := []
-var _item_tweens: Array[Tween] = []
 
 func _enter_tree() -> void:
 	instance = self
 
 func _ready() -> void:
-	for itmidx in items.size():
-		hide_item(itmidx)
-
-var _reservations: Dictionary = {}
+	for item in items:
+		item.scale = Vector2.ZERO
+		item.visible = false
 
 func _hide_all() -> void:
-	for itmidx in items.size():
-		await hide_item(itmidx)
-		_used_items.clear()
+	for obj in _reserved.keys():
+		hide_wobj(obj)
 
-func reserve_item(prev: int, taker) -> int:
-	for itmidx in items.size():
-		if items[itmidx] not in _used_items:
-			_used_items.append(items[itmidx])
-			if taker in _reservations:
-				hide_item(_reservations[taker])
-				free_item(_reservations[taker], taker)
-			_reservations[taker] = itmidx
-			return itmidx
-	#assert(false, "No more free items damn.")
-	return prev
-
-func free_item(item: int, taker) -> void:
-	var idx := _used_items.find(items[item])
-	if idx == -1:
+# every object can reserve ONE SINGLE ITNERACTION
+var _reserved: Dictionary = {}
+func reserve_wobj(obj: Node) -> void:
+	if obj in _reserved.keys() and _reserved[obj] != null:
 		return
-	_used_items.remove_at(idx)
-	if taker in _reservations:
-		_reservations.erase(taker)
+	_reserved[obj] = _get_free_item()
 
-func display_item(item: int) -> void:
-	if item < 0:
+func unreserve_wobj(obj: Node) -> void:
+	if obj not in _reserved.keys():
 		return
-	items[item].visible = true
-	if item >= _item_tweens.size():
-		_item_tweens.resize(item + 1)
-	if item >= 0 and item < _item_tweens.size() and is_instance_valid(_item_tweens[item]):
-		_item_tweens[item].kill()
-		_item_tweens[item] = null
-	_item_tweens[item] = get_tree().create_tween()
+	_reserved[obj] = null
 
-	var t := _item_tweens[item]
-	t.set_ease(Tween.EASE_IN_OUT)
-	t.chain().tween_property(items[item], "scale", Vector2.ONE * 1.2, 0.1)
-	t.chain().tween_property(items[item], "scale", Vector2.ONE * 1, 0.05)
+func _get_free_item() -> Node:
+	for item in items:
+		if item not in _reserved.values():
+			return item
+	assert(false, "Error: ran out of items to allocate!")
+	return null
+
+var _tweens: Dictionary = {}
+func show_wobj(obj: Node) -> void:
+	if obj not in _reserved.keys():
+		return
+	var item: Node = _reserved[obj]
+	item.visible = true
+	var t := _setup_tween(obj).set_ease(Tween.EASE_IN_OUT)
+	t.chain().tween_property(item, "scale", Vector2.ONE * 1.2, 0.1)
+	t.chain().tween_property(item, "scale", Vector2.ONE * 1, 0.05)
 	t.play()
 	await t.finished
 
-func hide_item(item: int) -> void:
-	if item < 0:
+func hide_wobj(obj: Node) -> void:
+	if obj not in _reserved.keys():
 		return
-	if item <= _item_tweens.size():
-		_item_tweens.resize(item + 1)
-	if item >= 0 and item < _item_tweens.size() and is_instance_valid(_item_tweens[item]):
-		_item_tweens[item].kill()
-		_item_tweens[item] = null
-	_item_tweens[item] = get_tree().create_tween()
-	var t := _item_tweens[item]
-	t.set_ease(Tween.EASE_IN_OUT)
-	t.chain().tween_property(items[item], "scale", Vector2.ONE * 1.2, 0.05)
-	t.chain().tween_property(items[item], "scale", Vector2.ONE * 0, 0.1)
+	var t := _setup_tween(obj).set_ease(Tween.EASE_IN_OUT)
+	t.chain().tween_property(_reserved[obj], "scale", Vector2.ONE * 1.2, 0.05)
+	t.chain().tween_property(_reserved[obj], "scale", Vector2.ONE * 0, 0.1)
 	t.play()
 	await t.finished
-	items[item].visible = false
-	
+	_reserved[obj].visible = false
 
-func update_item(item: int, world_position: Vector2) -> void:
+func _setup_tween(obj: Node) -> Tween:
+	if obj in _tweens.keys() and is_instance_valid(_tweens[obj]):
+		_tweens[obj].kill()
+		_tweens[obj] = null
+	_tweens[obj] = get_tree().create_tween()
+	return _tweens[obj]
+
+func update_wobj(obj: Node, world_position: Vector2) -> void:
 	var pos := GameCamera.instance.get_screen_center_position() + (Vector2(-320, -180) / 2.0)
-	# var pos := GameCamera.instance.get_screen_center_position()
-	items[item].global_position = (world_position - pos) * 2.0
+	_reserved[obj].global_position = (world_position - pos) * 2.0

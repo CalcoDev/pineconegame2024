@@ -10,7 +10,7 @@ func _should_show_popup(_interactor: Interactor) -> bool:
     return DialogueManager.r.node_exists(_get_current_node_id())
 
 func _on_interact(interactor: Interactor) -> void:
-    should_show_popup = false
+    # should_show_popup = false
     var id := _get_current_node_id()
     if incrementing:
         curr_id += 1
