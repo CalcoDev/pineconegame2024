@@ -1,8 +1,6 @@
-[gd_scene load_steps=4 format=3 uid="uid://u27yy1pnw1c7"]
+[gd_scene load_steps=2 format=3 uid="uid://u27yy1pnw1c7"]
 
 [ext_resource type="Script" path="res://scripts/scenes/death.gd" id="1_4apjc"]
-[ext_resource type="VideoStream" path="res://assets/videos/vergil_motivation.ogv" id="1_q8t26"]
-[ext_resource type="VideoStream" path="res://assets/videos/raiden.ogv" id="3_tffp4"]
 
 [node name="Death" type="Node2D" node_paths=PackedStringArray("bplay", "bquit")]
 script = ExtResource("1_4apjc")
@@ -27,29 +25,6 @@ text = "doktor,
 turn off my kongle inhibtorsw"
 horizontal_alignment = 1
 vertical_alignment = 1
-
-[node name="VideoStreamPlayer" type="VideoStreamPlayer" parent="."]
-offset_left = 240.0
-offset_top = 94.0
-offset_right = 720.0
-offset_bottom = 366.0
-scale = Vector2(0.831954, 0.831954)
-stream = ExtResource("1_q8t26")
-volume_db = -80.0
-autoplay = true
-loop = true
-
-[node name="VideoStreamPlayer2" type="VideoStreamPlayer" parent="."]
-z_index = -1
-offset_left = 2.0
-offset_top = 133.0
-offset_right = 642.0
-offset_bottom = 501.0
-scale = Vector2(0.357649, 0.357649)
-stream = ExtResource("3_tffp4")
-volume_db = -80.0
-autoplay = true
-loop = true
 
 [node name="ColorRect" type="ColorRect" parent="."]
 z_index = -195

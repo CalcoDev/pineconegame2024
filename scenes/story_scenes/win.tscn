@@ -1,7 +1,6 @@
-[gd_scene load_steps=3 format=3 uid="uid://c5tmv4a7piik8"]
+[gd_scene load_steps=2 format=3 uid="uid://c5tmv4a7piik8"]
 
 [ext_resource type="Script" path="res://scripts/scenes/win.gd" id="1_vlpkr"]
-[ext_resource type="VideoStream" path="res://assets/videos/judas.ogv" id="2_1dfmy"]
 
 [node name="Win" type="Node2D" node_paths=PackedStringArray("bplay", "bquit")]
 script = ExtResource("1_vlpkr")
@@ -16,18 +15,6 @@ text = "nah, kongle'd win
 (Kong Satoru)"
 horizontal_alignment = 1
 vertical_alignment = 1
-
-[node name="VideoStreamPlayer" type="VideoStreamPlayer" parent="."]
-offset_left = 118.0
-offset_top = 92.0
-offset_right = 758.0
-offset_bottom = 508.0
-scale = Vector2(0.609365, 0.609365)
-stream = ExtResource("2_1dfmy")
-volume_db = -17.61
-autoplay = true
-loop = true
-bus = &"Music"
 
 [node name="ColorRect" type="ColorRect" parent="."]
 z_index = -195

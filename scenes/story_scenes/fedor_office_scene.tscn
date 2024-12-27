@@ -573,7 +573,7 @@ color = Color(0.00159779, 0.00208778, 0.00627486, 1)
 [node name="Camera2D" type="Camera2D" parent="."]
 process_mode = 3
 physics_interpolation_mode = 1
-position = Vector2(437, 90)
+position = Vector2(340.684, 70.1637)
 zoom = Vector2(2, 2)
 limit_left = 0
 limit_top = 0
