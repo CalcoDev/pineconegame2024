@@ -32,7 +32,7 @@ SoundManager="*res://addons/sound_manager/sound_manager.gd"
 window/size/viewport_width=640
 window/size/viewport_height=480
 window/size/window_width_override=1280
-window/size/window_height_override=720
+window/size/window_height_override=960
 window/stretch/mode="viewport"
 window/stretch/scale_mode="integer"
 window/vsync/vsync_mode=0
@@ -137,7 +137,10 @@ fullscreen={
 
 [physics]
 
+common/physics_jitter_fix=0.0
+2d/physics_engine="GodotPhysics2D"
 2d/default_gravity=490.0
+common/physics_interpolation=true
 
 [rendering]
 

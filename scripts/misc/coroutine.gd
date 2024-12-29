@@ -1,5 +1,8 @@
 class_name Coroutine
 
+static func is_node_valid(node: Node) -> bool:
+	return is_instance_valid(node) and is_instance_valid(node.get_tree()) and is_instance_valid(node.owner)
+
 # const BIND_CTX: int = 542 # wax quail => b64 => hex => +
 class Ctx extends RefCounted:
 	var coro: Coroutine = null
