@@ -1,7 +1,7 @@
 [gd_scene load_steps=3 format=3 uid="uid://bbldoor67prnl"]
 
-[ext_resource type="Texture2D" uid="uid://c8ps26lrruldd" path="res://assets/art/interactions/interaction_nineslice.png" id="1_8yycn"]
-[ext_resource type="Script" path="res://scripts/interactions/interaction_manager.gd" id="1_i6dkg"]
+[ext_resource type="Texture2D" uid="uid://c8ps26lrruldd" path="res://assets/art/categories/interactions/interaction_nineslice.png" id="1_8yycn"]
+[ext_resource type="Script" path="res://scripts/autoload/interaction_manager.gd" id="1_i6dkg"]
 
 [node name="InteractionManager" type="Node2D" node_paths=PackedStringArray("items")]
 process_mode = 3

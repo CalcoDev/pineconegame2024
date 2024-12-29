@@ -3,24 +3,25 @@
 [ext_resource type="Texture2D" uid="uid://dx6tocvike34w" path="res://assets/art/entities/player/player.png" id="1_mdjh7"]
 [ext_resource type="Script" path="res://scripts/entities/player.gd" id="1_n2bhu"]
 [ext_resource type="Shader" path="res://shaders/color_flash.gdshader" id="2_olyj7"]
-[ext_resource type="Script" path="res://scripts/interactions/interactor.gd" id="3_2ocu5"]
-[ext_resource type="Script" path="res://scripts/health/hurtbox_component.gd" id="4_lu3pa"]
-[ext_resource type="Script" path="res://scripts/health/health_component.gd" id="5_gujf2"]
-[ext_resource type="Script" path="res://scripts/health/faction_component.gd" id="5_pneij"]
+[ext_resource type="Script" path="res://scripts/components/interactions/interactor.gd" id="3_2ocu5"]
+[ext_resource type="Script" path="res://scripts/components/health/hurtbox_component.gd" id="4_lu3pa"]
+[ext_resource type="Script" path="res://scripts/components/health/health_component.gd" id="5_gujf2"]
+[ext_resource type="Script" path="res://scripts/components/health/faction_component.gd" id="5_pneij"]
 
 [sub_resource type="PhysicsMaterial" id="PhysicsMaterial_gf8kh"]
 bounce = 0.4
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_ote4v"]
-radius = 4.0
+radius = 5.0
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_k3yvl"]
 shader = ExtResource("2_olyj7")
 shader_parameter/solid_color = Color(1, 1, 1, 0)
-shader_parameter/width = 1
-shader_parameter/outline_color = Color(0, 0, 0, 0)
+shader_parameter/thick = false
+shader_parameter/width = 0
+shader_parameter/outline_color = Color(1, 1, 1, 1)
 
-[sub_resource type="AtlasTexture" id="AtlasTexture_mik4e"]
+[sub_resource type="AtlasTexture" id="AtlasTexture_kofic"]
 atlas = ExtResource("1_mdjh7")
 region = Rect2(0, 0, 17, 19)
 
@@ -28,7 +29,7 @@ region = Rect2(0, 0, 17, 19)
 animations = [{
 "frames": [{
 "duration": 1.0,
-"texture": SubResource("AtlasTexture_mik4e")
+"texture": SubResource("AtlasTexture_kofic")
 }],
 "loop": true,
 "name": &"default",
@@ -59,9 +60,9 @@ hurtbox = NodePath("HurtboxComponent")
 roll_speed = 0.5
 jump_force = 100.0
 yeet_max_dist = 200.0
-yeet_max_force = 100.0
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+z_index = 3
 shape = SubResource("CircleShape2D_ote4v")
 
 [node name="Visuals" type="Node2D" parent="."]
@@ -69,7 +70,7 @@ z_index = 1
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="Visuals"]
 material = SubResource("ShaderMaterial_k3yvl")
-position = Vector2(-8, -10)
+position = Vector2(-9, -10)
 sprite_frames = SubResource("SpriteFrames_uj0g6")
 centered = false
 

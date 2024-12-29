@@ -63,12 +63,12 @@ signal physics_target_changed
 ## The different modes have different functionalities and purposes, so choosing
 ## the correct one depends on what each [param PhantomCamera2D] is meant to do.
 enum FollowMode {
-	NONE 			= 0, ## Default - No follow logic is applied.
-	GLUED 			= 1, ## Sticks to its target.
-	SIMPLE 			= 2, ## Follows its target with an optional offset.
-	GROUP 			= 3, ## Follows multiple targets with option to dynamically reframe itself.
-	PATH 			= 4, ## Follows a target while being positionally confined to a [Path2D] node.
-	FRAMED 			= 5, ## Applies a dead zone on the frame and only follows its target when it tries to leave it.
+	NONE = 0, ## Default - No follow logic is applied.
+	GLUED = 1, ## Sticks to its target.
+	SIMPLE = 2, ## Follows its target with an optional offset.
+	GROUP = 3, ## Follows multiple targets with option to dynamically reframe itself.
+	PATH = 4, ## Follows a target while being positionally confined to a [Path2D] node.
+	FRAMED = 5, ## Applies a dead zone on the frame and only follows its target when it tries to leave it.
 }
 
 ## Determines how often an inactive [param PhantomCamera2D] should update
@@ -704,7 +704,10 @@ func _follow(delta: float) -> void:
 			else:
 				follow_position = _target_position_with_offset()
 
-	_interpolate_position(follow_position, delta)
+ 	# follow_position = follow_position.round()
+	var f := (follow_position / 2.0).round() * 2.0
+	_interpolate_position(f, delta)
+	# _interpolate_position(follow_position.round(), delta)
 
 
 func _set_follow_velocity(index: int, value: float):
@@ -791,7 +794,7 @@ func _target_position_with_offset() -> Vector2:
 
 
 func _on_dead_zone_changed() -> void:
-	set_global_position( _target_position_with_offset() )
+	set_global_position(_target_position_with_offset())
 
 
 func _has_valid_pcam_owner() -> bool:
@@ -1347,19 +1350,19 @@ func get_auto_zoom_margin() -> Vector4:
 ## It's recommended to pass the [enum Side] enum as the sid parameter.
 func set_limit(side: int, value: int) -> void:
 	match side:
-		SIDE_LEFT: 		limit_left = value
-		SIDE_TOP: 		limit_top = value
-		SIDE_RIGHT: 	limit_right = value
-		SIDE_BOTTOM: 	limit_bottom = value
-		_:				printerr("Not a valid Side.")
+		SIDE_LEFT: limit_left = value
+		SIDE_TOP: limit_top = value
+		SIDE_RIGHT: limit_right = value
+		SIDE_BOTTOM: limit_bottom = value
+		_: printerr("Not a valid Side.")
 
 ## Gets the limit side
 func get_limit(value: int) -> int:
 	match value:
-		SIDE_LEFT: 		return limit_left
-		SIDE_TOP: 		return limit_top
-		SIDE_RIGHT: 	return limit_right
-		SIDE_BOTTOM: 	return limit_bottom
+		SIDE_LEFT: return limit_left
+		SIDE_TOP: return limit_top
+		SIDE_RIGHT: return limit_right
+		SIDE_BOTTOM: return limit_bottom
 		_:
 						printerr("Not a valid Side.")
 						return -1
@@ -1411,7 +1414,7 @@ func get_limit_bottom() -> int:
 
 func _limit_target_exist_error() -> void:
 	if not limit_target.is_empty():
-		printerr("Unable to set Limit Side due to Limit Target ", _limit_node.name,  " being assigned")
+		printerr("Unable to set Limit Side due to Limit Target ", _limit_node.name, " being assigned")
 
 
 # Sets a [memeber limit_target] node.

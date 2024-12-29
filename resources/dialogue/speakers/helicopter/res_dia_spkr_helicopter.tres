@@ -1,9 +1,0 @@
-[gd_resource type="Resource" script_class="DialogueSpeakerRes" load_steps=3 format=3 uid="uid://5pwon0vgkgl"]
-
-[ext_resource type="Script" path="res://scripts/dialogue/dialogue_speaker_res.gd" id="1_k0iu6"]
-[ext_resource type="FontFile" uid="uid://3vpul48sh4mo" path="res://resources/fonts/m5x7.ttf" id="1_tovod"]
-
-[resource]
-script = ExtResource("1_k0iu6")
-name = "Helicopter"
-font = ExtResource("1_tovod")

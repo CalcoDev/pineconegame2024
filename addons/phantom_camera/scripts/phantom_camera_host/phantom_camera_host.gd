@@ -35,8 +35,8 @@ signal update_editor_viewfinder
 #region Variables
 
 enum InterpolationMode {
-	AUTO    = 0,
-	IDLE    = 1,
+	AUTO = 0,
+	IDLE = 1,
 	PHYSICS = 2,
 }
 

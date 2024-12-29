@@ -1,13 +1,13 @@
 [gd_scene load_steps=21 format=3 uid="uid://bs4uj3244majj"]
 
-[ext_resource type="Script" path="res://scripts/dialogue/dialogue_manager.gd" id="1_4s0db"]
-[ext_resource type="Script" path="res://scripts/dialogue/dialogue_runner.gd" id="1_bseb2"]
-[ext_resource type="Script" path="res://scripts/dialogue/dia_box_view.gd" id="2_foav0"]
-[ext_resource type="Script" path="res://scripts/dialogue/dia_line_view.gd" id="3_fqjon"]
-[ext_resource type="Script" path="res://scripts/dialogue/dia_option_view.gd" id="4_tu7hx"]
-[ext_resource type="Texture2D" uid="uid://d1iikfwdreks" path="res://assets/art/dialogue/dialogue_box_nineslice.png" id="5_0nabx"]
+[ext_resource type="Script" path="res://scripts/autoload/dialogue_manager.gd" id="1_4s0db"]
+[ext_resource type="Script" path="res://scripts/categories/dialogue/core/dialogue_runner.gd" id="1_bseb2"]
+[ext_resource type="Script" path="res://scripts/categories/dialogue/views/dia_box_view.gd" id="2_foav0"]
+[ext_resource type="Script" path="res://scripts/categories/dialogue/views/dia_line_view.gd" id="3_fqjon"]
+[ext_resource type="Script" path="res://scripts/categories/dialogue/views/dia_option_view.gd" id="4_tu7hx"]
+[ext_resource type="Texture2D" uid="uid://d1iikfwdreks" path="res://assets/art/categories/dialogue/dialogue_box_nineslice.png" id="5_0nabx"]
 [ext_resource type="FontFile" uid="uid://dpk4r84bel6r1" path="res://resources/fonts/MartianMono-NrMd.ttf" id="6_24fxi"]
-[ext_resource type="Texture2D" uid="uid://cqgai48rvxykl" path="res://assets/art/dialogue/dialogue_option_arrow.png" id="7_tdj1n"]
+[ext_resource type="Texture2D" uid="uid://cqgai48rvxykl" path="res://assets/art/categories/dialogue/dialogue_option_arrow.png" id="7_tdj1n"]
 
 [sub_resource type="Animation" id="Animation_heyo8"]
 length = 0.001
@@ -254,7 +254,6 @@ _data = {
 process_mode = 3
 script = ExtResource("1_4s0db")
 runner = NodePath("CanvasLayer/DialogueRunner")
-autoloads = Array[String](["res://resources/dialogue/dia_fedor_office.txt"])
 
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
 
