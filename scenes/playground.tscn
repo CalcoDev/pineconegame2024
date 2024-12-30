@@ -1,26 +1,18 @@
-[gd_scene load_steps=17 format=4 uid="uid://s1h11sqrpwum"]
+[gd_scene load_steps=16 format=4 uid="uid://s1h11sqrpwum"]
 
 [ext_resource type="Script" path="res://scripts/objects/room.gd" id="1_7nits"]
-[ext_resource type="Script" path="res://scripts/objects/game_camera.gd" id="1_8htyi"]
 [ext_resource type="Texture2D" uid="uid://62emabqefgn3" path="res://assets/art/scenes/playground/playground_forest_background.png" id="1_nc3tq"]
-[ext_resource type="Script" path="res://addons/phantom_camera/scripts/phantom_camera_host/phantom_camera_host.gd" id="1_r2i5h"]
-[ext_resource type="Script" path="res://addons/phantom_camera/scripts/phantom_camera/phantom_camera_2d.gd" id="2_tr2lr"]
-[ext_resource type="Script" path="res://addons/phantom_camera/scripts/resources/tween_resource.gd" id="3_cq56v"]
+[ext_resource type="Script" path="res://scripts/categories/camera/camera_instance.gd" id="4_l12y5"]
 [ext_resource type="PackedScene" uid="uid://vpcg1kgktd14" path="res://scenes/prefabs/entites/player.tscn" id="5_d36rm"]
 [ext_resource type="TileSet" uid="uid://dfns0yxxavx1q" path="res://resources/stages/playground/playground_tileset.tres" id="7_31exc"]
 [ext_resource type="Shader" path="res://shaders/multiply_color.gdshader" id="7_duev7"]
 [ext_resource type="Script" path="res://scripts/objects/platforms/moving_platform.gd" id="10_so50k"]
 [ext_resource type="Texture2D" uid="uid://drlq7tpu5af8" path="res://assets/art/scenes/playground/playground_moving_block.png" id="10_vjval"]
 [ext_resource type="Script" path="res://scripts/objects/platforms/moving_platform_point.gd" id="11_ho5kn"]
+[ext_resource type="Texture2D" uid="uid://wpj0y66gkkyy" path="res://assets/art/scenes/playground/playground_gift.png" id="13_nymxx"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_37ib4"]
 size = Vector2(1736, 1091)
-
-[sub_resource type="Resource" id="Resource_y7384"]
-script = ExtResource("3_cq56v")
-duration = 0.75
-transition = 1
-ease = 2
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_n4yym"]
 shader = ExtResource("7_duev7")
@@ -29,24 +21,19 @@ shader_parameter/multiply_color = Color(0.235294, 0.235294, 0.235294, 1)
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_b61yc"]
 size = Vector2(32.0001, 47.9999)
 
+[sub_resource type="PhysicsMaterial" id="PhysicsMaterial_t67sf"]
+friction = 0.4
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_ny0jw"]
+size = Vector2(14, 15)
+
 [node name="Playground" type="Node2D"]
 
-[node name="Camera2D" type="Camera2D" parent="."]
-physics_interpolation_mode = 1
-position = Vector2(-200, -202)
+[node name="CameraInstance" type="Node2D" parent="." node_paths=PackedStringArray("_follow_target")]
+script = ExtResource("4_l12y5")
+debug_draw = false
 zoom = Vector2(2, 2)
-process_callback = 0
-limit_left = -869
-limit_top = -546
-limit_right = 867
-limit_bottom = 545
-script = ExtResource("1_8htyi")
-set_instance = true
-
-[node name="PhantomCameraHost" type="Node" parent="Camera2D"]
-process_priority = 300
-process_physics_priority = 300
-script = ExtResource("1_r2i5h")
+_follow_target = NodePath("../Player")
 
 [node name="ParallaxBackground" type="ParallaxBackground" parent="."]
 
@@ -73,28 +60,15 @@ position = Vector2(256, 256)
 texture = ExtResource("1_nc3tq")
 centered = false
 
-[node name="Room" type="Area2D" parent="." node_paths=PackedStringArray("coll", "camera")]
+[node name="Room" type="Area2D" parent="."]
 collision_layer = 0
 collision_mask = 2
 script = ExtResource("1_7nits")
-coll = NodePath("CollisionShape2D")
-camera = NodePath("PhantomCamera2D")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Room"]
 position = Vector2(-1, -0.5)
 shape = SubResource("RectangleShape2D_37ib4")
 debug_color = Color(0, 0.595, 0.7, 0.0156863)
-
-[node name="PhantomCamera2D" type="Node2D" parent="Room" node_paths=PackedStringArray("follow_target")]
-top_level = true
-position = Vector2(-200, -202)
-script = ExtResource("2_tr2lr")
-follow_mode = 2
-follow_target = NodePath("../../Player")
-zoom = Vector2(2, 2)
-tween_resource = SubResource("Resource_y7384")
-follow_damping = true
-limit_target = NodePath("../CollisionShape2D")
 
 [node name="Tiles" type="Node2D" parent="."]
 
@@ -114,7 +88,12 @@ tile_map_data = PackedByteArray("AAAAAAgAAAABAAMAAAAAAAkAAAABAAQAAAABAAgAAAACAAM
 tile_set = ExtResource("7_31exc")
 
 [node name="Player" parent="." instance=ExtResource("5_d36rm")]
-position = Vector2(-199, -202)
+position = Vector2(430, 387)
+floor_block_on_wall = false
+floor_snap_length = 3.0
+slope_friction = 200.0
+roll_decelrtaion = 800.0
+jump_force = 140.0
 
 [node name="MovingPlatform" type="AnimatableBody2D" parent="."]
 position = Vector2(-72, 159)
@@ -144,3 +123,20 @@ script = ExtResource("11_ho5kn")
 position = Vector2(0, -144)
 script = ExtResource("11_ho5kn")
 loop = 2
+
+[node name="MovingPlatformPoint5" type="Marker2D" parent="MovingPlatform"]
+position = Vector2(0, -144)
+script = ExtResource("11_ho5kn")
+loop = 2
+
+[node name="AnimatableBody2D" type="RigidBody2D" parent="."]
+position = Vector2(114, 105)
+physics_material_override = SubResource("PhysicsMaterial_t67sf")
+gravity_scale = 0.0
+
+[node name="Sprite2D" type="Sprite2D" parent="AnimatableBody2D"]
+texture = ExtResource("13_nymxx")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="AnimatableBody2D"]
+position = Vector2(0, 1.5)
+shape = SubResource("RectangleShape2D_ny0jw")

@@ -7,6 +7,7 @@ extends StaticBody2D
 ## Allow sliding down on slopes
 @export var slide_on_slope := false
 
+
 ## Maximum angle at which a surface is considered a floor
 @export var floor_max_angle := 30.0
 ## Maximum angle at which a surface is considered a slope
@@ -62,6 +63,8 @@ func move(motion: Vector2, callback: Callable = _empty_callable, max_slides: int
 	
 	_colliders.clear()
 
+	var init_motion := motion
+
 	_last_motion = Vector2.ZERO
 	_was_on_floor = _on_floor
 	_on_floor = false
@@ -88,7 +91,6 @@ func move(motion: Vector2, callback: Callable = _empty_callable, max_slides: int
 		if result:
 			_last_coll = result
 			_set_collision_direction(result)
-			callback.call(result)
 			coll_cnt += 1
 
 			if _on_floor and not slide_on_floor and (velocity.normalized() + Vector2.UP).length() < 0.01:
@@ -119,7 +121,8 @@ func move(motion: Vector2, callback: Callable = _empty_callable, max_slides: int
 					motion = result.get_remainder()
 			# todo calco handle constant speed thing 
 			elif (not _on_floor or slide_on_floor) and (not _on_slope or slide_on_slope) and (not _on_ceiling or slide_on_ceiling or not vel_dir_facing_up):
-				var slide_motion := result.get_remainder().slide(result.get_normal())
+				# var slide_motion := result.get_remainder().slide(result.get_normal())
+				var slide_motion := motion.slide(result.get_normal())
 				# velocity not motion
 				if slide_motion.dot(motion) > 0.0:
 					motion = slide_motion
@@ -141,6 +144,14 @@ func move(motion: Vector2, callback: Callable = _empty_callable, max_slides: int
 					# motion = motion.slide(Vector2.UP)
 			
 			_last_motion = result.get_travel()
+			var st := {"motion": motion}
+			callback.call(result, st)
+			motion = st["motion"]
+
+			var other := result.get_collider()
+			if other is RigidBody2D:
+				other.apply_central_impulse(-result.get_normal() * 200)
+			
 		
 		if not result or motion.is_zero_approx():
 			break
@@ -165,8 +176,9 @@ func _snap_to_floor() -> void:
 		if PhysicsServer2D.body_test_motion(get_rid(), p, r):
 			var normal = r.get_collision_normal()
 			var coll_angle = rad_to_deg(acos(normal.dot(Vector2.UP)))
-			if (floor_snap and coll_angle <= floor_max_angle) or (slope_snap and coll_angle <= slope_max_angle):
-				_on_floor = true
+			if (floor_snap and coll_angle <= floor_max_angle): # or (slope_snap and coll_angle <= slope_max_angle)
+				if floor_snap and coll_angle <= floor_max_angle:
+					_on_floor = true
 				_on_floor_normal = normal
 				_on_floor_rid = r.get_collider_rid()
 				_on_floor_obj_id = r.get_collider_id()
@@ -247,5 +259,5 @@ func is_on_ceiling() -> bool:
 # 	var normal = _last_coll.get_normal()
 # 	return rad_to_deg(acos(normal.dot(Vector2.UP))) > 90.0
 
-static func _empty_callable(_coll: KinematicCollision2D) -> void:
+static func _empty_callable(_coll: KinematicCollision2D, _state: Dictionary) -> void:
 	pass

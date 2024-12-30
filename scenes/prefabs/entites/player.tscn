@@ -55,21 +55,21 @@ radius = 4.0
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_scgxt"]
 size = Vector2(9, 3)
 
-[node name="Player" type="StaticBody2D" node_paths=PackedStringArray("_visuals", "_line", "_interactor", "heatlh", "hurtbox")]
+[node name="Player" type="CharacterBody2D" node_paths=PackedStringArray("_visuals", "_line", "_interactor", "heatlh", "hurtbox")]
 collision_layer = 2
 collision_mask = 9
+floor_stop_on_slope = false
+floor_constant_speed = true
+floor_max_angle = 0.261799
 script = ExtResource("1_n2bhu")
 _visuals = NodePath("Visuals")
 _line = NodePath("Line2D")
 _interactor = NodePath("InteractorComponent")
 heatlh = NodePath("HealthComponent")
 hurtbox = NodePath("HurtboxComponent")
-roll_speed = 0.5
 jump_force = 100.0
 yeet_max_dist = 200.0
 gravity = -480.0
-slide_on_floor = true
-slide_on_slope = true
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 z_index = 3
