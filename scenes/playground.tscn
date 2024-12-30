@@ -29,13 +29,8 @@ size = Vector2(14, 15)
 
 [node name="Playground" type="Node2D"]
 
-[node name="CameraInstance" type="Node2D" parent="." node_paths=PackedStringArray("_follow_target")]
-script = ExtResource("4_l12y5")
-debug_draw = false
-zoom = Vector2(2, 2)
-_follow_target = NodePath("../Player")
-
 [node name="ParallaxBackground" type="ParallaxBackground" parent="."]
+scroll_offset = Vector2(-318, -417.5)
 
 [node name="ParallaxLayer" type="ParallaxLayer" parent="ParallaxBackground"]
 motion_scale = Vector2(0.5, 0.5)
@@ -94,6 +89,12 @@ floor_snap_length = 3.0
 slope_friction = 200.0
 roll_decelrtaion = 800.0
 jump_force = 140.0
+
+[node name="CameraInstance" type="Node2D" parent="Player"]
+script = ExtResource("4_l12y5")
+enable_physics_interpolation = true
+process_event = 0
+zoom = Vector2(2, 2)
 
 [node name="MovingPlatform" type="AnimatableBody2D" parent="."]
 position = Vector2(-72, 159)
