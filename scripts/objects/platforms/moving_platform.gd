@@ -5,6 +5,8 @@ extends PhysicsBody2D
 
 var _points: Array[MovingPlatformPoint]
 
+# var velocity := Vector2.ZERO
+
 func _enter_tree() -> void:
 	var pts = find_children("*", "MovingPlatformPoint", false)
 	_points.assign(pts)
@@ -17,6 +19,12 @@ func _enter_tree() -> void:
 
 func _ready() -> void:
 	_go_points()
+# 	_p = global_position
+
+# var _p := Vector2.ZERO
+# func _process(delta: float) -> void:
+# 	velocity = (global_position - _p) / delta
+# 	_p = global_position
 
 func _go_points() -> void:
 	var idx := 0

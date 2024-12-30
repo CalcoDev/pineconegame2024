@@ -70,7 +70,6 @@ yeet_max_dist = 200.0
 gravity = -480.0
 slide_on_floor = true
 slide_on_slope = true
-floor_snap_length = 2.0
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 z_index = 3

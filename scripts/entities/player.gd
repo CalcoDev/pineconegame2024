@@ -70,7 +70,6 @@ func _physics_process(delta: float) -> void:
 		_handle_yeet()
 
 		velocity = move(velocity * delta) / delta
-		# move_and_slide()
 	pass
 
 # =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-==-=-=-=-=-=-=-=
