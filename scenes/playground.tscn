@@ -29,6 +29,8 @@ size = Vector2(14, 15)
 
 [node name="Playground" type="Node2D"]
 
+[node name="Marker2D" type="Marker2D" parent="."]
+
 [node name="ParallaxBackground" type="ParallaxBackground" parent="."]
 scroll_offset = Vector2(-318, -417.5)
 
@@ -83,7 +85,7 @@ tile_map_data = PackedByteArray("AAAAAAgAAAABAAMAAAAAAAkAAAABAAQAAAABAAgAAAACAAM
 tile_set = ExtResource("7_31exc")
 
 [node name="Player" parent="." instance=ExtResource("5_d36rm")]
-position = Vector2(430, 387)
+position = Vector2(430, 410)
 floor_block_on_wall = false
 floor_snap_length = 3.0
 slope_friction = 200.0
@@ -92,9 +94,15 @@ jump_force = 140.0
 
 [node name="CameraInstance" type="Node2D" parent="Player"]
 script = ExtResource("4_l12y5")
+enable_ingame_draw = true
 enable_physics_interpolation = true
 process_event = 0
 zoom = Vector2(2, 2)
+limit_left = 0.0
+limit_right = 816.0
+limit_top = 0.0
+limit_bottom = 536.0
+bounds_target = NodePath("../../Room/CollisionShape2D")
 
 [node name="MovingPlatform" type="AnimatableBody2D" parent="."]
 position = Vector2(-72, 159)
