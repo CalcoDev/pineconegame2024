@@ -3,6 +3,8 @@ extends CharacterBody2D
 
 static var instance: Player = null
 
+@export var cam: KongleCamera
+
 @export var slope_max_angle := 85.0
 @export var slope_snap := true
 
@@ -59,6 +61,13 @@ func _ready() -> void:
 func _process(_delta: float) -> void:
 	# Dumb "top level" ahhh resets
 	_line.global_rotation = 0.0
+
+	# if Input.is_action_just_pressed("jump"):
+		# cam.shake_noise(100, 100, 5, true, KongleCamera.ProcessEvent.PROCESS)
+		# cam.shake_spring(Vector2.DOWN * 100, 100, 2, 0)
+		# await get_tree().create_timer(2.5).timeout
+		# print("Trying to reset!")
+		# cam.shake_noise(100, 100, 1, true, KongleCamera.ProcessEvent.PROCESS)
 
 	if not locked:
 		if Input.is_action_just_pressed("interact"):
@@ -201,6 +210,7 @@ func _handle_yeet() -> void:
 			# _rb.linear_velocity = Vector2.ZERO
 			# _rb.apply_impulse(dir * t * yeet_max_force)
 			velocity = dir * t * yeet_max_force
+			cam.shake_spring(-velocity, 100, 10, 0)
 			_snap_breakout = true
 
 			_yeeted = true

@@ -85,7 +85,7 @@ tile_map_data = PackedByteArray("AAAAAAgAAAABAAMAAAAAAAkAAAABAAQAAAABAAgAAAACAAM
 tile_set = ExtResource("7_31exc")
 
 [node name="KongleCamera" type="Node2D" parent="."]
-position = Vector2(430, 410)
+position = Vector2(350, 108)
 script = ExtResource("4_l12y5")
 enable_ingame_draw = true
 enable_physics_interpolation = true
@@ -93,10 +93,11 @@ process_event = 0
 zoom = Vector2(2, 2)
 bounds_target = NodePath("../Room/CollisionShape2D")
 
-[node name="Player" parent="." instance=ExtResource("5_d36rm")]
-position = Vector2(430, 410)
+[node name="Player" parent="." node_paths=PackedStringArray("cam") instance=ExtResource("5_d36rm")]
+position = Vector2(350, 108)
 floor_block_on_wall = false
 floor_snap_length = 3.0
+cam = NodePath("../KongleCamera")
 slope_friction = 200.0
 roll_decelrtaion = 800.0
 jump_force = 140.0

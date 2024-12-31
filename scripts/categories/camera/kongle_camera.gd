@@ -13,6 +13,17 @@ enum ProcessEvent {
 	PHYSICS
 }
 
+func _await_process_event(process_event: ProcessEvent) -> void:
+	if process_event == ProcessEvent.PROCESS:
+		await get_tree().process_frame
+	else:
+		await get_tree().physics_frame
+
+func _get_process_event_delta(process_event: ProcessEvent) -> float:
+	if process_event == ProcessEvent.PROCESS:
+		return get_process_delta_time()
+	return get_physics_process_delta_time()
+
 #endregion
 
 #region Vars - Transform
@@ -101,6 +112,78 @@ var _bounds_node: CollisionShape2D
 
 #endregion
 
+#region API
+signal on_shake_begin()
+signal on_shake_end()
+
+# var _shake_transform_offset := Transform2D()
+var _shake_pos_offset := Vector2.ZERO
+var _shake_rot_offset := 0.0
+var _shake_scale := Vector2.ONE
+var _is_shaking := false
+
+var _shake_coro: Coroutine
+var _noise := FastNoiseLite.new()
+
+@warning_ignore("shadowed_global_identifier", "shadowed_variable")
+func shake_noise(freq: float, ampl: float, duration: float, lerp: bool, process_event: ProcessEvent) -> void:
+	await _shake_handler(_shake_noise_coro.bind(freq, ampl, duration, lerp, process_event))
+
+@warning_ignore("shadowed_global_identifier", "shadowed_variable")
+func shake_spring(velocity: Vector2, spring: float, damp: float, process_event: ProcessEvent) -> void:
+	await _shake_handler(_shake_spring_coro.bind(velocity, spring, damp, process_event))
+
+@warning_ignore("shadowed_global_identifier", "shadowed_variable")
+func _shake_spring_coro(ctx: Coroutine.Ctx, velocity: Vector2, spring: float, damp: float, process_event: ProcessEvent) -> void:
+	var s := Spring2D.new(spring, damp, velocity)
+	var offset := Vector2.ZERO
+	while not s.is_approx_done(offset, 0.001):
+		print(offset.is_equal_approx(s.target))
+		if not ctx.is_valid() or not is_instance_valid(self) or not is_inside_tree():
+			return
+		await _await_process_event(process_event)
+		offset = s.tick(_get_process_event_delta(process_event), offset)
+		_shake_pos_offset = offset
+
+@warning_ignore("shadowed_global_identifier", "shadowed_variable")
+func _shake_noise_coro(ctx: Coroutine.Ctx, freq: float, ampl: float, duration: float, lerp: bool, process_event: ProcessEvent) -> void:
+	_noise.noise_type = FastNoiseLite.TYPE_SIMPLEX
+	var timer := 0.0
+	while timer <= duration:
+		if not ctx.is_valid() or not is_instance_valid(self) or not is_inside_tree():
+			return
+		await _await_process_event(process_event)
+		
+		var curr_ampl := lerpf(ampl, 0.0, timer / duration) if lerp else ampl
+		_noise.frequency = freq
+
+		var x_off := _noise.get_noise_2d(timer * freq, 0.0) * curr_ampl
+		var y_off := _noise.get_noise_2d(0.0, timer * freq) * curr_ampl
+
+		_shake_pos_offset = Vector2(x_off, y_off)
+		# var curr_rot_ampl := lerpf(rot_ampl, rot_ampl * 0.25, timer / duration) if lerp else 
+
+		timer += _get_process_event_delta(process_event)
+
+func _shake_handler(new_callable: Callable) -> void:
+	if _is_shaking and Coroutine.is_instance_valid(_shake_coro):
+		_shake_coro.stop()
+	if not _is_shaking:
+		on_shake_begin.emit()
+		_is_shaking = true
+	_shake_coro = Coroutine.make_single(true, new_callable)
+	await _shake_coro.run()
+	_reset_shake()
+	_is_shaking = false
+	on_shake_end.emit()
+
+func _reset_shake() -> void:
+	_shake_pos_offset = Vector2.ZERO
+	_shake_rot_offset = 0.0
+	_shake_scale = Vector2.ONE
+
+#endregion
+
 #region Lifecycle
 func _notification(what: int) -> void:
 	match what:
@@ -113,6 +196,7 @@ func _notification(what: int) -> void:
 			add_to_group(_group_name)
 			add_to_group(_canvas_group_name)
 
+			_reset_shake()
 			_update_process_events()
 			_update_transform()
 
@@ -240,22 +324,28 @@ func _get_camera_transform() -> Transform2D:
 			cam_pos.y -= cam_rect.position.y + cam_rect.size.y - _limits[SIDE_BOTTOM]
 	
 	# stuff after rotations
-	var cam_offset_rot := cam_offset.rotated(rotation)
+	cam_pos += _shake_pos_offset
+
+	var camera_rot := global_rotation + _shake_rot_offset
+	var cam_offset_rot := cam_offset.rotated(camera_rot)
 	var cam_rect_rot := Rect2(-cam_offset_rot + cam_pos, cam_size * _zoom_inverse)
-	if enable_limits:
-		if cam_rect_rot.position.x < _limits[SIDE_LEFT]:
-			cam_rect_rot.position.x = _limits[SIDE_LEFT]
-		if cam_rect_rot.position.x + cam_rect_rot.size.x > _limits[SIDE_RIGHT]:
-			cam_rect_rot.position.x = _limits[SIDE_RIGHT] - cam_rect_rot.size.x
-		if cam_rect_rot.position.y < _limits[SIDE_TOP]:
-			cam_rect_rot.position.y = _limits[SIDE_TOP]
-		if cam_rect_rot.position.y + cam_rect_rot.size.y > _limits[SIDE_BOTTOM]:
-			cam_rect_rot.position.y = _limits[SIDE_BOTTOM] - cam_rect_rot.size.y
+	# todo calco this is kinda broken lmfao
+	# if enable_limits:
+	# 	if cam_rect_rot.position.x < _limits[SIDE_LEFT]:
+	# 		cam_rect_rot.position.x = _limits[SIDE_LEFT]
+	# 	if cam_rect_rot.position.x + cam_rect_rot.size.x > _limits[SIDE_RIGHT]:
+	# 		cam_rect_rot.position.x = _limits[SIDE_RIGHT] - cam_rect_rot.size.x
+	# 	if cam_rect_rot.position.y < _limits[SIDE_TOP]:
+	# 		cam_rect_rot.position.y = _limits[SIDE_TOP]
+	# 	if cam_rect_rot.position.y + cam_rect_rot.size.y > _limits[SIDE_BOTTOM]:
+	# 		cam_rect_rot.position.y = _limits[SIDE_BOTTOM] - cam_rect_rot.size.y
 
 	var t := Transform2D()
-	t = t.scaled(_zoom_inverse)
-	t = t.rotated_local(rotation)
+	t = t.scaled(Vector2.ONE / (zoom * _shake_scale))
+	t = t.rotated(camera_rot)
 	t.origin = cam_rect_rot.position
+
+	# t = t * _shake_transform_offset
 
 	_cam_screen_center = t * (cam_size * 0.5)
 
@@ -268,6 +358,12 @@ func _get_camera_size() -> Vector2:
 			ProjectSettings.get_setting("display/window/size/viewport_height")
 		)
 	return _viewport.get_visible_rect().size
+
+func _get_scaled_camera_size() -> Vector2:
+	var cam := _get_camera_size()
+	if _is_inside_editor():
+		return cam
+	return cam * _zoom_inverse
 
 func _update_interpolation_data() -> void:
 	var tick := Engine.get_physics_frames()

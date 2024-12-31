@@ -21,6 +21,10 @@ var _t := 0.0
 var _spr := Spring2D.new(1, 1)
 func _ready() -> void:
 	_spr = Spring2D.new(spring, damp)
+	test.bind("a", "b").bind("c").call()
+
+func test(a, b, c) -> void:
+	print(a, b, c)
 
 var _pos := Vector2.ZERO
 func _process(delta: float) -> void:
@@ -31,7 +35,7 @@ func _process(delta: float) -> void:
 	# y_pos = _y_spring.tick(delta, y_pos)
 	if Input.is_action_just_pressed("jump"):
 		var m := (get_global_mouse_position() - Vector2(320, 240)).normalized() * 40
-		_spr.vel = m / delta
+		_spr.velocity = m / delta
 	_pos = _spr.tick(delta, _pos)
 
 	x_line.add_point(Vector2(0, _pos.x / 2.0))

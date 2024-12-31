@@ -3,19 +3,25 @@ extends Object
 
 var spring: float
 var damp: float
-var vel := Vector2.ZERO
+var velocity: Vector2
 var target := Vector2.ZERO
 
 @warning_ignore("shadowed_variable")
-func _init(spring: float, damping: float) -> void:
+func _init(spring: float, damp: float, velocity := Vector2.ZERO) -> void:
     self.spring = spring
-    self.damp = damping
+    self.damp = damp
+    self.velocity = velocity
 
 func tick(delta: float, position: Vector2) -> Vector2:
-    var deceleration := delta * damp * vel
-    if vel.length_squared() > deceleration.length_squared():
-        vel -= deceleration
+    var deceleration := delta * damp * velocity
+    if velocity.length_squared() > deceleration.length_squared():
+        velocity -= deceleration
     else:
-        vel = Vector2.ZERO
-    vel += delta * spring * (target - position)
-    return position + delta * vel
+        velocity = Vector2.ZERO
+    velocity += delta * spring * (target - position)
+    return position + delta * velocity
+
+func is_approx_done(position: Vector2, epsilon: float = 0.001) -> bool:
+    var p := (position - target).length_squared() < epsilon * epsilon
+    var v := velocity.length_squared() < epsilon * epsilon
+    return p and v

@@ -3,6 +3,9 @@ class_name Coroutine
 static func is_node_valid(node: Node) -> bool:
 	return is_instance_valid(node) and is_instance_valid(node.get_tree()) and is_instance_valid(node.owner)
 
+static func is_instance_valid(coro: Coroutine) -> bool:
+	return is_instance_valid(coro) and is_instance_valid(coro.context) and not coro.context.cancelled
+
 # const BIND_CTX: int = 542 # wax quail => b64 => hex => +
 class Ctx extends RefCounted:
 	var coro: Coroutine = null
@@ -14,6 +17,8 @@ class Ctx extends RefCounted:
 			return coro.started
 	func _init(coroutine: Coroutine) -> void:
 		coro = coroutine
+	func is_valid() -> bool:
+		return Coroutine.is_instance_valid(coro)
 
 signal on_completed()
 signal on_cancelled()
@@ -21,44 +26,36 @@ signal on_cancelled()
 var to_await: Callable
 var started: bool = false
 var cancelled: bool = false
-
 var context: Ctx = Ctx.new(self)
 
 func bind_ctx(callable: Callable) -> Callable:
 	return callable.bind(context)
 
-var _raw: bool = true
 func run() -> bool: # returns (completed)
 	started = true
 	cancelled = false
 
-	if _raw:
-		await call_to_await()
+	await _call_to_await()
+	if not context.is_valid() or cancelled:
+		on_cancelled.emit()
+		return false
+	else:
 		on_completed.emit()
 		return true
-	else:
-		var await_finish = func():
-			await call_to_await()
-			if not cancelled:
-				on_completed.emit()
-		var await_cancelled = func():
-			await on_cancelled
-		var c = Coroutine.new()
-		c._raw = false
-		c.first_of([await_finish, await_cancelled], false)
-		var was_cancelled = await c.run()
-		return not was_cancelled
 
 # CALCO: This actually only has an effect if first param of to_await is of type coroutine
 func stop() -> void:
 	if started:
 		cancelled = true
 
-func call_to_await():
-	if to_await.get_argument_count() == 1:
-		await to_await.call(context)
-	else:
-		await to_await.call()
+func _call_to_await():
+	await to_await.call()
+
+#region API
+static func make_single(bind_context: bool, awaitable: Callable) -> Coroutine:
+	var c := Coroutine.new()
+	c.to_await = c.bind_ctx(awaitable) if bind_context else awaitable
+	return c
 
 func single(awaitable: Callable) -> void:
 	to_await = awaitable
@@ -99,3 +96,4 @@ func first_of(awaitables: Array[Callable], stop_on_finish: bool) -> int:
 			coroutines[i].stop()
 
 	return index[0]
+#endregion
