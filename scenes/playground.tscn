@@ -1,14 +1,16 @@
-[gd_scene load_steps=16 format=4 uid="uid://s1h11sqrpwum"]
+[gd_scene load_steps=21 format=4 uid="uid://s1h11sqrpwum"]
 
 [ext_resource type="Script" path="res://scripts/objects/room.gd" id="1_7nits"]
 [ext_resource type="Texture2D" uid="uid://62emabqefgn3" path="res://assets/art/scenes/playground/playground_forest_background.png" id="1_nc3tq"]
 [ext_resource type="Script" path="res://scripts/categories/camera/kongle_camera.gd" id="4_l12y5"]
 [ext_resource type="PackedScene" uid="uid://vpcg1kgktd14" path="res://scenes/prefabs/entites/player.tscn" id="5_d36rm"]
+[ext_resource type="Script" path="res://scripts/entities/player_visuals_test.gd" id="6_fmi6b"]
 [ext_resource type="TileSet" uid="uid://dfns0yxxavx1q" path="res://resources/stages/playground/playground_tileset.tres" id="7_31exc"]
 [ext_resource type="Shader" path="res://shaders/multiply_color.gdshader" id="7_duev7"]
 [ext_resource type="Script" path="res://scripts/objects/platforms/moving_platform.gd" id="10_so50k"]
 [ext_resource type="Texture2D" uid="uid://drlq7tpu5af8" path="res://assets/art/scenes/playground/playground_moving_block.png" id="10_vjval"]
 [ext_resource type="Script" path="res://scripts/objects/platforms/moving_platform_point.gd" id="11_ho5kn"]
+[ext_resource type="Texture2D" uid="uid://d20pnh6n2clsy" path="res://assets/art/scenes/playground/playgroeund_crystal.png" id="12_hqgux"]
 [ext_resource type="Texture2D" uid="uid://wpj0y66gkkyy" path="res://assets/art/scenes/playground/playground_gift.png" id="13_nymxx"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_37ib4"]
@@ -26,6 +28,45 @@ friction = 0.4
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_ny0jw"]
 size = Vector2(14, 15)
+
+[sub_resource type="Animation" id="Animation_e22hw"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(405, 117)]
+}
+
+[sub_resource type="Animation" id="Animation_g2par"]
+resource_name = "new_animation"
+length = 10.0
+loop_mode = 1
+step = 0.1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:position")
+tracks/0/interp = 2
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 5.1, 10),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [Vector2(405, 117), Vector2(405, 54), Vector2(405, 117)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_mearc"]
+_data = {
+"RESET": SubResource("Animation_e22hw"),
+"new_animation": SubResource("Animation_g2par")
+}
 
 [node name="Playground" type="Node2D"]
 
@@ -84,24 +125,6 @@ tile_set = ExtResource("7_31exc")
 tile_map_data = PackedByteArray("AAAAAAgAAAABAAMAAAAAAAkAAAABAAQAAAABAAgAAAACAAMAAAABAAkAAAACAAQAAAAFAAkAAAABAAMAAAAFAAoAAAABAAQAAAAGAAkAAAACAAMAAAAGAAoAAAACAAQAAAAKAAgAAAABAAMAAAAKAAkAAAABAAQAAAALAAgAAAACAAMAAAALAAkAAAACAAQAAAAMAAgAAAABAAMAAAAMAAkAAAABAAQAAAAUAAgAAAABAAMAAAAUAAkAAAABAAQAAAAVAAgAAAACAAMAAAAVAAkAAAACAAQAAAAWAAgAAAABAAMAAAAWAAkAAAABAAQAAAAXAAgAAAACAAMAAAAXAAkAAAACAAQAAAAdAAUAAAABAAMAAAAeAAUAAAACAAMAAAAeAAYAAAACAAQAAAAfAAUAAAABAAMAAAAfAAYAAAABAAQAAAAgAAUAAAACAAMAAAAgAAYAAAACAAQAAAAhAAUAAAABAAMAAAAhAAYAAAABAAQAAAAiAAUAAAACAAMAAAAiAAYAAAACAAQAAAAjAAUAAAABAAMAAAAjAAYAAAABAAQAAAAkAAUAAAACAAMAAAAkAAYAAAACAAQAAAAcAAYAAAABAAMAAAAcAAcAAAABAAQAAAAaAAYAAAABAAMAAAAaAAcAAAABAAQAAAAbAAYAAAACAAMAAAAbAAcAAAACAAQAAAAdAAYAAAABAAQAAAAhABEAAAABAAMAAAAhABIAAAABAAQAAAAiABEAAAACAAMAAAAiABIAAAACAAQAAAAjABEAAAABAAMAAAAjABIAAAABAAQAAAAkABEAAAACAAMAAAAkABIAAAACAAQAAAAlABEAAAABAAMAAAAlABIAAAABAAQAAAAmABEAAAACAAMAAAAmABIAAAACAAQAAAAoAA8AAAABAAMAAAAoABAAAAABAAQAAAApAA8AAAACAAMAAAApABAAAAACAAQAAAAmAA8AAAABAAMAAAAmABAAAAABAAQAAAAnAA8AAAALAAAAAAAnABAAAAACAAQAAAAjAA0AAAABAAMAAAAjAA4AAAABAAQAAAAkAA0AAAACAAMAAAAkAA4AAAACAAQAAAASAB0AAAABAAMAAAASAB4AAAABAAQAAAATAB0AAAACAAMAAAATAB4AAAACAAQAAAAUAB0AAAABAAMAAAAUAB4AAAABAAQAAAAVAB0AAAACAAMAAAAVAB4AAAACAAQAAAAWAB0AAAABAAMAAAAWAB4AAAABAAQAAAAXAB0AAAACAAMAAAAXAB4AAAACAAQAAAAYAB0AAAABAAMAAAAYAB4AAAABAAQAAAAZAB0AAAACAAMAAAAZAB4AAAACAAQAAAAaAB0AAAABAAMAAAAaAB4AAAABAAQAAAAbAB0AAAACAAMAAAAbAB4AAAACAAQAAAAcAB0AAAABAAMAAAAcAB4AAAABAAQAAAAdAB0AAAACAAMAAAAdAB4AAAACAAQAAAAeAB0AAAABAAMAAAAeAB4AAAABAAQAAAAfAB0AAAACAAMAAAAfAB4AAAACAAQAAAAgAB0AAAABAAMAAAAgAB4AAAABAAQAAAAhAB0AAAACAAMAAAAhAB4AAAACAAQAAAAiAB0AAAABAAMAAAAiAB4AAAABAAQAAAAjAB0AAAACAAMAAAAjAB4AAAACAAQAAAAmAB0AAAABAAMAAAAmAB4AAAABAAQAAAAnAB0AAAACAAMAAAAnAB4AAAACAAQAAAAoAB0AAAABAAMAAAAoAB4AAAABAAQAAAApAB0AAAACAAMAAAApAB4AAAACAAQAAAAqAB0AAAABAAMAAAAqAB4AAAABAAQAAAArAB0AAAACAAMAAAArAB4AAAACAAQAAAAuAB0AAAABAAMAAAAuAB4AAAABAAQAAAAvAB0AAAACAAMAAAAvAB4AAAACAAQAAAAmABkAAAABAAMAAAAmABoAAAABAAQAAAAnABkAAAACAAMAAAAnABoAAAACAAQAAAAoABkAAAABAAMAAAAoABoAAAABAAQAAAApABkAAAACAAMAAAApABoAAAACAAQAAAAqABkAAAABAAMAAAAqABoAAAABAAQAAAArABkAAAACAAMAAAArABoAAAACAAQAAAAsABkAAAABAAMAAAAsABoAAAABAAQAAAAtABkAAAACAAMAAAAtABoAAAACAAQAAAAgABgAAAABAAMAAAAgABkAAAABAAQAAAAhABgAAAACAAMAAAAhABkAAAACAAQAAAAeABcAAAALAAAAAAAfABQAAAALAAAAAAAgABQAAAALAAAAAAAiAA4AAAALAAAAAAAhAA0AAAALAAAAAAAgAAwAAAALAAAAAAAnAA4AAAALAAAAAAAYAAoAAAALAAAAAAAXAAoAAAALAAAAAAAeAAsAAAALAAAAAAAcAAsAAAALAAAAAAAmAAcAAAALAAAAAAApAAcAAAALAAAAAAAsAAIAAAALAAAAAAAnAAIAAAALAAAAAAAoAAIAAAALAAAAAAArAAEAAAALAAAAAAAuAAEAAAALAAAAAAAxAAUAAAALAAAAAAAxAAQAAAALAAAAAAAhAAAAAAALAAAAAAAkAP7/AAALAAAAAAAhAPz/AAALAAAAAAAcAPv/AAALAAAAAAAVAPv/AAALAAAAAAAZAPr/AAALAAAAAAAZAPn/AAALAAAAAAAQAPv/AAALAAAAAAANAPr/AAALAAAAAAAIAPn/AAALAAAAAAADAAoAAAALAAAAAAAKAAoAAAALAAAAAAAGAAwAAAALAAAAAAAEAA8AAAALAAAAAAAHABAAAAALAAAAAAAFABMAAAALAAAAAAAIABUAAAALAAAAAAAEABYAAAALAAAAAAAIABcAAAALAAAAAAADABwAAAALAAAAAAAJAB0AAAALAAAAAAAIABoAAAALAAAAAAAPAB4AAAALAAAAAAA=")
 tile_set = ExtResource("7_31exc")
 
-[node name="KongleCamera" type="Node2D" parent="."]
-position = Vector2(350, 108)
-script = ExtResource("4_l12y5")
-enable_ingame_draw = true
-enable_physics_interpolation = true
-process_event = 0
-zoom = Vector2(2, 2)
-bounds_target = NodePath("../Room/CollisionShape2D")
-
-[node name="Player" parent="." node_paths=PackedStringArray("cam") instance=ExtResource("5_d36rm")]
-position = Vector2(350, 108)
-floor_block_on_wall = false
-floor_snap_length = 3.0
-cam = NodePath("../KongleCamera")
-slope_friction = 200.0
-roll_decelrtaion = 800.0
-jump_force = 140.0
-
 [node name="MovingPlatform" type="AnimatableBody2D" parent="."]
 position = Vector2(-72, 159)
 script = ExtResource("10_so50k")
@@ -109,37 +132,49 @@ move_speed = 100.0
 
 [node name="Sprite2D" type="Sprite2D" parent="MovingPlatform"]
 texture = ExtResource("10_vjval")
+centered = false
+script = ExtResource("6_fmi6b")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="MovingPlatform"]
-position = Vector2(0, 1.52588e-05)
+position = Vector2(24, 16)
 rotation = -1.57079
 shape = SubResource("RectangleShape2D_b61yc")
 
 [node name="MovingPlatformPoint" type="Marker2D" parent="MovingPlatform"]
 script = ExtResource("11_ho5kn")
+trans_type = 2
 
 [node name="MovingPlatformPoint2" type="Marker2D" parent="MovingPlatform"]
 position = Vector2(-130, 0)
 script = ExtResource("11_ho5kn")
+trans_type = 2
 
 [node name="MovingPlatformPoint3" type="Marker2D" parent="MovingPlatform"]
 position = Vector2(-130, -144)
 script = ExtResource("11_ho5kn")
+trans_type = 2
 
 [node name="MovingPlatformPoint4" type="Marker2D" parent="MovingPlatform"]
 position = Vector2(0, -144)
 script = ExtResource("11_ho5kn")
+trans_type = 2
 loop = 2
 
-[node name="MovingPlatformPoint5" type="Marker2D" parent="MovingPlatform"]
-position = Vector2(0, -144)
-script = ExtResource("11_ho5kn")
-loop = 2
+[node name="Player" parent="." instance=ExtResource("5_d36rm")]
+position = Vector2(311, 64)
+floor_block_on_wall = false
+floor_snap_length = 3.0
+slope_friction = 200.0
+roll_decelrtaion = 800.0
+jump_force = 140.0
+
+[node name="Visuals" parent="Player" index="1"]
+script = ExtResource("6_fmi6b")
 
 [node name="AnimatableBody2D" type="RigidBody2D" parent="."]
-position = Vector2(114, 105)
+position = Vector2(255, 14)
 physics_material_override = SubResource("PhysicsMaterial_t67sf")
-gravity_scale = 0.0
+gravity_scale = 0.5
 
 [node name="Sprite2D" type="Sprite2D" parent="AnimatableBody2D"]
 texture = ExtResource("13_nymxx")
@@ -147,3 +182,30 @@ texture = ExtResource("13_nymxx")
 [node name="CollisionShape2D" type="CollisionShape2D" parent="AnimatableBody2D"]
 position = Vector2(0, 1.5)
 shape = SubResource("RectangleShape2D_ny0jw")
+
+[node name="Node2D" type="Node2D" parent="."]
+position = Vector2(405, 117)
+
+[node name="Sprite2D" type="Sprite2D" parent="Node2D"]
+position = Vector2(-33, -41)
+texture = ExtResource("12_hqgux")
+centered = false
+script = ExtResource("6_fmi6b")
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="Node2D"]
+libraries = {
+"": SubResource("AnimationLibrary_mearc")
+}
+autoplay = "new_animation"
+
+[node name="KongleCamera" type="Node2D" parent="."]
+position = Vector2(311, 64)
+script = ExtResource("4_l12y5")
+enable_physics_interpolation = true
+process_event = 0
+zoom = Vector2(2, 2)
+enable_limits = false
+bounds_target = NodePath("../Room/CollisionShape2D")
+follow_target = NodePath("../Player/Visuals")
+
+[editable path="Player"]

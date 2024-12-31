@@ -13,12 +13,29 @@ enum ProcessEvent {
 	PHYSICS
 }
 
+static var instance: KongleCamera = null:
+	get():
+		if instance != null and (not is_instance_valid(instance) or not instance.is_inside_tree()):
+			instance = null
+		return instance
+@export var active: bool:
+	set(value):
+		print("setting active to ", value)
+		active = value
+		if not _is_inside_editor() and active and instance != self:
+			if is_instance_valid(instance) and instance.is_inside_tree():
+				instance.active = false
+				print("does this fucker run")
+			instance = self
+
+@warning_ignore("shadowed_variable")
 func _await_process_event(process_event: ProcessEvent) -> void:
 	if process_event == ProcessEvent.PROCESS:
 		await get_tree().process_frame
 	else:
 		await get_tree().physics_frame
 
+@warning_ignore("shadowed_variable")
 func _get_process_event_delta(process_event: ProcessEvent) -> float:
 	if process_event == ProcessEvent.PROCESS:
 		return get_process_delta_time()
@@ -62,10 +79,15 @@ var _zoom_inverse := Vector2.ONE:
 			zoom = v
 		queue_redraw()
 
+@export var pixel_snap_size := 0
+
 var _interp_data := InterpolationData.new()
 var _group_name: String = ""
 var _canvas_group_name: String = ""
 var _viewport: Viewport
+
+func get_screen_center() -> Vector2:
+	return _cam_screen_center
 
 #endregion
 
@@ -103,16 +125,34 @@ var _viewport: Viewport
 		_bounds_node = node
 		_update_bounds()
 	get():
-		if not bounds_target:
-			return NodePath("")
-		else:
-			return bounds_target
+		return bounds_target if bounds_target else NodePath("")
 var _bounds_node: CollisionShape2D
 #endregion
 
+#region Vars - Follows
+@export_node_path("Node2D") var follow_target := NodePath(""):
+	set(value):
+		follow_target = value
+		if not is_node_ready():
+			await ready
+		var node := get_node_or_null(follow_target)
+		if is_instance_valid(node):
+			if node is Node2D:
+				_follow_node = node
+			else:
+				printerr("Follow Target is of an unsupported type!")
+				return
+		elif follow_target == NodePath(""):
+			_follow_node = null
+		else:
+			printerr("Follow Target cannot be null!")
+		queue_redraw()
+	get():
+		return follow_target if follow_target else NodePath("")
+var _follow_node: Node2D
 #endregion
 
-#region API
+#region Shake API
 signal on_shake_begin()
 signal on_shake_end()
 
@@ -138,7 +178,6 @@ func _shake_spring_coro(ctx: Coroutine.Ctx, velocity: Vector2, spring: float, da
 	var s := Spring2D.new(spring, damp, velocity)
 	var offset := Vector2.ZERO
 	while not s.is_approx_done(offset, 0.001):
-		print(offset.is_equal_approx(s.target))
 		if not ctx.is_valid() or not is_instance_valid(self) or not is_inside_tree():
 			return
 		await _await_process_event(process_event)
@@ -196,6 +235,9 @@ func _notification(what: int) -> void:
 			add_to_group(_group_name)
 			add_to_group(_canvas_group_name)
 
+			if active and instance == null:
+				active = true # auto set
+
 			_reset_shake()
 			_update_process_events()
 			_update_transform()
@@ -209,6 +251,8 @@ func _notification(what: int) -> void:
 			if bounds_target == NodePath(""):
 				bounds_target = NodePath("")
 		NOTIFICATION_EXIT_TREE:
+			active = false
+
 			_group_name = "__cameras_" + str(_viewport.get_viewport_rid().get_id())
 			_canvas_group_name = "__cameras_c" + str(get_canvas().get_id())
 			remove_from_group(_group_name)
@@ -223,6 +267,8 @@ func _notification(what: int) -> void:
 		NOTIFICATION_PROCESS:
 			if Engine.is_editor_hint():
 				return
+			# print("camera")
+			# print("camera")
 			_update_transform()
 		NOTIFICATION_PHYSICS_PROCESS:
 			if _should_interpolate():
@@ -246,18 +292,18 @@ func _notification(what: int) -> void:
 			var inv_glob := global_transform.affine_inverse()
 			for i in 4:
 				draw_line(inv_glob * points[i], inv_glob * points[(i + 1) % 4], 0xff0000ff, 2)
-
 #endregion
 
 #region Transform Helpers
 func _update_process_events() -> void:
 	if _should_interpolate():
-		set_process_internal(true)
+		# set_process_internal(true)
 		set_process(true)
 		set_physics_process(true)
 	elif _is_inside_editor():
-		set_process_internal(false)
-		set_physics_process_internal(false)
+		# set_process_internal(false)
+		# set_physics_process_internal(false)
+		pass
 	else:
 		if process_event == ProcessEvent.PROCESS:
 			set_process(true)
@@ -265,6 +311,8 @@ func _update_process_events() -> void:
 		else:
 			set_process(false)
 			set_physics_process(true)
+
+var __last_interp_pos := Vector2.ZERO
 
 var _cam_screen_center := Vector2.ZERO
 func _update_transform() -> void:
@@ -284,6 +332,7 @@ func _update_transform() -> void:
 		_cam_screen_center = t.affine_inverse() * hs_size
 	else:
 		t = _get_camera_transform()
+	# __last_interp_pos = t.affine_inverse().origin + hs_size * _zoom_inverse
 	get_viewport().canvas_transform = t
 	# Ensure compat with normal camera nodes
 	var adj_screen_pos := _cam_screen_center - hs_size
@@ -303,6 +352,8 @@ func _get_camera_transform() -> Transform2D:
 	if not get_tree():
 		return Transform2D()
 
+	if is_instance_valid(_follow_node):
+		global_position = _follow_node.global_position
 	var cam_pos = global_position
 	
 	var cam_size := _get_camera_size()
@@ -343,7 +394,13 @@ func _get_camera_transform() -> Transform2D:
 	var t := Transform2D()
 	t = t.scaled(Vector2.ONE / (zoom * _shake_scale))
 	t = t.rotated(camera_rot)
-	t.origin = cam_rect_rot.position
+	t.origin = cam_rect_rot.position.round()
+	__last_interp_pos = cam_rect_rot.position
+	# if pixel_snap_size > 0:
+	# 	var snap_size := pixel_snap_size
+	# 	print(snap_size)
+	# 	t.origin = round(t.origin / snap_size) * snap_size
+	# 	# print("new org: ", t.origin)
 
 	# t = t * _shake_transform_offset
 

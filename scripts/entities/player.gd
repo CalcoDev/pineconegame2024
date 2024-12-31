@@ -3,8 +3,6 @@ extends CharacterBody2D
 
 static var instance: Player = null
 
-@export var cam: KongleCamera
-
 @export var slope_max_angle := 85.0
 @export var slope_snap := true
 
@@ -55,10 +53,8 @@ func _enter_tree() -> void:
 		push_warning("ERROR: Somehow 2 player instances at same time?")
 	_line.top_level = true
 
-func _ready() -> void:
-	_visuals.scale = Vector2.ONE * 0.75
-
 func _process(_delta: float) -> void:
+	# _visuals.global_position = global_position.round()
 	# Dumb "top level" ahhh resets
 	_line.global_rotation = 0.0
 
@@ -210,7 +206,6 @@ func _handle_yeet() -> void:
 			# _rb.linear_velocity = Vector2.ZERO
 			# _rb.apply_impulse(dir * t * yeet_max_force)
 			velocity = dir * t * yeet_max_force
-			cam.shake_spring(-velocity, 100, 10, 0)
 			_snap_breakout = true
 
 			_yeeted = true

@@ -68,5 +68,5 @@ func _setup_tween(obj: Node) -> Tween:
 func update_wobj(obj: Node, world_position: Vector2) -> void:
 	if obj not in _reserved.keys():
 		return
-	var pos := GameCamera.instance.get_screen_center_position() + (Vector2(-320, -180) / 2.0)
+	var pos := KongleCamera.instance.get_screen_center() + (Vector2(-320, -180) / 2.0)
 	_reserved[obj].global_position = (world_position - pos) * 2.0
