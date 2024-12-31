@@ -1,5 +1,5 @@
 @tool
-class_name CameraInstance
+class_name KongleCamera
 extends Node2D
 
 #region Types
@@ -12,6 +12,7 @@ enum ProcessEvent {
 	PROCESS,
 	PHYSICS
 }
+
 #endregion
 
 #region Vars - Transform

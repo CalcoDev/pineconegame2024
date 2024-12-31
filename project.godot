@@ -21,7 +21,6 @@ config/icon="res://assets/art/icon.png"
 
 [autoload]
 
-PhantomCameraManager="*res://addons/phantom_camera/scripts/managers/phantom_camera_manager.gd"
 InteractionManager="res://scenes/autoloads/interaction_manager.tscn"
 DialogueManager="res://scenes/autoloads/dialogue_manager.tscn"
 Game="res://scenes/autoloads/game.tscn"
@@ -47,7 +46,7 @@ export/convert_text_resources_to_binary=false
 
 [editor_plugins]
 
-enabled=PackedStringArray("res://addons/phantom_camera/plugin.cfg", "res://addons/sound_manager/plugin.cfg")
+enabled=PackedStringArray("res://addons/sound_manager/plugin.cfg")
 
 [input]
 
