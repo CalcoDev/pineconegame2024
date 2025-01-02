@@ -101,7 +101,7 @@ func _physics_process(delta: float) -> void:
 		_on_slope = false
 		_update_directions()
 
-		if not _snap_breakout:
+		if not _snap_breakout and not is_on_floor() and not _on_slope and velocity.y > 0:
 			_snap_to_floor()
 
 func _update_directions() -> void:

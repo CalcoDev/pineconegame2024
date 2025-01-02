@@ -79,7 +79,7 @@ var _zoom_inverse := Vector2.ONE:
 			zoom = v
 		queue_redraw()
 
-@export var pixel_snap_size := 0
+@export var enable_pixel_snap := false
 
 var _interp_data := InterpolationData.new()
 var _group_name: String = ""
@@ -394,10 +394,14 @@ func _get_camera_transform() -> Transform2D:
 	var t := Transform2D()
 	t = t.scaled(Vector2.ONE / (zoom * _shake_scale))
 	t = t.rotated(camera_rot)
-	t.origin = cam_rect_rot.position.round()
+	if enable_pixel_snap:
+		t.origin = cam_rect_rot.position.round()
+	else:
+		t.origin = cam_rect_rot.position
+
 	__last_interp_pos = cam_rect_rot.position
-	# if pixel_snap_size > 0:
-	# 	var snap_size := pixel_snap_size
+	# if enable_pixel_snap > 0:
+	# 	var snap_size := enable_pixel_snap
 	# 	print(snap_size)
 	# 	t.origin = round(t.origin / snap_size) * snap_size
 	# 	# print("new org: ", t.origin)
