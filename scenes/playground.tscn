@@ -1,18 +1,17 @@
-[gd_scene load_steps=48 format=4 uid="uid://s1h11sqrpwum"]
+[gd_scene load_steps=41 format=4 uid="uid://s1h11sqrpwum"]
 
-[ext_resource type="Script" path="res://scripts/objects/room.gd" id="1_7nits"]
+[ext_resource type="Script" uid="uid://cyd347cit3s3" path="res://scripts/objects/room.gd" id="1_7nits"]
 [ext_resource type="Texture2D" uid="uid://62emabqefgn3" path="res://assets/art/scenes/playground/playground_forest_background.png" id="1_nc3tq"]
-[ext_resource type="Script" path="res://scripts/categories/camera/kongle_camera.gd" id="4_l12y5"]
+[ext_resource type="Script" uid="uid://dp7a8lsydrkfb" path="res://scripts/categories/camera/kongle_camera.gd" id="4_l12y5"]
 [ext_resource type="PackedScene" uid="uid://vpcg1kgktd14" path="res://scenes/prefabs/entites/player.tscn" id="5_d36rm"]
-[ext_resource type="Script" path="res://scripts/entities/player_visuals_test.gd" id="6_fmi6b"]
+[ext_resource type="Script" uid="uid://dildr0lwcje2j" path="res://scripts/entities/player_visuals_test.gd" id="6_fmi6b"]
 [ext_resource type="TileSet" uid="uid://dfns0yxxavx1q" path="res://resources/stages/playground/playground_tileset.tres" id="7_31exc"]
-[ext_resource type="Shader" path="res://shaders/multiply_color.gdshader" id="7_duev7"]
-[ext_resource type="Script" path="res://scripts/objects/platforms/moving_platform.gd" id="10_so50k"]
+[ext_resource type="Shader" uid="uid://8yyol8jautw4" path="res://shaders/multiply_color.gdshader" id="7_duev7"]
+[ext_resource type="Script" uid="uid://cunnuf6en5mqa" path="res://scripts/objects/platforms/moving_platform.gd" id="10_so50k"]
 [ext_resource type="Texture2D" uid="uid://drlq7tpu5af8" path="res://assets/art/scenes/playground/playground_moving_block.png" id="10_vjval"]
-[ext_resource type="Script" path="res://scripts/objects/platforms/moving_platform_point.gd" id="11_ho5kn"]
+[ext_resource type="Script" uid="uid://bfmj788diuiaa" path="res://scripts/objects/platforms/moving_platform_point.gd" id="11_ho5kn"]
 [ext_resource type="Texture2D" uid="uid://d20pnh6n2clsy" path="res://assets/art/scenes/playground/playgroeund_crystal.png" id="12_hqgux"]
 [ext_resource type="Texture2D" uid="uid://wpj0y66gkkyy" path="res://assets/art/scenes/playground/playground_gift.png" id="13_nymxx"]
-[ext_resource type="Texture2D" uid="uid://8crjlqbxjy8h" path="res://assets/art/_concept/scenes/playground/playground_firework_Test.png" id="13_vdrtf"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_37ib4"]
 size = Vector2(1736, 1091)
@@ -65,8 +64,8 @@ tracks/0/keys = {
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_mearc"]
 _data = {
-"RESET": SubResource("Animation_e22hw"),
-"new_animation": SubResource("Animation_g2par")
+&"RESET": SubResource("Animation_e22hw"),
+&"new_animation": SubResource("Animation_g2par")
 }
 
 [sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_sn6cr"]
@@ -119,6 +118,9 @@ emission_curve = SubResource("CurveTexture_vnt8l")
 sub_emitter_mode = 2
 sub_emitter_amount_at_end = 32
 
+[sub_resource type="ViewportTexture" id="ViewportTexture_xcpf3"]
+viewport_path = NodePath("Sprite2D/SubViewport")
+
 [sub_resource type="Curve" id="Curve_lnm3q"]
 _data = [Vector2(0, 0), 0.0, 6.5336, 0, 0, Vector2(0.488649, 1), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
 point_count = 3
@@ -164,42 +166,6 @@ alpha_curve = SubResource("CurveTexture_vhck2")
 emission_curve = SubResource("CurveTexture_ifn6n")
 sub_emitter_mode = 2
 sub_emitter_amount_at_end = 3
-
-[sub_resource type="Curve" id="Curve_x8te6"]
-bake_resolution = 256
-_data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(0.0942111, 0), 0.0, 0.0, 0, 0, Vector2(0.0970488, 1), 0.0, 0.0, 0, 0, Vector2(0.202043, 0), 0.0, 0.0, 0, 0, Vector2(0.216232, 1), 0.0, 0.0, 0, 0, Vector2(1, 0), -3.32574, 0.0, 0, 0]
-point_count = 6
-
-[sub_resource type="CurveTexture" id="CurveTexture_mb4yb"]
-curve = SubResource("Curve_x8te6")
-
-[sub_resource type="Gradient" id="Gradient_bbc4c"]
-colors = PackedColorArray(0.89, 0.61588, 0.1424, 1, 0.683333, 0, 1, 1)
-
-[sub_resource type="GradientTexture1D" id="GradientTexture1D_d8ipe"]
-gradient = SubResource("Gradient_bbc4c")
-
-[sub_resource type="Curve" id="Curve_koohk"]
-_data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(0.505675, 0.70179), -1.89153, -1.89153, 0, 0, Vector2(1, 0), -0.191145, 0.0, 0, 0]
-point_count = 3
-
-[sub_resource type="CurveTexture" id="CurveTexture_7kcsx"]
-curve = SubResource("Curve_koohk")
-
-[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_7ot5h"]
-particle_flag_disable_z = true
-angle_min = 1.07288e-05
-angle_max = 445.4
-direction = Vector3(0, 1, 0)
-spread = 180.0
-initial_velocity_min = 26.24
-initial_velocity_max = 70.11
-gravity = Vector3(0, 100, 0)
-scale_min = 0.1
-scale_max = 0.5
-scale_curve = SubResource("CurveTexture_7kcsx")
-color_initial_ramp = SubResource("GradientTexture1D_d8ipe")
-alpha_curve = SubResource("CurveTexture_mb4yb")
 
 [node name="Playground" type="Node2D"]
 
@@ -328,7 +294,7 @@ script = ExtResource("6_fmi6b")
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="Node2D"]
 libraries = {
-"": SubResource("AnimationLibrary_mearc")
+&"": SubResource("AnimationLibrary_mearc")
 }
 autoplay = "new_animation"
 
@@ -337,6 +303,7 @@ position = Vector2(432, 437)
 script = ExtResource("4_l12y5")
 enable_physics_interpolation = true
 process_event = 0
+zoom = Vector2(2, 2)
 enable_pixel_snap = true
 bounds_target = NodePath("../Room/CollisionShape2D")
 follow_target = NodePath("../Player/Visuals")
@@ -346,31 +313,28 @@ visible = false
 material = SubResource("CanvasItemMaterial_sn6cr")
 position = Vector2(369, 453)
 amount = 30
-sub_emitter = NodePath("../GPUParticles2D2")
-process_material = SubResource("ParticleProcessMaterial_vhobu")
 lifetime = 3.0
 explosiveness = 0.51
 trail_enabled = true
 trail_lifetime = 0.1
+process_material = SubResource("ParticleProcessMaterial_vhobu")
 
-[node name="GPUParticles2D3" type="GPUParticles2D" parent="."]
+[node name="Sprite2D" type="Sprite2D" parent="."]
+position = Vector2(369, 451)
+texture = SubResource("ViewportTexture_xcpf3")
+
+[node name="SubViewport" type="SubViewport" parent="Sprite2D"]
+transparent_bg = true
+size = Vector2i(200, 200)
+
+[node name="GPUParticles2D3" type="GPUParticles2D" parent="Sprite2D/SubViewport"]
 material = SubResource("CanvasItemMaterial_sn6cr")
-position = Vector2(369, 453)
+position = Vector2(100, 100)
 amount = 30
-sub_emitter = NodePath("../GPUParticles2D2")
-process_material = SubResource("ParticleProcessMaterial_utmka")
 lifetime = 1.5
 explosiveness = 0.51
 trail_enabled = true
 trail_lifetime = 0.1
-
-[node name="GPUParticles2D2" type="GPUParticles2D" parent="."]
-position = Vector2(397, 371)
-amount = 1000
-process_material = SubResource("ParticleProcessMaterial_7ot5h")
-texture = ExtResource("13_vdrtf")
-explosiveness = 1.0
-randomness = 1.0
-trail_enabled = true
+process_material = SubResource("ParticleProcessMaterial_utmka")
 
 [editable path="Player"]

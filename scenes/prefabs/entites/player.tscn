@@ -1,12 +1,12 @@
 [gd_scene load_steps=14 format=3 uid="uid://vpcg1kgktd14"]
 
 [ext_resource type="Texture2D" uid="uid://dx6tocvike34w" path="res://assets/art/entities/player/player.png" id="1_mdjh7"]
-[ext_resource type="Script" path="res://scripts/entities/player.gd" id="1_n2bhu"]
-[ext_resource type="Shader" path="res://shaders/color_flash.gdshader" id="2_olyj7"]
-[ext_resource type="Script" path="res://scripts/components/interactions/interactor.gd" id="3_2ocu5"]
+[ext_resource type="Script" uid="uid://b506ykx0vbb8j" path="res://scripts/entities/player.gd" id="1_n2bhu"]
+[ext_resource type="Shader" uid="uid://c0oq71sg6ya84" path="res://shaders/color_flash.gdshader" id="2_olyj7"]
+[ext_resource type="Script" uid="uid://ddxkboot18ot3" path="res://scripts/components/interactions/interactor.gd" id="3_2ocu5"]
 [ext_resource type="Texture2D" uid="uid://c75mtsslpcfan" path="res://assets/art/entities/player/player_v2.png" id="4_uxby6"]
-[ext_resource type="Script" path="res://scripts/components/health/health_component.gd" id="5_gujf2"]
-[ext_resource type="Script" path="res://scripts/components/health/faction_component.gd" id="5_pneij"]
+[ext_resource type="Script" uid="uid://c1nyd4qks0o43" path="res://scripts/components/health/health_component.gd" id="5_gujf2"]
+[ext_resource type="Script" uid="uid://bu34812ix8os6" path="res://scripts/components/health/faction_component.gd" id="5_pneij"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_ote4v"]
 radius = 4.0
@@ -48,7 +48,7 @@ animations = [{
 [sub_resource type="CircleShape2D" id="CircleShape2D_71q4l"]
 radius = 14.0
 
-[node name="Player" type="CharacterBody2D" node_paths=PackedStringArray("_visuals", "_line", "_interactor", "heatlh", "hurtbox")]
+[node name="Player" type="CharacterBody2D" node_paths=PackedStringArray("_visuals", "_line", "_interactor", "heatlh")]
 collision_layer = 2
 collision_mask = 9
 floor_stop_on_slope = false
@@ -59,7 +59,6 @@ _visuals = NodePath("Visuals")
 _line = NodePath("Line2D")
 _interactor = NodePath("InteractorComponent")
 heatlh = NodePath("HealthComponent")
-hurtbox = NodePath("")
 jump_force = 100.0
 yeet_max_dist = 200.0
 gravity = -480.0
