@@ -32,6 +32,7 @@ func _go_points() -> void:
 		if idx <= 0:
 			while idx + 1 < _points.size():
 				if idx > 0:
+					@warning_ignore("redundant_await")
 					await _points[idx].poll_move_type_begin()
 				idx += 1
 				await _go_to_point(idx)
@@ -46,6 +47,7 @@ func _go_points() -> void:
 		if idx + 1 == _points.size():
 			while idx > 0:
 				if idx < _points.size():
+					@warning_ignore("redundant_await")
 					await _points[idx].poll_move_type_begin()
 				idx -= 1
 				await _go_to_point(idx)

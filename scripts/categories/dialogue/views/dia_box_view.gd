@@ -9,7 +9,7 @@ func _enter_tree() -> void:
     if not _is_shown:
         _hide(true)
 
-func play_animation(animation: String, seek: float = 0.0, resume_old: bool = false) -> void:
+func play_animation(animation: String, seek: float = 0.0, _resume_old: bool = false) -> void:
     #var prev_anim := view_animator.current_animation
     #var prev_time := view_animator.current_animation_position
     view_animator.play(animation)

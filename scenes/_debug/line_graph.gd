@@ -66,7 +66,7 @@ func _update_limit_display() -> void:
     _v_start.text = str(round(0))
     _v_end.text = str(round(axis_lengths.y))
 
-func _process(delta: float) -> void:
+func _process(_delta: float) -> void:
     queue_redraw()
 
 var _p_prev_x: float = 10.0
@@ -108,7 +108,7 @@ func get_render_pos(p: Point) -> Vector2:
 
 func _draw() -> void:
     var tl = Vector2.ZERO
-    var tr = Vector2.RIGHT * size.x
+    var topr = Vector2.RIGHT * size.x
     var bl = Vector2.DOWN * size.y
     var br = size
 
@@ -131,6 +131,6 @@ func _draw() -> void:
     draw_rect(Rect2(tl, size), Color.BLACK, false, LINE_WIDTH)
 
     draw_circle(tl, POINT_SIZE, Color.RED)
-    draw_circle(tr, POINT_SIZE, Color.RED)
+    draw_circle(topr, POINT_SIZE, Color.RED)
     draw_circle(bl, POINT_SIZE, Color.RED)
     draw_circle(br, POINT_SIZE, Color.RED)

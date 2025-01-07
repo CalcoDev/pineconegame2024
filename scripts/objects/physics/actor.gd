@@ -63,8 +63,6 @@ func move(motion: Vector2, callback: Callable = _empty_callable, max_slides: int
 	
 	_colliders.clear()
 
-	var init_motion := motion
-
 	_last_motion = Vector2.ZERO
 	_was_on_floor = _on_floor
 	_on_floor = false

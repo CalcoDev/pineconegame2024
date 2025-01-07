@@ -16,7 +16,7 @@ func _process(_delta: float) -> void:
 	if Input.is_action_just_pressed("jump"):
 		if _thread_invoke(_render_compute):
 			_rd.submit()
-			_rd.sync()
+			_rd. sync ()
 			var data := _rd.texture_get_data(_tex_rid, 0)
 			var img := Image.create_from_data(tex_size.x, tex_size.y, false, Image.FORMAT_RGBAF, data)
 			(_output_sprite.texture as ImageTexture).update(img)

@@ -15,7 +15,7 @@ class Token:
 
 class TokenLine extends Token:
     var dia_line: DialogueLine
-    @warning_ignore("shadowed_variable")
+    @warning_ignore("shadowed_variable", "SHADOWED_VARIABLE_BASE_CLASS")
     func _init(indent: int, parent: Token, speaker: String, line: String):
         super(indent, parent, LINE)
         self.dia_line = DialogueLine.new(speaker, line)
@@ -32,7 +32,7 @@ class TokenOptionToken:
 
 class TokenOption extends Token:
     var options: Array[TokenOptionToken]
-    @warning_ignore("shadowed_variable")
+    @warning_ignore("shadowed_variable", "SHADOWED_VARIABLE_BASE_CLASS")
     func _init(indent: int, parent: Token):
         super(indent, parent, OPTION)
     func add_option(token: TokenOptionToken) -> void:
@@ -46,7 +46,7 @@ class TokenOption extends Token:
 # basic because ... honestly this should be sth else probably
 class TokenInstruction extends Token:
     var dia_command: DialogueCommand
-    @warning_ignore("shadowed_variable")
+    @warning_ignore("shadowed_variable", "SHADOWED_VARIABLE_BASE_CLASS")
     func _init(indent: int, parent: Token, value: String):
         super(indent, parent, INSTRUCTION)
         value = value.strip_edges().substr(2, len(value) - 4).strip_edges()
@@ -58,7 +58,7 @@ class TokenInstruction extends Token:
 # really basic as Godot will handle stuff
 class TokenCode extends Token:
     var value: String
-    @warning_ignore("shadowed_variable")
+    @warning_ignore("shadowed_variable", "SHADOWED_VARIABLE_BASE_CLASS")
     func _init(indent: int, parent: Token, value: String):
         super(indent, parent, CODE)
         self.value = value

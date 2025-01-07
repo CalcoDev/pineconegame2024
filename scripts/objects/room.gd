@@ -5,7 +5,9 @@ extends Area2D
 #@export var coll: CollisionShape2D
 #@export var camera: PhantomCamera2D
 
+@warning_ignore("unused_signal")
 signal on_enter_room()
+@warning_ignore("unused_signal")
 signal on_exit_room()
 
 # @export var notify_left_area := true

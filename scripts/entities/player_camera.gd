@@ -11,7 +11,7 @@ extends Node2D
 # func _enter_tree() -> void:
 #     set_process_internal(true)
 
-func _process(delta: float) -> void:
+func _process(_delta: float) -> void:
     # position = position.lerp(player.velocity / 10, delta * 10)
 #     global_position = player.global_position
     # print(global_position)
