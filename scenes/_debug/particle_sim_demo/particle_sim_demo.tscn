@@ -1,10 +1,7 @@
-[gd_scene load_steps=4 format=3 uid="uid://bp7ylnbq632qy"]
+[gd_scene load_steps=3 format=3 uid="uid://bp7ylnbq632qy"]
 
 [ext_resource type="Script" uid="uid://dp7a8lsydrkfb" path="res://scripts/categories/camera/kongle_camera.gd" id="1_jap2a"]
 [ext_resource type="Script" uid="uid://btfaxnl48ytm1" path="res://scenes/_debug/particle_sim_demo/particle_simulation.gd" id="2_d0brx"]
-
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_erdpd"]
-size = Vector2(62, 12)
 
 [node name="ParticleSim" type="Node2D"]
 
@@ -13,23 +10,12 @@ position = Vector2(160, 120)
 script = ExtResource("1_jap2a")
 zoom = Vector2(2, 2)
 
-[node name="ParticleSimulation" type="Node2D" parent="." node_paths=PackedStringArray("_output_sprite")]
+[node name="ParticleSimulation" type="Node2D" parent="." node_paths=PackedStringArray("_output_sprite", "camera")]
 script = ExtResource("2_d0brx")
-_output_sprite = NodePath("../Sprite2D")
+_output_sprite = NodePath("../OutputTexture")
+camera = NodePath("../Camera3D")
 
-[node name="Sprite2D" type="Sprite2D" parent="."]
+[node name="OutputTexture" type="Sprite2D" parent="."]
 centered = false
 
-[node name="StaticBody2D" type="StaticBody2D" parent="."]
-position = Vector2(267, 189)
-rotation = -0.316224
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D"]
-shape = SubResource("RectangleShape2D_erdpd")
-
-[node name="StaticBody2D2" type="StaticBody2D" parent="."]
-position = Vector2(52, 143)
-rotation = 0.187047
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D2"]
-shape = SubResource("RectangleShape2D_erdpd")
+[node name="Camera3D" type="Camera3D" parent="."]
