@@ -1,65 +1,106 @@
 extends Node2D
 
+@export var use_render_thread := false
+@export var tex_size := Vector2i(320, 240)
 @export var _output_sprite: Sprite2D
 
-var rd: RenderingDevice
-
-var _shader_rid := RID()
-var _output_tex_rid := RID()
-
+#region Node Lifecycle
 func _ready() -> void:
-	rd = RenderingServer.create_local_rendering_device()
+	var img := Image.create(tex_size.x, tex_size.y, false, Image.FORMAT_RGBAF)
+	img.fill(Color.BLACK)
+	_output_sprite.texture = ImageTexture.create_from_image(img)
 	
-	# do shader
+	_thread_invoke(_init_compute)
+
+func _process(_delta: float) -> void:
+	if Input.is_action_just_pressed("jump"):
+		if _thread_invoke(_render_compute):
+			_rd.submit()
+			_rd.sync()
+			var data := _rd.texture_get_data(_tex_rid, 0)
+			var img := Image.create_from_data(tex_size.x, tex_size.y, false, Image.FORMAT_RGBAF, data)
+			(_output_sprite.texture as ImageTexture).update(img)
+
+func _exit_tree() -> void:
+	_thread_invoke(_free_compute)
+#endregion
+
+#region Compute Lifecycle
+var _rd: RenderingDevice
+var _shader_rid := RID()
+var _pipeline_rid := RID()
+var _tex_rid := RID()
+var _tex_uniform_set_rid := RID()
+
+func _init_compute() -> void:
+	if use_render_thread:
+		_rd = RenderingServer.get_rendering_device()
+	else:
+		_rd = RenderingServer.create_local_rendering_device()
+	
 	var shader_source: RDShaderFile = load("res://scenes/_debug/particle_sim_demo/particle.glsl")
 	var shader_spirv := shader_source.get_spirv()
-	_shader_rid = rd.shader_create_from_spirv(shader_spirv)
+	_shader_rid = _rd.shader_create_from_spirv(shader_spirv)
 
-	# handle output texture data
+	var tf := RDTextureFormat.new()
+	tf.width = tex_size.x
+	tf.height = tex_size.y
+	tf.format = RenderingDevice.DATA_FORMAT_R32G32B32A32_SFLOAT
+	tf.texture_type = RenderingDevice.TEXTURE_TYPE_2D
+	tf.depth = 1
+	tf.array_layers = 1
+	tf.mipmaps = 1
+	tf.usage_bits = \
+		RenderingDevice.TEXTURE_USAGE_SAMPLING_BIT \
+		| RenderingDevice.TEXTURE_USAGE_CAN_COPY_TO_BIT \
+		| RenderingDevice.TEXTURE_USAGE_STORAGE_BIT \
+		| RenderingDevice.TEXTURE_USAGE_CAN_COPY_FROM_BIT
 
-	const TW := 320
-	const TH := 240
+	# var data := (_output_sprite.texture as ImageTexture).get_image().get_data()
+	# assert(not data.is_empty(), "ERROR: Data is somehow empty?")
+	_tex_rid = _rd.texture_create(tf, RDTextureView.new(), [])
+	_rd.texture_clear(_tex_rid, Color.BLACK, 0, 1, 0, 1)
 
-	var img := Image.create(TW, TH, false, Image.FORMAT_RGBAF)
-	_output_sprite.texture = ImageTexture.create_from_image(img)
+	var uniform := RDUniform.new()
+	uniform.uniform_type = RenderingDevice.UNIFORM_TYPE_IMAGE
+	uniform.binding = 0
+	uniform.add_id(_tex_rid)
+	_tex_uniform_set_rid = _rd.uniform_set_create([uniform], _shader_rid, 0)
 
-	var f := RDTextureFormat.new()
-	f.width = TW
-	f.height = TH
-	f.format = RenderingDevice.DATA_FORMAT_R32G32B32A32_SFLOAT
-	f.usage_bits = RenderingDevice.TEXTURE_USAGE_CAN_UPDATE_BIT | RenderingDevice.TEXTURE_USAGE_STORAGE_BIT | RenderingDevice.TEXTURE_USAGE_CAN_COPY_FROM_BIT
-	
-	var v := RDTextureView.new()
-	_output_tex_rid = rd.texture_create(f, v, [img.get_data()])
+	_pipeline_rid = _rd.compute_pipeline_create(_shader_rid)
 
-	var tex_uniform := RDUniform.new()
-	tex_uniform.uniform_type = RenderingDevice.UNIFORM_TYPE_IMAGE
-	tex_uniform.binding = 0
-	tex_uniform.add_id(_output_tex_rid)
-
-	# image data uniform
-	# var tex_data_data := PackedInt32Array([TW, TH]).to_byte_array()
-	# var tex_data_buffer := rd.storage_buffer_create(tex_data_data.size(), tex_data_data)
-	# var tex_data_uniform := RDUniform.new()
-	# tex_data_uniform.uniform_type = RenderingDevice.UNIFORM_TYPE_STORAGE_BUFFER
-	# tex_data_uniform.binding = 1
-	# tex_data_uniform.add_id(tex_data_buffer)
-
-	# uniform set
-	var uniform_set := rd.uniform_set_create([tex_uniform], _shader_rid, 0)
-
-	# pipeline
-	var pipeline := rd.compute_pipeline_create(_shader_rid)
-
-	# fire the things
-	var compute_list := rd.compute_list_begin()
-	rd.compute_list_bind_compute_pipeline(compute_list, pipeline)
-	rd.compute_list_bind_uniform_set(compute_list, uniform_set, 0)
+func _render_compute() -> void:
 	@warning_ignore("INTEGER_DIVISION")
-	rd.compute_list_dispatch(compute_list, TW / 8, TH / 8, 1)
-	rd.compute_list_end()
+	var x_groups := (tex_size.x - 1) / 8 + 1
+	@warning_ignore("INTEGER_DIVISION")
+	var y_groups := (tex_size.y - 1) / 8 + 1
 
-	rd.submit()
-	rd.sync()
-	var byte_data: PackedByteArray = rd.texture_get_data(_output_tex_rid, 0)
-	_output_sprite.texture.update(Image.create_from_data(TW, TH, false, Image.FORMAT_RGBAF, byte_data))
+	var cl_rid := _rd.compute_list_begin()
+	_rd.compute_list_bind_compute_pipeline(cl_rid, _pipeline_rid)
+	_rd.compute_list_bind_uniform_set(cl_rid, _tex_uniform_set_rid, 0)
+	_rd.compute_list_dispatch(cl_rid, x_groups, y_groups, 1)
+	_rd.compute_list_end()
+
+func _free_compute() -> void:
+	_free_rid(_tex_rid)
+	_free_rid(_shader_rid)
+	_free_rid(_pipeline_rid)
+#endregion
+
+#region Helpers
+## returns whether rid was valid and could be freed
+func _free_rid(rid: RID) -> bool:
+	if rid:
+		_rd.free_rid(rid)
+		return true
+	return false
+
+## return whether function was called instantly
+func _thread_invoke(callable: Callable) -> bool:
+	if use_render_thread:
+		RenderingServer.call_on_render_thread(callable)
+		return false
+	else:
+		callable.call()
+		return true
+#endregion
