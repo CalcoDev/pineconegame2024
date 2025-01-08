@@ -261,7 +261,7 @@ trans_type = 2
 loop = 2
 
 [node name="Player" parent="." instance=ExtResource("5_d36rm")]
-position = Vector2(432, 437)
+position = Vector2(430, 377)
 floor_block_on_wall = false
 floor_snap_length = 3.0
 slope_friction = 200.0
@@ -299,7 +299,7 @@ libraries = {
 autoplay = "new_animation"
 
 [node name="KongleCamera" type="Node2D" parent="."]
-position = Vector2(432, 437)
+position = Vector2(430, 377)
 script = ExtResource("4_l12y5")
 enable_physics_interpolation = true
 process_event = 0
@@ -320,7 +320,7 @@ trail_lifetime = 0.1
 process_material = SubResource("ParticleProcessMaterial_vhobu")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
-position = Vector2(369, 451)
+position = Vector2(404, 414)
 texture = SubResource("ViewportTexture_xcpf3")
 
 [node name="SubViewport" type="SubViewport" parent="Sprite2D"]

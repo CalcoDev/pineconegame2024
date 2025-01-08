@@ -1,7 +1,19 @@
-[gd_scene load_steps=3 format=3 uid="uid://bp7ylnbq632qy"]
+[gd_scene load_steps=7 format=3 uid="uid://bp7ylnbq632qy"]
 
 [ext_resource type="Script" uid="uid://dp7a8lsydrkfb" path="res://scripts/categories/camera/kongle_camera.gd" id="1_jap2a"]
 [ext_resource type="Script" uid="uid://btfaxnl48ytm1" path="res://scenes/_debug/particle_sim_demo/particle_simulation.gd" id="2_d0brx"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_pa3b5"]
+size = Vector2(72, 16)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_tiwws"]
+size = Vector2(136.914, 16)
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_pa3b5"]
+radius = 22.0227
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_tiwws"]
+radius = 8.06226
 
 [node name="ParticleSim" type="Node2D"]
 
@@ -18,11 +30,55 @@ centered = false
 script = ExtResource("2_d0brx")
 camera = NodePath("../KongleCamera")
 output_sprite = NodePath("../KongleCamera/OutputTexture")
-particle_count = 50
+sim_physics_layers = 1
+particle_count = 100
 spawn_type = 1
 spawn_position = Vector2(160, 120)
 spawn_bounds = Rect2(80, 60, 160, 120)
 random_velocity = true
-velocity_magnitude = 500.0
-gravity = 400.0
-particle_radius = 1.0
+velocity_magnitude = 100.0
+gravity = 500.0
+
+[node name="StaticBody2D" type="StaticBody2D" parent="."]
+position = Vector2(258, 155)
+rotation = -0.451898
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D"]
+shape = SubResource("RectangleShape2D_pa3b5")
+
+[node name="StaticBody2D2" type="StaticBody2D" parent="."]
+position = Vector2(100, 138)
+rotation = 0.796885
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D2"]
+shape = SubResource("RectangleShape2D_tiwws")
+
+[node name="StaticBody2D3" type="StaticBody2D" parent="."]
+position = Vector2(241, 40)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D3"]
+shape = SubResource("CircleShape2D_pa3b5")
+
+[node name="StaticBody2D4" type="StaticBody2D" parent="."]
+position = Vector2(51, 184)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D4"]
+shape = SubResource("CircleShape2D_tiwws")
+
+[node name="StaticBody2D5" type="StaticBody2D" parent="."]
+position = Vector2(102, 206)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D5"]
+shape = SubResource("CircleShape2D_tiwws")
+
+[node name="StaticBody2D6" type="StaticBody2D" parent="."]
+position = Vector2(19, 134)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D6"]
+shape = SubResource("CircleShape2D_tiwws")
+
+[node name="StaticBody2D7" type="StaticBody2D" parent="."]
+position = Vector2(94, 29)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D7"]
+shape = SubResource("CircleShape2D_tiwws")

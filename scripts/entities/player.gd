@@ -59,6 +59,8 @@ func _process(_delta: float) -> void:
 	_line.global_rotation = 0.0
 
 	# if Input.is_action_just_pressed("jump"):
+	# 	var vel := (get_global_mouse_position() - global_position).normalized() * 10000
+	# 	KongleCamera.instance.shake_spring(vel, 200, 50, 0)
 		# cam.shake_noise(100, 100, 5, true, KongleCamera.ProcessEvent.PROCESS)
 		# cam.shake_spring(Vector2.DOWN * 100, 100, 2, 0)
 		# await get_tree().create_timer(2.5).timeout

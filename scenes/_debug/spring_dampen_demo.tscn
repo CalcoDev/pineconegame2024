@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3 uid="uid://bcm7e2pkokxnl"]
 
-[ext_resource type="Script" path="res://scenes/_debug/spring_dampener_demo.gd" id="1_cnx46"]
+[ext_resource type="Script" uid="uid://c3q5mv2aaq8ei" path="res://scenes/_debug/spring_dampener_demo.gd" id="1_cnx46"]
 
 [node name="SpringDampenDemo" type="Node2D" node_paths=PackedStringArray("bouncing_ball", "x_line", "y_line")]
 script = ExtResource("1_cnx46")
