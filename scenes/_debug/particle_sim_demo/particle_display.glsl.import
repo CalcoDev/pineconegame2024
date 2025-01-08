@@ -1,0 +1,14 @@
+[remap]
+
+importer="glsl"
+type="RDShaderFile"
+uid="uid://dgrf1ktt4q2gh"
+path="res://.godot/imported/particle_display.glsl-6a63b8eb03fa73eb8e3cbfe999dade6e.res"
+
+[deps]
+
+source_file="res://scenes/_debug/particle_sim_demo/particle_display.glsl"
+dest_files=["res://.godot/imported/particle_display.glsl-6a63b8eb03fa73eb8e3cbfe999dade6e.res"]
+
+[params]
+

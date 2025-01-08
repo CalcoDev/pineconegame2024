@@ -1,0 +1,14 @@
+[remap]
+
+importer="glsl"
+type="RDShaderFile"
+uid="uid://brscbvcd6r0vn"
+path="res://.godot/imported/particle_simulate.glsl-67b1ef44869749c0c86b044a89c963e4.res"
+
+[deps]
+
+source_file="res://scenes/_debug/particle_sim_demo/particle_simulate.glsl"
+dest_files=["res://.godot/imported/particle_simulate.glsl-67b1ef44869749c0c86b044a89c963e4.res"]
+
+[params]
+

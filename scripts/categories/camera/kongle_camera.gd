@@ -86,6 +86,9 @@ var _group_name: String = ""
 var _canvas_group_name: String = ""
 var _viewport: Viewport
 
+func get_top_left() -> Vector2:
+	return _cam_screen_center - _get_scaled_camera_size() * 0.5
+
 func get_screen_center() -> Vector2:
 	return _cam_screen_center
 

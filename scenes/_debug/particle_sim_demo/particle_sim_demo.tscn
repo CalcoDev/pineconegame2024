@@ -1,9 +1,7 @@
-[gd_scene load_steps=5 format=3 uid="uid://bp7ylnbq632qy"]
+[gd_scene load_steps=3 format=3 uid="uid://bp7ylnbq632qy"]
 
 [ext_resource type="Script" uid="uid://dp7a8lsydrkfb" path="res://scripts/categories/camera/kongle_camera.gd" id="1_jap2a"]
 [ext_resource type="Script" uid="uid://btfaxnl48ytm1" path="res://scenes/_debug/particle_sim_demo/particle_simulation.gd" id="2_d0brx"]
-[ext_resource type="Texture2D" uid="uid://bjw7x1rdnblff" path="res://scenes/_debug/particle_sim_demo/cape_hill_skybox.png" id="3_tiwws"]
-[ext_resource type="Script" uid="uid://bh4dsq8qk3sxe" path="res://scenes/_debug/particle_sim_demo/particle_sim_sphere.gd" id="4_q5rij"]
 
 [node name="ParticleSim" type="Node2D"]
 
@@ -12,33 +10,19 @@ position = Vector2(160, 120)
 script = ExtResource("1_jap2a")
 zoom = Vector2(2, 2)
 
-[node name="ParticleSimulation" type="Node2D" parent="." node_paths=PackedStringArray("_output_sprite", "camera")]
-script = ExtResource("2_d0brx")
-_output_sprite = NodePath("../OutputTexture")
-camera = NodePath("../Camera3D")
-skybox_texture = ExtResource("3_tiwws")
-rotate_speed = 90.0
-
-[node name="OutputTexture" type="Sprite2D" parent="."]
+[node name="OutputTexture" type="Sprite2D" parent="KongleCamera"]
+position = Vector2(-160, -120)
 centered = false
-flip_v = true
 
-[node name="Camera3D" type="Camera3D" parent="."]
-transform = Transform3D(-0.999877, 0, -0.0157072, 0, 1, 0, 0.0157072, 0, -0.999877, 0, 0, 0)
-cull_mask = 0
-
-[node name="CSGSphere3D" type="CSGSphere3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 2)
-script = ExtResource("4_q5rij")
-
-[node name="CSGSphere3D2" type="CSGSphere3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0412502, 0.944807, 3.836)
-radius = 0.97562
-script = ExtResource("4_q5rij")
-color = Color(1, 0.298039, 1, 1)
-
-[node name="CSGSphere3D3" type="CSGSphere3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.60531, 0.663801, 9.56229)
-radius = 2.2423
-script = ExtResource("4_q5rij")
-color = Color(0.969778, 0.527636, 0.136346, 1)
+[node name="ParticleSimulation" type="Node2D" parent="." node_paths=PackedStringArray("camera", "output_sprite")]
+script = ExtResource("2_d0brx")
+camera = NodePath("../KongleCamera")
+output_sprite = NodePath("../KongleCamera/OutputTexture")
+particle_count = 50
+spawn_type = 1
+spawn_position = Vector2(160, 120)
+spawn_bounds = Rect2(80, 60, 160, 120)
+random_velocity = true
+velocity_magnitude = 500.0
+gravity = 400.0
+particle_radius = 1.0
