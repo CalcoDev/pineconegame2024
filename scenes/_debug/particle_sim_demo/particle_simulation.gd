@@ -32,12 +32,12 @@ func _notification(what: int) -> void:
 			_rd = RenderingServer.create_local_rendering_device()
 			_init_particle_buffer()
 			_init_table_buffer()
-			_init_sim_shader()
 			_init_display_shader()
+			_init_sim_shader()
 			set_process(true)
 		NOTIFICATION_PROCESS:
-			_update_sim_shader()
 			_update_disp_shader()
+			_update_sim_shader()
 			_rd.submit()
 			_rd. sync ()
 
@@ -47,8 +47,8 @@ func _notification(what: int) -> void:
 		NOTIFICATION_PREDELETE:
 			_free_particle_buffer()
 			_free_table_buffer();
-			_free_sim_shader()
 			_free_disp_shader()
+			_free_sim_shader()
 #endregion
 
 var _rd: RenderingDevice
@@ -72,16 +72,25 @@ func _free_particle_buffer() -> void:
 #endregion
 
 #region Table Buffer
-var _table_buffer_rid := RID()
+var _table_buf_rid := RID()
+var _table_indices_buf_rid := RID()
+var _table_counters_buf_rid := RID()
 
 func _init_table_buffer() -> void:
 	var data := PackedInt32Array()
-	for i in 500510:
-		data.append(-1)
-	_table_buffer_rid = _rd.storage_buffer_create(data.size() * 4, data.to_byte_array())
+	data.resize(50051 * 2)
+	data.fill(-1)
+	_table_buf_rid = _rd.storage_buffer_create(data.size() * 4, data.to_byte_array())
+	data.resize(50051)
+	_table_indices_buf_rid = _rd.storage_buffer_create(data.size() * 4, data.to_byte_array())
+	data.resize(1)
+	data.fill(0)
+	_table_counters_buf_rid = _rd.storage_buffer_create(data.size() * 4, data.to_byte_array())
 
 func _free_table_buffer() -> void:
-	_free_rid(_table_buffer_rid)
+	_free_rid(_table_buf_rid)
+	_free_rid(_table_indices_buf_rid)
+	_free_rid(_table_counters_buf_rid)
 #endregion
 
 #region Simulation Shader
@@ -170,18 +179,30 @@ func _init_sim_shader() -> void:
 	obb_coll_rot_buf_uni.binding = 4
 	obb_coll_rot_buf_uni.add_id(_obb_coll_rot_buf_rid)
 
-	var uniforms: Array[RDUniform] = [
+	_sim_uniset_rid = _rd.uniform_set_create([
 		particle_buf_uni,
 		circ_coll_pos_buf_uni, circ_coll_rad_buf_uni,
 		obb_coll_data_buf_uni, obb_coll_rot_buf_uni
-	]
-	_sim_uniset_rid = _rd.uniform_set_create(uniforms, _sim_rid, 0)
+	], _sim_rid, 0)
 	
 	var table_buf_uni := RDUniform.new()
 	table_buf_uni.uniform_type = RenderingDevice.UNIFORM_TYPE_STORAGE_BUFFER
 	table_buf_uni.binding = 0
-	table_buf_uni.add_id(_table_buffer_rid)
-	_sim_table_uniset_rid = _rd.uniform_set_create([table_buf_uni], _sim_rid, 1)
+	table_buf_uni.add_id(_table_buf_rid)
+	
+	var table_indices_buf_uni := RDUniform.new()
+	table_indices_buf_uni.uniform_type = RenderingDevice.UNIFORM_TYPE_STORAGE_BUFFER
+	table_indices_buf_uni.binding = 1
+	table_indices_buf_uni.add_id(_table_indices_buf_rid)
+	
+	var table_counters_buf_uni := RDUniform.new()
+	table_counters_buf_uni.uniform_type = RenderingDevice.UNIFORM_TYPE_STORAGE_BUFFER
+	table_counters_buf_uni.binding = 2
+	table_counters_buf_uni.add_id(_table_counters_buf_rid)
+
+	_sim_table_uniset_rid = _rd.uniform_set_create([
+		table_buf_uni, table_indices_buf_uni, table_counters_buf_uni
+	], _sim_rid, 1)
 
 	_sim_pipeline_rid = _rd.compute_pipeline_create(_sim_rid)
 
@@ -278,14 +299,28 @@ func _init_display_shader() -> void:
 	particle_buf_uni.binding = 1
 	particle_buf_uni.add_id(_particle_buffer_rid)
 
-	var uniforms: Array[RDUniform] = [output_tex_uni, particle_buf_uni]
-	_disp_uniset_rid = _rd.uniform_set_create(uniforms, _disp_rid, 0)
+	_disp_uniset_rid = _rd.uniform_set_create([
+		output_tex_uni, particle_buf_uni
+	], _disp_rid, 0)
 	
 	var table_buf_uni := RDUniform.new()
 	table_buf_uni.uniform_type = RenderingDevice.UNIFORM_TYPE_STORAGE_BUFFER
 	table_buf_uni.binding = 0
-	table_buf_uni.add_id(_table_buffer_rid)
-	_disp_table_uniset_rid = _rd.uniform_set_create([table_buf_uni], _sim_rid, 1)
+	table_buf_uni.add_id(_table_buf_rid)
+
+	var table_indices_buf_uni := RDUniform.new()
+	table_indices_buf_uni.uniform_type = RenderingDevice.UNIFORM_TYPE_STORAGE_BUFFER
+	table_indices_buf_uni.binding = 1
+	table_indices_buf_uni.add_id(_table_indices_buf_rid)
+
+	var table_counters_buf_uni := RDUniform.new()
+	table_counters_buf_uni.uniform_type = RenderingDevice.UNIFORM_TYPE_STORAGE_BUFFER
+	table_counters_buf_uni.binding = 2
+	table_counters_buf_uni.add_id(_table_counters_buf_rid)
+
+	_disp_table_uniset_rid = _rd.uniform_set_create([
+		table_buf_uni, table_indices_buf_uni, table_counters_buf_uni
+	], _disp_rid, 1)
 
 	_disp_pipeline_rid = _rd.compute_pipeline_create(_disp_rid)
 

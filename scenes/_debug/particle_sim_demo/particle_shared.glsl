@@ -30,19 +30,24 @@ int hash(ivec2 key, uint tableSize) {
 }
 
 #define TABLE_SIZE int(50051)
-#define MAX_CHAIN_LENGTH int(10)
-
 #define GRID_CELL_SIZE int(32)
-
-#define TABLE_MAX_MAX_SIZE int(TABLE_SIZE * MAX_CHAIN_LENGTH)
 
 struct ParticleEntry {
     int particle_index;
+    int next;
 };
 
 layout(set = 1, binding = 0) restrict buffer HashTableBuffer {
     ParticleEntry data[];
 } _hashtable;
+
+layout(set = 1, binding = 1) restrict buffer BucketIndicesBuffer {
+    int data[];
+} _bucket_indices;
+
+layout(set = 1, binding = 2) restrict buffer Counters {
+    int particle_counter;
+} _counters;
 
 ivec2 get_grid_cell(vec2 position) {
     return ivec2(floor(position / GRID_CELL_SIZE));
@@ -55,43 +60,73 @@ int hash_grid_cell(ivec2 gridCell) {
 void unset_old_position(int particle_index, vec2 position) {
     ivec2 grid_cell = get_grid_cell(position);
     int bucket_index = hash_grid_cell(grid_cell);
-    int entry_index = bucket_index * MAX_CHAIN_LENGTH;
 
-    int rewrite_index = -1;
-    for (int i = 0; i < MAX_CHAIN_LENGTH; ++i) {
-        int current_index = entry_index + i;
-        int pidx = _hashtable.data[current_index].particle_index;
-        if (pidx < 0) {
-            break;
+    // memory_barrier();
+    barrier();
+    int current_index = _bucket_indices.data[bucket_index];
+    int prev_index = -1;
+
+    while (current_index != -1) {
+        if (_hashtable.data[current_index].particle_index == particle_index) {
+            // unlink current entry
+            if (prev_index == -1) {
+                atomicExchange(_bucket_indices.data[bucket_index], _hashtable.data[current_index].next);
+            } else {
+                _hashtable.data[prev_index].next = _hashtable.data[current_index].next;
+            }
+
+            // invalidate entry
+            _hashtable.data[current_index].particle_index = -1;
+            _hashtable.data[current_index].next = -1;
         }
-        if (pidx == particle_index) {
-            rewrite_index = current_index;
-            break;
-        }
+
+        prev_index = current_index;
+        current_index = _hashtable.data[current_index].next;
     }
 
-    if (rewrite_index >= 0) {
-        while (rewrite_index + 1 < entry_index + MAX_CHAIN_LENGTH && rewrite_index + 1 < TABLE_MAX_MAX_SIZE && _hashtable.data[rewrite_index + 1].particle_index != -1) {
-            _hashtable.data[rewrite_index] = _hashtable.data[rewrite_index + 1];
-            rewrite_index += 1;
-        }
-        if (rewrite_index == entry_index + MAX_CHAIN_LENGTH) {
-            _hashtable.data[rewrite_index - 1].particle_index = -1;
-        }
-    }
+    // int entry_index = bucket_index * MAX_CHAIN_LENGTH;
+    // int rewrite_index = -1;
+    // for (int i = 0; i < MAX_CHAIN_LENGTH; ++i) {
+    //     int current_index = entry_index + i;
+    //     int pidx = _hashtable.data[current_index].particle_index;
+    //     if (pidx < 0) {
+    //         break;
+    //     }
+    //     if (pidx == particle_index) {
+    //         rewrite_index = current_index;
+    //         break;
+    //     }
+    // }
+
+    // if (rewrite_index >= 0) {
+    //     while (rewrite_index + 1 < entry_index + MAX_CHAIN_LENGTH && rewrite_index + 1 < TABLE_MAX_MAX_SIZE && _hashtable.data[rewrite_index + 1].particle_index != -1) {
+    //         _hashtable.data[rewrite_index] = _hashtable.data[rewrite_index + 1];
+    //         rewrite_index += 1;
+    //     }
+    //     if (rewrite_index == entry_index + MAX_CHAIN_LENGTH) {
+    //         _hashtable.data[rewrite_index - 1].particle_index = -1;
+    //     }
+    // }
 }
 
 void set_new_position(int particle_index, vec2 position) {
     ivec2 grid_cell = get_grid_cell(position);
     int bucket_index = hash_grid_cell(grid_cell);
-    int entry_index = bucket_index * MAX_CHAIN_LENGTH;
+
+    int new_entry_index = atomicAdd(_counters.particle_counter, 1) % TABLE_SIZE;
+    _hashtable.data[new_entry_index].particle_index = particle_index;
+    _hashtable.data[new_entry_index].next = -1;
+
+    int old_head = atomicExchange(_bucket_indices.data[bucket_index], new_entry_index);
+    _hashtable.data[new_entry_index].next = old_head;
+
     // _hashtable.data[entry_index].particle_index = particle_index;
 
-    for (int i = 0; i < MAX_CHAIN_LENGTH; ++i) {
-        uint current_index = entry_index + i;
-        if (_hashtable.data[current_index].particle_index == -1) {
-            _hashtable.data[current_index].particle_index = particle_index;
-            break;
-        }
-    }
+    // for (int i = 0; i < MAX_CHAIN_LENGTH; ++i) {
+    //     uint current_index = entry_index + i;
+    //     if (_hashtable.data[current_index].particle_index == -1) {
+    //         _hashtable.data[current_index].particle_index = particle_index;
+    //         break;
+    //     }
+    // }
 }

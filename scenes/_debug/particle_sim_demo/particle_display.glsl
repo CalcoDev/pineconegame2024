@@ -44,20 +44,14 @@ void main() {
     // }
 
     ivec2 grid_cell_og = get_grid_cell(pixel_world_pos);
+
     bool found = false;
     for (int yoff = -1; yoff < 2; ++yoff) {
         for (int xoff = -1; xoff < 2; ++xoff) {
-            ivec2 grid_cell = grid_cell_og + ivec2(xoff, yoff);
-            color = vec3(vec2(grid_cell.xy) / 20.0, 0.0);
-            int grid_cell_hash = hash_grid_cell(grid_cell);
-            int entry_index = grid_cell_hash * MAX_CHAIN_LENGTH;
-
-            for (int i = 0; i < MAX_CHAIN_LENGTH; ++i) {
-                int current_index = entry_index + i;
+            int bucket_index = hash_grid_cell(grid_cell_og + ivec2(xoff, yoff));
+            int current_index = _bucket_indices.data[bucket_index];
+            while (current_index != -1) {
                 int current = _hashtable.data[current_index].particle_index;
-                if (current == -1) {
-                    break;
-                }
                 vec2 diff = _particles.data[current].position - pixel_world_pos;
                 float dist_sqr = diff.x * diff.x + diff.y * diff.y;
                 if (dist_sqr < _params.particle_radius * _params.particle_radius) {
@@ -65,8 +59,8 @@ void main() {
                     found = true;
                     break;
                 }
-            }
-
+                current_index = _hashtable.data[current_index].next;
+            } 
             if (found) {
                 break;
             }
@@ -75,6 +69,32 @@ void main() {
             break;
         }
     }
+
+
+    // ivec2 grid_cell_og = get_grid_cell(pixel_world_pos);
+    // bool found = false;
+    // for (int yoff = -1; yoff < 2; ++yoff) {
+    //     for (int xoff = -1; xoff < 2; ++xoff) {
+    //         ivec2 grid_cell = grid_cell_og + ivec2(xoff, yoff);
+    //         color = vec3(vec2(grid_cell.xy) / 20.0, 0.0);
+    //         int grid_cell_hash = hash_grid_cell(grid_cell);
+    //         int entry_index = grid_cell_hash * MAX_CHAIN_LENGTH;
+
+    //         for (int i = 0; i < MAX_CHAIN_LENGTH; ++i) {
+    //             int current_index = entry_index + i;
+    //             int current = _hashtable.data[current_index].particle_index;
+    //             if (current == -1) {
+    //                 break;
+    //             }
+    //             vec2 diff = _particles.data[current].position - pixel_world_pos;
+    //             float dist_sqr = diff.x * diff.x + diff.y * diff.y;
+    //             if (dist_sqr < _params.particle_radius * _params.particle_radius) {
+    //                 color = _particles.data[current].color.rgb;
+    //                 found = true;
+    //                 break;
+    //             }
+    //         }
+
 
     imageStore(output_tex, pixel_coords, vec4(color, 1.0));
 }
