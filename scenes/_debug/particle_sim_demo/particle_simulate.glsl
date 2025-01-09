@@ -30,6 +30,8 @@ layout(set = 0, binding = 4, std430) restrict buffer OBBColliderRotationBuffer {
     float data[];
 } _obb_col_rot;
 
+layout(set = 1, binding = 0, rgba32f) uniform image2D kernel_tex;
+
 layout(push_constant, std430) uniform Params {
     float delta;
     float gravity;
@@ -88,17 +90,16 @@ void handle_colisions(int idx) {
     }
 }
 
-#include "particle_shared.glsl"
-
 layout(local_size_x = 64, local_size_y = 1, local_size_z = 1) in;
 void main() {
     int idx = int(gl_GlobalInvocationID.x);
 
-    unset_old_position(idx, _particles.data[idx].position);
-
+    ivec2 pixel_coords = ivec2(_particles.data[idx].position);
+    
     _particles.data[idx].velocity += vec2(0.0, 1.0) * _params.gravity * _params.delta;
     _particles.data[idx].position += _particles.data[idx].velocity * _params.delta;
     handle_colisions(idx);
-
-    set_new_position(idx, _particles.data[idx].position);
+    
+    pixel_coords = ivec2(_particles.data[idx].position);
+    imageStore(kernel_tex, pixel_coords, vec4(1.0, 0.0, 0.0, 1.0));
 }

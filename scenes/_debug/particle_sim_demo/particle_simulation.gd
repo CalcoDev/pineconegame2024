@@ -30,28 +30,61 @@ func _notification(what: int) -> void:
 	match what:
 		NOTIFICATION_READY:
 			_rd = RenderingServer.create_local_rendering_device()
+			_init_textures()
 			_init_particle_buffer()
 			_init_table_buffer()
-			_init_display_shader()
 			_init_sim_shader()
+			_init_display_shader()
 			set_process(true)
 		NOTIFICATION_PROCESS:
-			_update_disp_shader()
+			_rd.texture_clear(_kernel_tex_rid, Color.BLACK, 0, 1, 0, 1)
+			_rd.texture_clear(_output_tex_rid, Color.BLACK, 0, 1, 0, 1)
 			_update_sim_shader()
+			_update_disp_shader()
 			_rd.submit()
 			_rd. sync ()
 
-			var data := _rd.texture_get_data(_disp_output_tex_rid, 0)
+			var data := _rd.texture_get_data(_output_tex_rid, 0)
 			var img := Image.create_from_data(DISP_TEX_SIZE.x, DISP_TEX_SIZE.y, false, Image.FORMAT_RGBAF, data)
 			(output_sprite.texture as ImageTexture).update(img)
 		NOTIFICATION_PREDELETE:
+			_free_textures()
 			_free_particle_buffer()
 			_free_table_buffer();
-			_free_disp_shader()
 			_free_sim_shader()
+			_free_disp_shader()
 #endregion
 
 var _rd: RenderingDevice
+
+#region Output Texture
+
+var _kernel_tex_rid := RID()
+var _output_tex_rid := RID()
+
+func _init_textures() -> void:
+	var tf := RDTextureFormat.new()
+	tf.width = DISP_TEX_SIZE.x
+	tf.height = DISP_TEX_SIZE.y
+	tf.format = RenderingDevice.DATA_FORMAT_R32G32B32A32_SFLOAT
+	tf.texture_type = RenderingDevice.TEXTURE_TYPE_2D
+	tf.depth = 1
+	tf.array_layers = 1
+	tf.mipmaps = 1
+	tf.usage_bits = \
+		RenderingDevice.TEXTURE_USAGE_SAMPLING_BIT \
+		| RenderingDevice.TEXTURE_USAGE_CAN_COPY_TO_BIT \
+		| RenderingDevice.TEXTURE_USAGE_STORAGE_BIT \
+		| RenderingDevice.TEXTURE_USAGE_CAN_COPY_FROM_BIT
+
+	_kernel_tex_rid = _rd.texture_create(tf, RDTextureView.new(), [])
+	_output_tex_rid = _rd.texture_create(tf, RDTextureView.new(), [])
+
+func _free_textures() -> void:
+	_free_rid(_kernel_tex_rid)
+	_free_rid(_output_tex_rid)
+
+#endreigon
 
 #region Particle Buffer
 var _particle_buffer_rid := RID()
@@ -185,23 +218,29 @@ func _init_sim_shader() -> void:
 		obb_coll_data_buf_uni, obb_coll_rot_buf_uni
 	], _sim_rid, 0)
 	
-	var table_buf_uni := RDUniform.new()
-	table_buf_uni.uniform_type = RenderingDevice.UNIFORM_TYPE_STORAGE_BUFFER
-	table_buf_uni.binding = 0
-	table_buf_uni.add_id(_table_buf_rid)
+	# var table_buf_uni := RDUniform.new()
+	# table_buf_uni.uniform_type = RenderingDevice.UNIFORM_TYPE_STORAGE_BUFFER
+	# table_buf_uni.binding = 0
+	# table_buf_uni.add_id(_table_buf_rid)
 	
-	var table_indices_buf_uni := RDUniform.new()
-	table_indices_buf_uni.uniform_type = RenderingDevice.UNIFORM_TYPE_STORAGE_BUFFER
-	table_indices_buf_uni.binding = 1
-	table_indices_buf_uni.add_id(_table_indices_buf_rid)
+	# var table_indices_buf_uni := RDUniform.new()
+	# table_indices_buf_uni.uniform_type = RenderingDevice.UNIFORM_TYPE_STORAGE_BUFFER
+	# table_indices_buf_uni.binding = 1
+	# table_indices_buf_uni.add_id(_table_indices_buf_rid)
 	
-	var table_counters_buf_uni := RDUniform.new()
-	table_counters_buf_uni.uniform_type = RenderingDevice.UNIFORM_TYPE_STORAGE_BUFFER
-	table_counters_buf_uni.binding = 2
-	table_counters_buf_uni.add_id(_table_counters_buf_rid)
+	# var table_counters_buf_uni := RDUniform.new()
+	# table_counters_buf_uni.uniform_type = RenderingDevice.UNIFORM_TYPE_STORAGE_BUFFER
+	# table_counters_buf_uni.binding = 2
+	# table_counters_buf_uni.add_id(_table_counters_buf_rid)
+
+	var output_tex_uni := RDUniform.new()
+	output_tex_uni.uniform_type = RenderingDevice.UNIFORM_TYPE_IMAGE
+	output_tex_uni.binding = 0
+	output_tex_uni.add_id(_kernel_tex_rid)
 
 	_sim_table_uniset_rid = _rd.uniform_set_create([
-		table_buf_uni, table_indices_buf_uni, table_counters_buf_uni
+		# table_buf_uni, table_indices_buf_uni, table_counters_buf_uni
+		output_tex_uni
 	], _sim_rid, 1)
 
 	_sim_pipeline_rid = _rd.compute_pipeline_create(_sim_rid)
@@ -260,7 +299,6 @@ var _disp_uniset_rid := RID()
 
 var _disp_table_uniset_rid := RID()
 
-var _disp_output_tex_rid := RID()
 
 const DISP_TEX_SIZE := Vector2i(320, 240)
 func _init_display_shader() -> void:
@@ -271,55 +309,28 @@ func _init_display_shader() -> void:
 	var shader_source: RDShaderFile = load("res://scenes/_debug/particle_sim_demo/particle_display.glsl")
 	var shader_spirv := shader_source.get_spirv()
 	_disp_rid = _rd.shader_create_from_spirv(shader_spirv)
-
-	var tf := RDTextureFormat.new()
-	tf.width = DISP_TEX_SIZE.x
-	tf.height = DISP_TEX_SIZE.y
-	tf.format = RenderingDevice.DATA_FORMAT_R32G32B32A32_SFLOAT
-	tf.texture_type = RenderingDevice.TEXTURE_TYPE_2D
-	tf.depth = 1
-	tf.array_layers = 1
-	tf.mipmaps = 1
-	tf.usage_bits = \
-		RenderingDevice.TEXTURE_USAGE_SAMPLING_BIT \
-		| RenderingDevice.TEXTURE_USAGE_CAN_COPY_TO_BIT \
-		| RenderingDevice.TEXTURE_USAGE_STORAGE_BIT \
-		| RenderingDevice.TEXTURE_USAGE_CAN_COPY_FROM_BIT
-
-	_disp_output_tex_rid = _rd.texture_create(tf, RDTextureView.new(), [])
-	_rd.texture_clear(_disp_output_tex_rid, Color.BLACK, 0, 1, 0, 1)
-
-	var output_tex_uni := RDUniform.new()
-	output_tex_uni.uniform_type = RenderingDevice.UNIFORM_TYPE_IMAGE
-	output_tex_uni.binding = 0
-	output_tex_uni.add_id(_disp_output_tex_rid)
  
 	var particle_buf_uni := RDUniform.new()
 	particle_buf_uni.uniform_type = RenderingDevice.UNIFORM_TYPE_STORAGE_BUFFER
-	particle_buf_uni.binding = 1
+	particle_buf_uni.binding = 0
 	particle_buf_uni.add_id(_particle_buffer_rid)
 
 	_disp_uniset_rid = _rd.uniform_set_create([
-		output_tex_uni, particle_buf_uni
+		particle_buf_uni
 	], _disp_rid, 0)
 	
-	var table_buf_uni := RDUniform.new()
-	table_buf_uni.uniform_type = RenderingDevice.UNIFORM_TYPE_STORAGE_BUFFER
-	table_buf_uni.binding = 0
-	table_buf_uni.add_id(_table_buf_rid)
+	var kernel_tex_uni := RDUniform.new()
+	kernel_tex_uni.uniform_type = RenderingDevice.UNIFORM_TYPE_IMAGE
+	kernel_tex_uni.binding = 0
+	kernel_tex_uni.add_id(_kernel_tex_rid)
 
-	var table_indices_buf_uni := RDUniform.new()
-	table_indices_buf_uni.uniform_type = RenderingDevice.UNIFORM_TYPE_STORAGE_BUFFER
-	table_indices_buf_uni.binding = 1
-	table_indices_buf_uni.add_id(_table_indices_buf_rid)
-
-	var table_counters_buf_uni := RDUniform.new()
-	table_counters_buf_uni.uniform_type = RenderingDevice.UNIFORM_TYPE_STORAGE_BUFFER
-	table_counters_buf_uni.binding = 2
-	table_counters_buf_uni.add_id(_table_counters_buf_rid)
+	var output_tex_uni := RDUniform.new()
+	output_tex_uni.uniform_type = RenderingDevice.UNIFORM_TYPE_IMAGE
+	output_tex_uni.binding = 1
+	output_tex_uni.add_id(_output_tex_rid)
 
 	_disp_table_uniset_rid = _rd.uniform_set_create([
-		table_buf_uni, table_indices_buf_uni, table_counters_buf_uni
+		kernel_tex_uni, output_tex_uni
 	], _disp_rid, 1)
 
 	_disp_pipeline_rid = _rd.compute_pipeline_create(_disp_rid)
@@ -366,7 +377,6 @@ func _update_disp_shader() -> void:
 
 func _free_disp_shader() -> void:
 	_free_rid(_disp_rid)
-	_free_rid(_disp_output_tex_rid)
 	_free_rid(_disp_uniset_rid)
 	_free_rid(_disp_pipeline_rid)
 #endregion
