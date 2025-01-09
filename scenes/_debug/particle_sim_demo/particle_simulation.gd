@@ -31,6 +31,7 @@ func _notification(what: int) -> void:
 		NOTIFICATION_READY:
 			_rd = RenderingServer.create_local_rendering_device()
 			_init_particle_buffer()
+			_init_table_buffer()
 			_init_sim_shader()
 			_init_display_shader()
 			set_process(true)
@@ -45,6 +46,7 @@ func _notification(what: int) -> void:
 			(output_sprite.texture as ImageTexture).update(img)
 		NOTIFICATION_PREDELETE:
 			_free_particle_buffer()
+			_free_table_buffer();
 			_free_sim_shader()
 			_free_disp_shader()
 #endregion
@@ -69,10 +71,25 @@ func _free_particle_buffer() -> void:
 	_free_rid(_particle_buffer_rid)
 #endregion
 
+#region Table Buffer
+var _table_buffer_rid := RID()
+
+func _init_table_buffer() -> void:
+	var data := PackedInt32Array()
+	for i in 500510:
+		data.append(-1)
+	_table_buffer_rid = _rd.storage_buffer_create(data.size() * 4, data.to_byte_array())
+
+func _free_table_buffer() -> void:
+	_free_rid(_table_buffer_rid)
+#endregion
+
 #region Simulation Shader
 var _sim_rid := RID()
 var _sim_pipeline_rid := RID()
 var _sim_uniset_rid := RID()
+
+var _sim_table_uniset_rid := RID()
 
 var _circle_collider_positions_buf_rid := RID()
 var _circle_collider_radius_buf_rid := RID()
@@ -159,6 +176,13 @@ func _init_sim_shader() -> void:
 		obb_coll_data_buf_uni, obb_coll_rot_buf_uni
 	]
 	_sim_uniset_rid = _rd.uniform_set_create(uniforms, _sim_rid, 0)
+	
+	var table_buf_uni := RDUniform.new()
+	table_buf_uni.uniform_type = RenderingDevice.UNIFORM_TYPE_STORAGE_BUFFER
+	table_buf_uni.binding = 0
+	table_buf_uni.add_id(_table_buffer_rid)
+	_sim_table_uniset_rid = _rd.uniform_set_create([table_buf_uni], _sim_rid, 1)
+
 	_sim_pipeline_rid = _rd.compute_pipeline_create(_sim_rid)
 
 func _get_sim_push_constant(circ_coll_cnt: int, obb_coll_cnt: int) -> PackedByteArray:
@@ -191,6 +215,7 @@ func _update_sim_shader() -> void:
 	var cl_rid := _rd.compute_list_begin()
 	_rd.compute_list_bind_compute_pipeline(cl_rid, _sim_pipeline_rid)
 	_rd.compute_list_bind_uniform_set(cl_rid, _sim_uniset_rid, 0)
+	_rd.compute_list_bind_uniform_set(cl_rid, _sim_table_uniset_rid, 1)
 	_rd.compute_list_set_push_constant(cl_rid, push_constant_data, push_constant_data.size())
 	_rd.compute_list_dispatch(cl_rid, x_groups, 1, 1)
 	_rd.compute_list_end()
@@ -211,6 +236,8 @@ func _free_sim_shader() -> void:
 var _disp_rid := RID()
 var _disp_pipeline_rid := RID()
 var _disp_uniset_rid := RID()
+
+var _disp_table_uniset_rid := RID()
 
 var _disp_output_tex_rid := RID()
 
@@ -253,6 +280,13 @@ func _init_display_shader() -> void:
 
 	var uniforms: Array[RDUniform] = [output_tex_uni, particle_buf_uni]
 	_disp_uniset_rid = _rd.uniform_set_create(uniforms, _disp_rid, 0)
+	
+	var table_buf_uni := RDUniform.new()
+	table_buf_uni.uniform_type = RenderingDevice.UNIFORM_TYPE_STORAGE_BUFFER
+	table_buf_uni.binding = 0
+	table_buf_uni.add_id(_table_buffer_rid)
+	_disp_table_uniset_rid = _rd.uniform_set_create([table_buf_uni], _sim_rid, 1)
+
 	_disp_pipeline_rid = _rd.compute_pipeline_create(_disp_rid)
 
 func _get_disp_push_constant() -> PackedByteArray:
@@ -290,6 +324,7 @@ func _update_disp_shader() -> void:
 	var cl_rid := _rd.compute_list_begin()
 	_rd.compute_list_bind_compute_pipeline(cl_rid, _disp_pipeline_rid)
 	_rd.compute_list_bind_uniform_set(cl_rid, _disp_uniset_rid, 0)
+	_rd.compute_list_bind_uniform_set(cl_rid, _disp_table_uniset_rid, 1)
 	_rd.compute_list_set_push_constant(cl_rid, push_constant_data, push_constant_data.size())
 	_rd.compute_list_dispatch(cl_rid, x_groups, y_groups, 1)
 	_rd.compute_list_end()

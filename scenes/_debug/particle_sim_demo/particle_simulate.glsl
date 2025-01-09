@@ -79,23 +79,26 @@ void handle_colisions(int idx) {
 
         vec2 dist = pos - closest_point_world;
         if (dot(dist, dist) < _params.particle_radius * _params.particle_radius) {
-            // _particles.data[idx].color = vec4(1.0, 0.0, 0.0, 1.0);
             vec2 normal = normalize(dist);
             vec2 vel = _particles.data[idx].velocity;
             _particles.data[idx].velocity = vel - 2.0 * dot(vel, normal) * normal;
-            // _particles.data[idx].position = closest_point_world + _params.particle_radius;
+            _particles.data[idx].position = closest_point_world + normal * _params.particle_radius;
             return;
         }
     }
-
-    // _particles.data[idx].color = vec4(1.0, 1.0, 1.0, 1.0);
 }
+
+#include "particle_shared.glsl"
 
 layout(local_size_x = 64, local_size_y = 1, local_size_z = 1) in;
 void main() {
     int idx = int(gl_GlobalInvocationID.x);
+
+    unset_old_position(idx, _particles.data[idx].position);
+
     _particles.data[idx].velocity += vec2(0.0, 1.0) * _params.gravity * _params.delta;
     _particles.data[idx].position += _particles.data[idx].velocity * _params.delta;
-
     handle_colisions(idx);
+
+    set_new_position(idx, _particles.data[idx].position);
 }

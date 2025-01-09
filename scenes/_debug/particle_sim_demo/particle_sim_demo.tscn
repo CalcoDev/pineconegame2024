@@ -31,13 +31,14 @@ script = ExtResource("2_d0brx")
 camera = NodePath("../KongleCamera")
 output_sprite = NodePath("../KongleCamera/OutputTexture")
 sim_physics_layers = 1
-particle_count = 100
+particle_count = 100000
 spawn_type = 1
 spawn_position = Vector2(160, 120)
-spawn_bounds = Rect2(80, 60, 160, 120)
+spawn_bounds = Rect2(80, 60, 32, 32)
 random_velocity = true
 velocity_magnitude = 100.0
 gravity = 500.0
+particle_radius = 5.0
 
 [node name="StaticBody2D" type="StaticBody2D" parent="."]
 position = Vector2(258, 155)
