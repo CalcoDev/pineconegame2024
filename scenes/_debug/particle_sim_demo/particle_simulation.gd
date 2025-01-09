@@ -25,28 +25,63 @@ enum SpawnType {
 @export var particle_color := Color.CYAN
 @export var particle_radius := 2.0
 
+const DISP_TEX_SIZE := Vector2i(320, 240) * 4
+
+@export var bad_apple: SpriteFrames
+@export var frame_len := 3
+var frame := 0
+
+var rf := 0
+
 #region Node Lifecycle
-func _notification(what: int) -> void:
+func _process(_delta: float) -> void:
+	frame += 1
+	if frame > frame_len:
+		rf += 1
+		frame = 0
+		var frame_tex := bad_apple.get_frame_texture("gif", rf)
+		var map := BitMap.new()
+		map.create_from_image_alpha(frame_tex.get_image())
+		var polygons := map.opaque_to_polygons(Rect2(0, 0, 360, 270), 20)
+		print(polygons.size())
+
+var _poly
+# func _draw() -> void:
+# 	for p in _poly.polygon:
+# 		draw_circle(_poly.global_position + p, 10, Color.RED, false)
+
+func __notification(what: int) -> void:
 	match what:
 		NOTIFICATION_READY:
-			_rd = RenderingServer.create_local_rendering_device()
+			var img := Image.create(DISP_TEX_SIZE.x, DISP_TEX_SIZE.y, false, Image.FORMAT_RGBAF)
+			img.fill(Color.BLACK)
+			output_sprite.texture = ImageTexture.create_from_image(img)
+
+			# _rd = RenderingServer.create_local_rendering_device()
+			_rd = RenderingServer.get_rendering_device()
 			_init_textures()
 			_init_particle_buffer()
 			_init_table_buffer()
 			_init_sim_shader()
 			_init_display_shader()
 			set_process(true)
+
+			await get_tree().create_timer(0.1).timeout
+			var tex_rd := RenderingServer.texture_rd_create(_output_tex_rid)
+			RenderingServer.canvas_item_add_texture_rect(output_sprite.get_canvas_item(), Rect2(Vector2.ZERO, DISP_TEX_SIZE), tex_rd)
 		NOTIFICATION_PROCESS:
 			_rd.texture_clear(_kernel_tex_rid, Color.BLACK, 0, 1, 0, 1)
 			_rd.texture_clear(_output_tex_rid, Color.BLACK, 0, 1, 0, 1)
 			_update_sim_shader()
 			_update_disp_shader()
-			_rd.submit()
-			_rd. sync ()
+			# _rd.submit()
+			# _rd. sync ()
 
-			var data := _rd.texture_get_data(_output_tex_rid, 0)
-			var img := Image.create_from_data(DISP_TEX_SIZE.x, DISP_TEX_SIZE.y, false, Image.FORMAT_RGBAF, data)
-			(output_sprite.texture as ImageTexture).update(img)
+			# if Input.is_action_just_pressed("jump"):
+
+			# var data := _rd.texture_get_data(_output_tex_rid, 0)
+			# var img := Image.create_from_data(DISP_TEX_SIZE.x, DISP_TEX_SIZE.y, false, Image.FORMAT_RGBAF, data)
+			# (output_sprite.texture as ImageTexture).update(img)
 		NOTIFICATION_PREDELETE:
 			_free_textures()
 			_free_particle_buffer()
@@ -155,6 +190,10 @@ var _obb_coll_rot_data := PackedFloat32Array()
 var _circle_collider_cnt := 0
 var _obb_collider_cnt := 0
 
+# var _polygon_collider_buf_rid 
+var _poly_verts_buf_rid := RID()
+var _poly_verts := PackedVector2Array()
+
 func _update_sim_collider_info() -> void:
 	var circle_colliders: Array[CollisionShape2D] = []
 	var obb_colliders: Array[CollisionShape2D] = []
@@ -188,6 +227,22 @@ func _update_sim_collider_info() -> void:
 	_obb_coll_rot_data = PackedFloat32Array()
 	for c in obb_colliders:
 		_obb_coll_rot_data.append(c.global_rotation)
+
+	var polygon_colliders: Array[CollisionPolygon2D] = []
+	coll = camera.get_parent().find_children("*", "CollisionPolygon2D")
+	for c: CollisionPolygon2D in coll:
+		if c.get_parent() is not PhysicsBody2D:
+			continue
+		var p: PhysicsBody2D = c.get_parent()
+		if sim_physics_layers & p.collision_layer == 0:
+			continue
+		polygon_colliders.append(c)
+	_poly_verts = PackedVector2Array()
+	for p in polygon_colliders[0].polygon:
+		_poly_verts.append(polygon_colliders[0].global_position + p)
+	# _poly_verts = polygon_colliders[0].polygon
+	# _poly_verts = F
+	_poly = polygon_colliders[0]
 
 func _init_sim_shader() -> void:
 	var shader_source: RDShaderFile = load("res://scenes/_debug/particle_sim_demo/particle_simulate.glsl")
@@ -237,10 +292,18 @@ func _init_sim_shader() -> void:
 	obb_coll_rot_buf_uni.binding = 4
 	obb_coll_rot_buf_uni.add_id(_obb_coll_rot_buf_rid)
 
+	var poly_data := _poly_verts.to_byte_array()
+	_poly_verts_buf_rid = _rd.storage_buffer_create(poly_data.size(), poly_data)
+	var poly_data_buf_uni := RDUniform.new()
+	poly_data_buf_uni.uniform_type = RenderingDevice.UNIFORM_TYPE_STORAGE_BUFFER
+	poly_data_buf_uni.binding = 5
+	poly_data_buf_uni.add_id(_poly_verts_buf_rid)
+
 	_sim_uniset_rid = _rd.uniform_set_create([
 		particle_buf_uni,
 		circ_coll_pos_buf_uni, circ_coll_rad_buf_uni,
-		obb_coll_data_buf_uni, obb_coll_rot_buf_uni
+		obb_coll_data_buf_uni, obb_coll_rot_buf_uni,
+		poly_data_buf_uni
 	], _sim_rid, 0)
 	
 	var output_tex_uni := RDUniform.new()
@@ -270,7 +333,9 @@ func _get_sim_push_constant() -> PackedByteArray:
 	i.append(_obb_collider_cnt)
 	i.append(particle_count)
 
-	i.append_array([0, 0]) # padding
+	i.append(_poly_verts.size())
+
+	i.append_array([0]) # padding
 	
 	a.append_array(i.to_byte_array())
 
@@ -340,13 +405,7 @@ var _disp_uniset_rid := RID()
 
 var _disp_table_uniset_rid := RID()
 
-
-const DISP_TEX_SIZE := Vector2i(320, 240)
 func _init_display_shader() -> void:
-	var img := Image.create(DISP_TEX_SIZE.x, DISP_TEX_SIZE.y, false, Image.FORMAT_RGBAF)
-	img.fill(Color.BLACK)
-	output_sprite.texture = ImageTexture.create_from_image(img)
-
 	var shader_source: RDShaderFile = load("res://scenes/_debug/particle_sim_demo/particle_display.glsl")
 	var shader_spirv := shader_source.get_spirv()
 	_disp_rid = _rd.shader_create_from_spirv(shader_spirv)

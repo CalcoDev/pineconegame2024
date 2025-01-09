@@ -1,102 +1,57 @@
-[gd_scene load_steps=9 format=3 uid="uid://bp7ylnbq632qy"]
+[gd_scene load_steps=6 format=3 uid="uid://bp7ylnbq632qy"]
 
 [ext_resource type="Script" uid="uid://dp7a8lsydrkfb" path="res://scripts/categories/camera/kongle_camera.gd" id="1_jap2a"]
 [ext_resource type="Script" uid="uid://btfaxnl48ytm1" path="res://scenes/_debug/particle_sim_demo/particle_simulation.gd" id="2_d0brx"]
-[ext_resource type="PackedScene" uid="uid://vpcg1kgktd14" path="res://scenes/prefabs/entites/player.tscn" id="3_q5rij"]
-[ext_resource type="Script" uid="uid://dildr0lwcje2j" path="res://scripts/entities/player_visuals_test.gd" id="4_pbodg"]
+[ext_resource type="SpriteFrames" uid="uid://v8ffhqf8bcck" path="res://scenes/_debug/particle_sim_demo/good_bapple.gif" id="3_tiwws"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_pa3b5"]
-size = Vector2(72, 16)
-
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_tiwws"]
-size = Vector2(136.914, 16)
+size = Vector2(362.251, 77.6046)
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_pa3b5"]
-radius = 22.0227
-
-[sub_resource type="CircleShape2D" id="CircleShape2D_tiwws"]
-radius = 8.06226
+radius = 124.064
 
 [node name="ParticleSim" type="Node2D"]
 
-[node name="KongleCamera" type="Node2D" parent="."]
-position = Vector2(160, 120)
-script = ExtResource("1_jap2a")
-zoom = Vector2(2, 2)
-
-[node name="OutputTexture" type="Sprite2D" parent="KongleCamera"]
-position = Vector2(-160, -120)
+[node name="OutputTexture" type="Sprite2D" parent="."]
 centered = false
+
+[node name="KongleCamera" type="Node2D" parent="."]
+position = Vector2(640, 480)
+script = ExtResource("1_jap2a")
 
 [node name="ParticleSimulation" type="Node2D" parent="." node_paths=PackedStringArray("camera", "output_sprite")]
 script = ExtResource("2_d0brx")
 camera = NodePath("../KongleCamera")
-output_sprite = NodePath("../KongleCamera/OutputTexture")
+output_sprite = NodePath("../OutputTexture")
 sim_physics_layers = 1
-particle_count = 10000
+particle_count = 100
 spawn_type = 1
-spawn_position = Vector2(160, 120)
-spawn_bounds = Rect2(80, 60, 120, 120)
-random_velocity = true
-velocity_magnitude = 100.0
+spawn_position = Vector2(279, 573)
+spawn_bounds = Rect2(80, 100, 1200, 840)
+velocity_magnitude = 200.0
 gravity = 0.0
 particle_radius = 5.0
-
-[node name="Player" parent="." instance=ExtResource("3_q5rij")]
-position = Vector2(184, 179)
-collision_layer = 3
-floor_block_on_wall = false
-floor_snap_length = 3.0
-slope_friction = 200.0
-roll_decelrtaion = 800.0
-jump_force = 140.0
-gravity = -96.0
-
-[node name="Visuals" parent="Player" index="1"]
-script = ExtResource("4_pbodg")
+bad_apple = ExtResource("3_tiwws")
+frame_len = 60
 
 [node name="StaticBody2D" type="StaticBody2D" parent="."]
-position = Vector2(258, 155)
+position = Vector2(1062, 814)
 rotation = -0.451898
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D"]
 shape = SubResource("RectangleShape2D_pa3b5")
 
-[node name="StaticBody2D2" type="StaticBody2D" parent="."]
-position = Vector2(100, 138)
-rotation = 0.796885
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D2"]
-shape = SubResource("RectangleShape2D_tiwws")
-
 [node name="StaticBody2D3" type="StaticBody2D" parent="."]
-position = Vector2(241, 40)
+position = Vector2(155, 154)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D3"]
 shape = SubResource("CircleShape2D_pa3b5")
 
-[node name="StaticBody2D4" type="StaticBody2D" parent="."]
-position = Vector2(51, 184)
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D4"]
-shape = SubResource("CircleShape2D_tiwws")
-
-[node name="StaticBody2D5" type="StaticBody2D" parent="."]
-position = Vector2(102, 206)
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D5"]
-shape = SubResource("CircleShape2D_tiwws")
-
-[node name="StaticBody2D6" type="StaticBody2D" parent="."]
-position = Vector2(19, 134)
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D6"]
-shape = SubResource("CircleShape2D_tiwws")
-
 [node name="StaticBody2D7" type="StaticBody2D" parent="."]
-position = Vector2(94, 29)
+position = Vector2(133, 610)
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D7"]
-shape = SubResource("CircleShape2D_tiwws")
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="StaticBody2D7"]
+polygon = PackedVector2Array(804, 45, 745, -324, 439, 144, 439, -45, 289, 68, 151, -277, -86, 187, 790, 191)
 
-[editable path="Player"]
+[node name="Marker2D" type="Marker2D" parent="."]
+position = Vector2(360, 270)
