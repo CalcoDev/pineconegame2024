@@ -60,9 +60,14 @@ var _rd: RenderingDevice
 #region Output Texture
 
 var _kernel_tex_rid := RID()
+var _kernel_tex_samp_rid := RID()
+
 var _output_tex_rid := RID()
 
 func _init_textures() -> void:
+	var kernel_tex_samp_state := RDSamplerState.new()
+	_kernel_tex_samp_rid = _rd.sampler_create(kernel_tex_samp_state)
+
 	var tf := RDTextureFormat.new()
 	tf.width = DISP_TEX_SIZE.x
 	tf.height = DISP_TEX_SIZE.y
@@ -76,12 +81,15 @@ func _init_textures() -> void:
 		| RenderingDevice.TEXTURE_USAGE_CAN_COPY_TO_BIT \
 		| RenderingDevice.TEXTURE_USAGE_STORAGE_BIT \
 		| RenderingDevice.TEXTURE_USAGE_CAN_COPY_FROM_BIT
-
 	_kernel_tex_rid = _rd.texture_create(tf, RDTextureView.new(), [])
+
 	_output_tex_rid = _rd.texture_create(tf, RDTextureView.new(), [])
+
 
 func _free_textures() -> void:
 	_free_rid(_kernel_tex_rid)
+	_free_rid(_kernel_tex_samp_rid)
+	
 	_free_rid(_output_tex_rid)
 
 #endreigon
@@ -139,16 +147,15 @@ var _circle_collider_radius_buf_rid := RID()
 var _obb_coll_data_buf_rid := RID()
 var _obb_coll_rot_buf_rid := RID()
 
-func _init_sim_shader() -> void:
-	var shader_source: RDShaderFile = load("res://scenes/_debug/particle_sim_demo/particle_simulate.glsl")
-	var shader_spirv := shader_source.get_spirv()
-	_sim_rid = _rd.shader_create_from_spirv(shader_spirv)
+var _circle_collider_positions_data := PackedFloat32Array()
+var _circle_collider_radius_data := PackedFloat32Array()
+var _obb_coll_data_data := PackedFloat32Array()
+var _obb_coll_rot_data := PackedFloat32Array()
 
-	var particle_buf_uni := RDUniform.new()
-	particle_buf_uni.uniform_type = RenderingDevice.UNIFORM_TYPE_STORAGE_BUFFER
-	particle_buf_uni.binding = 0
-	particle_buf_uni.add_id(_particle_buffer_rid)
+var _circle_collider_cnt := 0
+var _obb_collider_cnt := 0
 
+func _update_sim_collider_info() -> void:
 	var circle_colliders: Array[CollisionShape2D] = []
 	var obb_colliders: Array[CollisionShape2D] = []
 	var coll := camera.get_parent().find_children("*", "CollisionShape2D")
@@ -163,49 +170,67 @@ func _init_sim_shader() -> void:
 		elif c.shape is RectangleShape2D:
 			obb_colliders.append(c)
 	
-	var circle_collider_positions_data := PackedFloat32Array()
+	_circle_collider_cnt = circle_colliders.size()
+	_circle_collider_positions_data = PackedFloat32Array()
 	for c in circle_colliders:
-		for i in 2: circle_collider_positions_data.append(c.global_position[i])
+		for i in 2: _circle_collider_positions_data.append(c.global_position[i])
+	
+	_circle_collider_radius_data = PackedFloat32Array()
+	for c in circle_colliders:
+		_circle_collider_radius_data.append(c.shape.radius)
+	
+	_obb_collider_cnt = obb_colliders.size()
+	_obb_coll_data_data = PackedFloat32Array()
+	for c in obb_colliders:
+		for i in 2: _obb_coll_data_data.append(c.global_position[i])
+		for i in 2: _obb_coll_data_data.append(c.shape.size[i] / 2.0)
+	
+	_obb_coll_rot_data = PackedFloat32Array()
+	for c in obb_colliders:
+		_obb_coll_rot_data.append(c.global_rotation)
+
+func _init_sim_shader() -> void:
+	var shader_source: RDShaderFile = load("res://scenes/_debug/particle_sim_demo/particle_simulate.glsl")
+	var shader_spirv := shader_source.get_spirv()
+	_sim_rid = _rd.shader_create_from_spirv(shader_spirv)
+
+	var particle_buf_uni := RDUniform.new()
+	particle_buf_uni.uniform_type = RenderingDevice.UNIFORM_TYPE_STORAGE_BUFFER
+	particle_buf_uni.binding = 0
+	particle_buf_uni.add_id(_particle_buffer_rid)
+
+	_update_sim_collider_info()
+
 	_circle_collider_positions_buf_rid = _rd.storage_buffer_create(
-		circle_collider_positions_data.size() * 4,
-		circle_collider_positions_data.to_byte_array()
+		_circle_collider_positions_data.size() * 4,
+		_circle_collider_positions_data.to_byte_array()
 	)
 	var circ_coll_pos_buf_uni := RDUniform.new()
 	circ_coll_pos_buf_uni.uniform_type = RenderingDevice.UNIFORM_TYPE_STORAGE_BUFFER
 	circ_coll_pos_buf_uni.binding = 1
 	circ_coll_pos_buf_uni.add_id(_circle_collider_positions_buf_rid)
 	
-	var circle_collider_radius_data := PackedFloat32Array()
-	for c in circle_colliders:
-		circle_collider_radius_data.append(c.shape.radius)
 	_circle_collider_radius_buf_rid = _rd.storage_buffer_create(
-		circle_collider_radius_data.size() * 4,
-		circle_collider_radius_data.to_byte_array()
+		_circle_collider_radius_data.size() * 4,
+		_circle_collider_radius_data.to_byte_array()
 	)
 	var circ_coll_rad_buf_uni := RDUniform.new()
 	circ_coll_rad_buf_uni.uniform_type = RenderingDevice.UNIFORM_TYPE_STORAGE_BUFFER
 	circ_coll_rad_buf_uni.binding = 2
 	circ_coll_rad_buf_uni.add_id(_circle_collider_radius_buf_rid)
 
-	var obb_coll_data_data := PackedFloat32Array()
-	for c in obb_colliders:
-		for i in 2: obb_coll_data_data.append(c.global_position[i])
-		for i in 2: obb_coll_data_data.append(c.shape.size[i] / 2.0)
 	_obb_coll_data_buf_rid = _rd.storage_buffer_create(
-		obb_coll_data_data.size() * 4,
-		obb_coll_data_data.to_byte_array()
+		_obb_coll_data_data.size() * 4,
+		_obb_coll_data_data.to_byte_array()
 	)
 	var obb_coll_data_buf_uni := RDUniform.new()
 	obb_coll_data_buf_uni.uniform_type = RenderingDevice.UNIFORM_TYPE_STORAGE_BUFFER
 	obb_coll_data_buf_uni.binding = 3
 	obb_coll_data_buf_uni.add_id(_obb_coll_data_buf_rid)
 	
-	var obb_coll_rot_data := PackedFloat32Array()
-	for c in obb_colliders:
-		obb_coll_rot_data.append(c.global_rotation)
 	_obb_coll_rot_buf_rid = _rd.storage_buffer_create(
-		obb_coll_rot_data.size() * 4,
-		obb_coll_rot_data.to_byte_array()
+		_obb_coll_rot_data.size() * 4,
+		_obb_coll_rot_data.to_byte_array()
 	)
 	var obb_coll_rot_buf_uni := RDUniform.new()
 	obb_coll_rot_buf_uni.uniform_type = RenderingDevice.UNIFORM_TYPE_STORAGE_BUFFER
@@ -218,34 +243,18 @@ func _init_sim_shader() -> void:
 		obb_coll_data_buf_uni, obb_coll_rot_buf_uni
 	], _sim_rid, 0)
 	
-	# var table_buf_uni := RDUniform.new()
-	# table_buf_uni.uniform_type = RenderingDevice.UNIFORM_TYPE_STORAGE_BUFFER
-	# table_buf_uni.binding = 0
-	# table_buf_uni.add_id(_table_buf_rid)
-	
-	# var table_indices_buf_uni := RDUniform.new()
-	# table_indices_buf_uni.uniform_type = RenderingDevice.UNIFORM_TYPE_STORAGE_BUFFER
-	# table_indices_buf_uni.binding = 1
-	# table_indices_buf_uni.add_id(_table_indices_buf_rid)
-	
-	# var table_counters_buf_uni := RDUniform.new()
-	# table_counters_buf_uni.uniform_type = RenderingDevice.UNIFORM_TYPE_STORAGE_BUFFER
-	# table_counters_buf_uni.binding = 2
-	# table_counters_buf_uni.add_id(_table_counters_buf_rid)
-
 	var output_tex_uni := RDUniform.new()
 	output_tex_uni.uniform_type = RenderingDevice.UNIFORM_TYPE_IMAGE
 	output_tex_uni.binding = 0
 	output_tex_uni.add_id(_kernel_tex_rid)
 
 	_sim_table_uniset_rid = _rd.uniform_set_create([
-		# table_buf_uni, table_indices_buf_uni, table_counters_buf_uni
 		output_tex_uni
 	], _sim_rid, 1)
 
 	_sim_pipeline_rid = _rd.compute_pipeline_create(_sim_rid)
 
-func _get_sim_push_constant(circ_coll_cnt: int, obb_coll_cnt: int) -> PackedByteArray:
+func _get_sim_push_constant() -> PackedByteArray:
 	var a := PackedByteArray()
 	var f := PackedFloat32Array()
 	var i := PackedInt32Array()
@@ -257,8 +266,8 @@ func _get_sim_push_constant(circ_coll_cnt: int, obb_coll_cnt: int) -> PackedByte
 	a.append_array(f.to_byte_array())
 	
 	i.clear()
-	i.append(circ_coll_cnt)
-	i.append(obb_coll_cnt)
+	i.append(_circle_collider_cnt)
+	i.append(_obb_collider_cnt)
 	i.append(particle_count)
 
 	i.append_array([0, 0]) # padding
@@ -270,7 +279,39 @@ func _get_sim_push_constant(circ_coll_cnt: int, obb_coll_cnt: int) -> PackedByte
 func _update_sim_shader() -> void:
 	@warning_ignore("INTEGER_DIVISION")
 	var x_groups := (particle_count - 1) / 8 + 1
-	var push_constant_data := _get_sim_push_constant(5, 2)
+	var push_constant_data := _get_sim_push_constant()
+
+	var p_circ := _circle_collider_cnt
+	var p_obb := _obb_collider_cnt
+	_update_sim_collider_info()
+	if p_circ == _circle_collider_cnt:
+		_rd.buffer_update(
+			_circle_collider_positions_buf_rid, 0,
+			_circle_collider_positions_data.size() * 4,
+			_circle_collider_positions_data.to_byte_array()
+		)
+		_rd.buffer_update(
+			_circle_collider_radius_buf_rid, 0,
+			_circle_collider_radius_data.size() * 4,
+			_circle_collider_radius_data.to_byte_array()
+		)
+	else:
+		# TODOcalco
+		pass
+	if p_obb == _obb_collider_cnt:
+		_rd.buffer_update(
+			_obb_coll_data_buf_rid, 0,
+			_obb_coll_data_data.size() * 4,
+			_obb_coll_data_data.to_byte_array()
+		)
+		_rd.buffer_update(
+			_obb_coll_rot_buf_rid, 0,
+			_obb_coll_rot_data.size() * 4,
+			_obb_coll_rot_data.to_byte_array()
+		)
+	else:
+		# TODOcalco
+		pass
 
 	var cl_rid := _rd.compute_list_begin()
 	_rd.compute_list_bind_compute_pipeline(cl_rid, _sim_pipeline_rid)
@@ -318,11 +359,18 @@ func _init_display_shader() -> void:
 	_disp_uniset_rid = _rd.uniform_set_create([
 		particle_buf_uni
 	], _disp_rid, 0)
+
+	# var kernel_tex_uni := RDUniform.new()
+	# kernel_tex_uni.uniform_type = RenderingDevice.UNIFORM_TYPE_SAMPLER_WITH_TEXTURE
+	# kernel_tex_uni.binding = 0
+	# kernel_tex_uni.add_id(_kernel_tex_samp_rid)
+	# kernel_tex_uni.add_id(_kernel_tex_rid)
 	
 	var kernel_tex_uni := RDUniform.new()
 	kernel_tex_uni.uniform_type = RenderingDevice.UNIFORM_TYPE_IMAGE
 	kernel_tex_uni.binding = 0
 	kernel_tex_uni.add_id(_kernel_tex_rid)
+
 
 	var output_tex_uni := RDUniform.new()
 	output_tex_uni.uniform_type = RenderingDevice.UNIFORM_TYPE_IMAGE

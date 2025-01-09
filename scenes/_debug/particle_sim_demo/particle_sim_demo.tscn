@@ -1,7 +1,9 @@
-[gd_scene load_steps=7 format=3 uid="uid://bp7ylnbq632qy"]
+[gd_scene load_steps=9 format=3 uid="uid://bp7ylnbq632qy"]
 
 [ext_resource type="Script" uid="uid://dp7a8lsydrkfb" path="res://scripts/categories/camera/kongle_camera.gd" id="1_jap2a"]
 [ext_resource type="Script" uid="uid://btfaxnl48ytm1" path="res://scenes/_debug/particle_sim_demo/particle_simulation.gd" id="2_d0brx"]
+[ext_resource type="PackedScene" uid="uid://vpcg1kgktd14" path="res://scenes/prefabs/entites/player.tscn" id="3_q5rij"]
+[ext_resource type="Script" uid="uid://dildr0lwcje2j" path="res://scripts/entities/player_visuals_test.gd" id="4_pbodg"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_pa3b5"]
 size = Vector2(72, 16)
@@ -31,14 +33,27 @@ script = ExtResource("2_d0brx")
 camera = NodePath("../KongleCamera")
 output_sprite = NodePath("../KongleCamera/OutputTexture")
 sim_physics_layers = 1
-particle_count = 100000
+particle_count = 10000
 spawn_type = 1
 spawn_position = Vector2(160, 120)
 spawn_bounds = Rect2(80, 60, 120, 120)
 random_velocity = true
 velocity_magnitude = 100.0
-gravity = 500.0
+gravity = 0.0
 particle_radius = 5.0
+
+[node name="Player" parent="." instance=ExtResource("3_q5rij")]
+position = Vector2(184, 179)
+collision_layer = 3
+floor_block_on_wall = false
+floor_snap_length = 3.0
+slope_friction = 200.0
+roll_decelrtaion = 800.0
+jump_force = 140.0
+gravity = -96.0
+
+[node name="Visuals" parent="Player" index="1"]
+script = ExtResource("4_pbodg")
 
 [node name="StaticBody2D" type="StaticBody2D" parent="."]
 position = Vector2(258, 155)
@@ -83,3 +98,5 @@ position = Vector2(94, 29)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D7"]
 shape = SubResource("CircleShape2D_tiwws")
+
+[editable path="Player"]

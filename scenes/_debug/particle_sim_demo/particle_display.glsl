@@ -12,6 +12,7 @@ layout(set = 0, binding = 0, std430) restrict buffer ParticleBuffer {
 } _particles;
 
 layout(set = 1, binding = 0, rgba32f) uniform image2D kernel_tex;
+// layout(set = 1, binding = 0) uniform sampelr2D kernel_tex;
 layout(set = 1, binding = 1, rgba32f) uniform image2D output_tex;
 
 layout(push_constant) uniform Params {
@@ -42,6 +43,7 @@ void main() {
             vec2 d = vec2(pos - pixel_coords);
             if (abs(dot(d, d)) < _params.particle_radius * _params.particle_radius) {
                 vec3 kernel_col = imageLoad(kernel_tex, pos).rgb;
+                // vec3 kernel_col = texture(kernel_tex, pos / vec2(img_size)).rgb;
                 if (kernel_col.r > 0.0) {
                     imageStore(output_tex, pixel_coords, vec4(kernel_col, 1.0));
                 }
