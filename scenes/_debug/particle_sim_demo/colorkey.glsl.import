@@ -1,0 +1,14 @@
+[remap]
+
+importer="glsl"
+type="RDShaderFile"
+uid="uid://b3a2ohcr0bgk3"
+path="res://.godot/imported/colorkey.glsl-894095b34f2bd0e22c91da21a08fddd4.res"
+
+[deps]
+
+source_file="res://scenes/_debug/particle_sim_demo/colorkey.glsl"
+dest_files=["res://.godot/imported/colorkey.glsl-894095b34f2bd0e22c91da21a08fddd4.res"]
+
+[params]
+

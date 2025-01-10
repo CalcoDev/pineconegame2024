@@ -99,12 +99,20 @@ void handle_colisions(int idx) {
     const float SCALE = 4.0;
 
     vec2 pos = _particles.data[idx].position;
-    if (pos.y < 0 || pos.y > SCALE * 240.0) {
+    if (pos.y - _params.particle_radius < 0 || pos.y + _params.particle_radius > SCALE * 240.0) {
         _particles.data[idx].velocity.y *= -1.0;
+        if (pos.y - _params.particle_radius < 0)
+            _particles.data[idx].position.y = _params.particle_radius + 0.1;
+        else
+            _particles.data[idx].position.y = SCALE * 240.0 - _params.particle_radius + 0.1;
         return;
     }
-    if (pos.x < 0.0 || pos.x > SCALE * 320.0) {
+    if (pos.x - _params.particle_radius < 0.0 || pos.x + _params.particle_radius > SCALE * 320.0) {
         _particles.data[idx].velocity.x *= -1.0;
+        if (pos.x - _params.particle_radius < 0)
+            _particles.data[idx].position.x = _params.particle_radius + 0.1;
+        else
+            _particles.data[idx].position.x = SCALE * 320.0 - _params.particle_radius + 0.1;
         return;
     }
 
@@ -218,6 +226,8 @@ void handle_colisions(int idx) {
             return;
         }
     }
+                    
+    _particles.data[idx].color = vec4(0.0, 1.0, 1.0, 1.0);
 }
 
 bool circle_circle(vec2 pos, float radius, vec2 cpos, float cradius) {

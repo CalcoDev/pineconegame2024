@@ -45,8 +45,8 @@ void main() {
                 vec3 kernel_col = imageLoad(kernel_tex, pos).rgb;
                 // vec3 kernel_col = texture(kernel_tex, pos / vec2(img_size)).rgb;
                 if (length(kernel_col) > 0.0) {
-                    // imageStore(output_tex, pixel_coords, vec4(_params.particle_color, 1.0));
-                    imageStore(output_tex, pixel_coords, vec4(kernel_col, 1.0));
+                    imageStore(output_tex, pixel_coords, vec4(_params.particle_color, 1.0));
+                    // imageStore(output_tex, pixel_coords, vec4(kernel_col, 1.0));
                 }
             }
         }

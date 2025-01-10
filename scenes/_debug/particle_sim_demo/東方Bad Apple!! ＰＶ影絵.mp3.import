@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://rxq0xmfod364"
+path="res://.godot/imported/東方Bad Apple!! ＰＶ影絵.mp3-152569d7b1935fd35ec56248971d5b0e.mp3str"
+
+[deps]
+
+source_file="res://scenes/_debug/particle_sim_demo/東方Bad Apple!! ＰＶ影絵.mp3"
+dest_files=["res://.godot/imported/東方Bad Apple!! ＰＶ影絵.mp3-152569d7b1935fd35ec56248971d5b0e.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4
