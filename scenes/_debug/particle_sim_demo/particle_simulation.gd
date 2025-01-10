@@ -27,30 +27,28 @@ enum SpawnType {
 
 const DISP_TEX_SIZE := Vector2i(320, 240) * 4
 
-@export var bad_apple: SpriteFrames
-@export var frame_len := 3
-var frame := 0
-
-var rf := 0
+# @export var bad_apple: SpriteFrames
+# @export var frame_len := 3
+# var frame := 0
+# var rf := 0
 
 #region Node Lifecycle
-func _process(_delta: float) -> void:
-	frame += 1
-	if frame > frame_len:
-		rf += 1
-		frame = 0
-		var frame_tex := bad_apple.get_frame_texture("gif", rf)
-		var map := BitMap.new()
-		map.create_from_image_alpha(frame_tex.get_image())
-		var polygons := map.opaque_to_polygons(Rect2(0, 0, 360, 270), 20)
-		print(polygons.size())
+# func _process(_delta: float) -> void:
+# 	frame += 1
+# 	if frame > frame_len:
+# 		rf += 1
+# 		frame = 0
+# 		var frame_tex := bad_apple.get_frame_texture("gif", rf)
+# 		var map := BitMap.new()
+# 		map.create_from_image_alpha(frame_tex.get_image())
+# 		var polygons := map.opaque_to_polygons(Rect2(0, 0, 360, 270), 20)
+# 		print(polygons.size())
 
-var _poly
 # func _draw() -> void:
 # 	for p in _poly.polygon:
 # 		draw_circle(_poly.global_position + p, 10, Color.RED, false)
 
-func __notification(what: int) -> void:
+func _notification(what: int) -> void:
 	match what:
 		NOTIFICATION_READY:
 			var img := Image.create(DISP_TEX_SIZE.x, DISP_TEX_SIZE.y, false, Image.FORMAT_RGBAF)
@@ -189,10 +187,14 @@ var _obb_coll_rot_data := PackedFloat32Array()
 
 var _circle_collider_cnt := 0
 var _obb_collider_cnt := 0
+var _poly_collider_cnt := 0
 
 # var _polygon_collider_buf_rid 
 var _poly_verts_buf_rid := RID()
-var _poly_verts := PackedVector2Array()
+var _poly_info_buf_rid := RID()
+
+var _poly_verts_data := PackedVector2Array()
+var _poly_info_data := PackedInt32Array()
 
 func _update_sim_collider_info() -> void:
 	var circle_colliders: Array[CollisionShape2D] = []
@@ -237,12 +239,19 @@ func _update_sim_collider_info() -> void:
 		if sim_physics_layers & p.collision_layer == 0:
 			continue
 		polygon_colliders.append(c)
-	_poly_verts = PackedVector2Array()
-	for p in polygon_colliders[0].polygon:
-		_poly_verts.append(polygon_colliders[0].global_position + p)
-	# _poly_verts = polygon_colliders[0].polygon
-	# _poly_verts = F
-	_poly = polygon_colliders[0]
+	
+	_poly_collider_cnt = polygon_colliders.size()
+
+	_poly_verts_data = PackedVector2Array()
+	_poly_info_data = PackedInt32Array()
+	var poly_info_offset := 0
+	for poly in polygon_colliders:
+		var poly_count := poly.polygon.size()
+		for p in poly.polygon:
+			_poly_verts_data.append(poly.global_position + p)
+		_poly_info_data.append(poly_count)
+		_poly_info_data.append(poly_info_offset)
+		poly_info_offset += poly_count
 
 func _init_sim_shader() -> void:
 	var shader_source: RDShaderFile = load("res://scenes/_debug/particle_sim_demo/particle_simulate.glsl")
@@ -292,18 +301,28 @@ func _init_sim_shader() -> void:
 	obb_coll_rot_buf_uni.binding = 4
 	obb_coll_rot_buf_uni.add_id(_obb_coll_rot_buf_rid)
 
-	var poly_data := _poly_verts.to_byte_array()
-	_poly_verts_buf_rid = _rd.storage_buffer_create(poly_data.size(), poly_data)
-	var poly_data_buf_uni := RDUniform.new()
-	poly_data_buf_uni.uniform_type = RenderingDevice.UNIFORM_TYPE_STORAGE_BUFFER
-	poly_data_buf_uni.binding = 5
-	poly_data_buf_uni.add_id(_poly_verts_buf_rid)
+	var poly_verts := _poly_verts_data.to_byte_array()
+	_poly_verts_buf_rid = _rd.storage_buffer_create(poly_verts.size(), poly_verts)
+	var poly_verts_buf_uni := RDUniform.new()
+	poly_verts_buf_uni.uniform_type = RenderingDevice.UNIFORM_TYPE_STORAGE_BUFFER
+	poly_verts_buf_uni.binding = 5
+	poly_verts_buf_uni.add_id(_poly_verts_buf_rid)
+
+	var poly_info := _poly_info_data.to_byte_array()
+	_poly_info_buf_rid = _rd.storage_buffer_create(poly_info.size(), poly_info)
+	var poly_info_buf_uni := RDUniform.new()
+	poly_info_buf_uni.uniform_type = RenderingDevice.UNIFORM_TYPE_STORAGE_BUFFER
+	poly_info_buf_uni.binding = 6
+	poly_info_buf_uni.add_id(_poly_info_buf_rid)
+
+	# print(_poly_collider_cnt)
+	# print(_poly_info_data)
 
 	_sim_uniset_rid = _rd.uniform_set_create([
 		particle_buf_uni,
 		circ_coll_pos_buf_uni, circ_coll_rad_buf_uni,
 		obb_coll_data_buf_uni, obb_coll_rot_buf_uni,
-		poly_data_buf_uni
+		poly_verts_buf_uni, poly_info_buf_uni
 	], _sim_rid, 0)
 	
 	var output_tex_uni := RDUniform.new()
@@ -331,9 +350,9 @@ func _get_sim_push_constant() -> PackedByteArray:
 	i.clear()
 	i.append(_circle_collider_cnt)
 	i.append(_obb_collider_cnt)
+	i.append(_poly_collider_cnt)
+	
 	i.append(particle_count)
-
-	i.append(_poly_verts.size())
 
 	i.append_array([0]) # padding
 	

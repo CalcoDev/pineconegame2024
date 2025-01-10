@@ -31,9 +31,19 @@ layout(set = 0, binding = 4, std430) restrict buffer OBBColliderRotationBuffer {
 } _obb_col_rot;
 
 // for now colliding against a single polygno, which is bad
-layout(set = 0, binding = 5, std430) restrict buffer PolygonColliderBuffer {
-    vec2 vertices[];
-} _polygon;
+layout(set = 0, binding = 5, std430) restrict buffer PolygonVerticesBuffer {
+    vec2 data[];
+} _polygon_vertices;
+
+// for now colliding against a single polygno, which is bad
+struct PolygonVertexInfoBuffer {
+    int count;
+    int offset;
+};
+
+layout(set = 0, binding = 6, std430) restrict buffer PolygonColliderBuffer {
+    PolygonVertexInfoBuffer data[];
+} _polygon_info;
 
 layout(set = 1, binding = 0, rgba32f) uniform image2D kernel_tex;
 
@@ -43,11 +53,9 @@ layout(push_constant, std430) uniform Params {
     float particle_radius;
     int circle_collider_count;
     int obb_collider_count;
+    int polygon_collider_count;
     int particle_count;
-
-    int poly_vertex_count;
-
-    int padding[1];
+    int _padding[1];
 } _params;
 
 vec2 rotate_vec(vec2 v, float rot) {
@@ -85,24 +93,7 @@ float point_line_distance(vec2 point, vec2 start, vec2 end) {
     vec2 closestPoint = start + t * lineVector;
     dist = length(point - closestPoint);
     return dist;
-
-    // vec2 line_dir = end - start;
-    // vec2 perp = vec2(line_dir.y, -line_dir.x);
-    // vec2 dir_to_start = start - point;
-    // return abs(dot(normalize(perp), dir_to_start));
 }
-
-// bool point_line(vec2 point, vec2 start, vec2 end) {
-//     vec2 d = end - start;
-//     vec2 v = point - start;
-//     float cross = v.x * d.y - v.y * d.x;
-//     if (abs(cross) > 0.0001) { // Allowing for floating-point precision error
-//         return false;
-//     }
-//     float dotProduct = dot(v, d);
-//     float lenSquared = dot(d, d);
-//     return dotProduct >= 0.0 && dotProduct <= lenSquared;
-// }
 
 void handle_colisions(int idx) {
     const float SCALE = 4.0;
@@ -148,99 +139,84 @@ void handle_colisions(int idx) {
     }
 
     // polygon SAT collision
-    vec2 p = _particles.data[idx].position;
-    bool c = false;
+    // todo calco this is absolutely terrible for performance but meh we chill
+    for (int poly_idx = 0; poly_idx < _params.polygon_collider_count; ++poly_idx) {
+        int count = _polygon_info.data[poly_idx].count;
+        int offset = _polygon_info.data[poly_idx].offset;
 
-    float min_dist = 1e9;
-    vec2 min_s;
-    vec2 min_e;
+        vec2 p = _particles.data[idx].position;
+        bool c = false;
 
-    for (int i = 0; i < _params.poly_vertex_count; ++i) {
-        vec2 s = _polygon.vertices[i];
-        vec2 e = _polygon.vertices[(i + 1) % _params.poly_vertex_count];
+        float min_dist = 1e9;
+        vec2 min_s;
+        vec2 min_e;
 
-        float dist = point_line_distance(p, s, e);
-        if (dist < min_dist) {
-            min_dist = dist;
-            min_s = s;
-            min_e = e;
-        }
+        for (int i = 0; i < count; ++i) {
+            vec2 s = _polygon_vertices.data[offset + i];
+            vec2 e = _polygon_vertices.data[offset + ((i + 1) % count)];
 
-        if (
-            ((s.y > p.y && e.y < p.y) || (s.y < p.y && e.y > p.y))
-            && ( p.x < (e.x - s.x) * (p.y - s.y) / (e.y - s.y) + s.x )
-        ) {
-            c = !c;
-        }
-    }
+            float dist = point_line_distance(p, s, e);
+            if (dist < min_dist) {
+                min_dist = dist;
+                min_s = s;
+                min_e = e;
+            }
 
-    if (!c) {
-        for (int i = 0; i < _params.poly_vertex_count; ++i) {
-            vec2 s = _polygon.vertices[i];
-            vec2 e = _polygon.vertices[(i + 1) % _params.poly_vertex_count];
-
-            if (circle_line(_particles.data[idx].position, _params.particle_radius, s, e)) {
-                vec2 edge = e - s;
-                vec2 particle_to_start = _particles.data[idx].position - s;
-                
-                // Project particle position onto the line segment
-                float t = clamp(dot(particle_to_start, edge) / dot(edge, edge), 0.0, 1.0);
-                vec2 closest_point = s + t * edge;
-
-                // Compute the collision normal
-                vec2 normal = normalize(_particles.data[idx].position - closest_point);
-
-                // Reflect the velocity
-                vec2 velocity = _particles.data[idx].velocity;
-                vec2 reflected_velocity = velocity - 2.0 * dot(velocity, normal) * normal;
-
-                // Update the particle's velocity
-                _particles.data[idx].velocity = reflected_velocity;
-
-                // Reposition the particle to just outside the polygon
-                _particles.data[idx].position = closest_point + normal * _params.particle_radius;
-
-                // Change the color to indicate collision
-                _particles.data[idx].color = vec4(1.0, 0.0, 0.0, 1.0);
-
-                return;
+            if (
+                ((s.y > p.y && e.y < p.y) || (s.y < p.y && e.y > p.y))
+                && ( p.x < (e.x - s.x) * (p.y - s.y) / (e.y - s.y) + s.x )
+            ) {
+                c = !c;
             }
         }
-        return;
-    } else {
-        vec2 edge = min_e - min_s;
-        vec2 perp_clock = normalize(vec2(-edge.y, edge.x));
-        vec2 perp_counter = normalize(vec2(edge.y, -edge.x));
 
-        vec2 perp = perp_clock;
+        if (!c) {
+            for (int i = 0; i < count; ++i) {
+                vec2 s = _polygon_vertices.data[offset + i];
+                vec2 e = _polygon_vertices.data[offset + ((i + 1) % count)];
 
-        // bool c = false;
-        // vec2 p = pos + perp_clock * (min_dist + _params.particle_radius);
-        // for (int i = 0; i < _params.poly_vertex_count; ++i) {
-        //     vec2 s = _polygon.vertices[i];
-        //     vec2 e = _polygon.vertices[(i + 1) % _params.poly_vertex_count];
-        //     if (
-        //         ((s.y > p.y && e.y < p.y) || (s.y < p.y && e.y > p.y))
-        //         && ( p.x < (e.x - s.x) * (p.y - s.y) / (e.y - s.y) + s.x )
-        //     ) {
-        //         c = !c;
-        //     }
-        // }
-        // if (c) {
-        //     perp = perp_counter;
-        // } else {
-        //     perp = perp_clock;
-        // }
+                if (circle_line(_particles.data[idx].position, _params.particle_radius, s, e)) {
+                    vec2 edge = e - s;
+                    vec2 particle_to_start = _particles.data[idx].position - s;
+                    float t = clamp(dot(particle_to_start, edge) / dot(edge, edge), 0.0, 1.0);
+                    vec2 closest_point = s + t * edge;
+                    vec2 normal = normalize(_particles.data[idx].position - closest_point);
+                    vec2 velocity = _particles.data[idx].velocity;
+                    vec2 reflected_velocity = velocity - 2.0 * dot(velocity, normal) * normal;
+                    _particles.data[idx].velocity = reflected_velocity;
+                    _particles.data[idx].position = closest_point + normal * _params.particle_radius;
+                    _particles.data[idx].color = vec4(1.0, 0.0, 0.0, 1.0);
+                    return;
+                }
+            }
+        } else {
+            vec2 edge = min_e - min_s;
+            vec2 perp_clock = normalize(vec2(-edge.y, edge.x));
+            vec2 perp_counter = normalize(vec2(edge.y, -edge.x));
 
-        // _particles.data[idx].position = pos + (perp * (min_dist + _params.particle_radius));
-        // _particles.data[idx].velocity = perp * 50.0;
-        // TODO(calco): fix this thing cuz this aint min distance
-        min_dist = sqrt(min_dist);
-        _particles.data[idx].position = pos + (perp * min_dist) + _params.particle_radius * perp;
-        _particles.data[idx].velocity = normalize(_particles.data[idx].position - pos) * min_dist * 100.0;
-        _particles.data[idx].color = vec4(min_dist, 1.0, 0, 1);
+            vec2 perp;
 
-        // 239 * 100 = 23900
+            bool c = false;
+            vec2 p = pos + perp_clock * (min_dist + _params.particle_radius);
+            for (int i = 0; i < count; ++i) {
+                vec2 s = _polygon_vertices.data[offset + i];
+                vec2 e = _polygon_vertices.data[offset + ((i + 1) % count)];
+                if (
+                    ((s.y > p.y && e.y < p.y) || (s.y < p.y && e.y > p.y))
+                    && ( p.x < (e.x - s.x) * (p.y - s.y) / (e.y - s.y) + s.x )
+                ) {
+                    c = !c;
+                }
+            }
+            if (c) {
+                perp = perp_counter;
+            } else {
+                perp = perp_clock;
+            }
+
+            _particles.data[idx].position = pos + (perp * (min_dist + _params.particle_radius));
+            return;
+        }
     }
 }
 
@@ -262,4 +238,13 @@ void main() {
     
     pixel_coords = ivec2(_particles.data[idx].position);
     imageStore(kernel_tex, pixel_coords, vec4(_particles.data[idx].color.rgb, 1.0));
+    // imageStore(
+    //     kernel_tex, pixel_coords, vec4(
+    //         _params.polygon_collider_count / 255.0,
+    //         float(_polygon_info.data[1].count) / 255.0,
+    //         float(_polygon_info.data[1].offset) / 255.0,
+    //         // 1.0, 1.0,
+    //         1.0
+    //     )
+    // );
 }
