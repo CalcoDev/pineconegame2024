@@ -3,7 +3,8 @@
 
 layout(push_constant) uniform Params {
     float _particle_radius;
-    int _padding[3];
+    // vec3 _particle_color;
+    float _padding[3];
 };
 
 layout(set = 0, binding = 0, rgba32f) uniform image2D _kernel_tex;
@@ -26,7 +27,9 @@ void main() {
             if (abs(dot(d, d)) < _particle_radius * _particle_radius) {
                 vec3 kernel_col = imageLoad(_kernel_tex, pos).rgb;
                 if (length(kernel_col) > 0.0) {
-                    imageStore(_output_tex, pixel_coords, vec4(kernel_col, 1.0));
+                    // imageStore(_output_tex, pixel_coords, vec4(kernel_col, 1.0));
+                    // imageStore(_output_tex, pixel_coords, vec4(_particle_color, 1.0));
+                    imageStore(_output_tex, pixel_coords, vec4(vec4(_padding[0], _padding[1], _padding[2], 1.0)));
                 }
             }
         }

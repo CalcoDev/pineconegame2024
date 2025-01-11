@@ -10,7 +10,16 @@ extends Node2D
 @export var gravity := 0.0
 @export var velocity_magnitude := 0.0
 
+@export var target_density := 0.0
+@export var pressure_multiplier := 10.0
+
+@export var particle_color := Color()
+@export var negative_pressure := Color()
+@export var positive_pressure := Color()
+@export var correct_pressure := Color()
+
 @export_group("Spawn Settings")
+@export var spawn_random := false
 @export_node_path("Node2D") var spawn_node_path := NodePath("")
 @export var particle_grid_spacing := 10.0
 
@@ -96,7 +105,7 @@ func _notification(what: int) -> void:
 			
 			_density_tex_shader = ComputeShader.new(
 				_rd, PATH + "/density_texture_pass.glsl", Vector3i(x_groups, y_groups, 1),
-				_get_density_shader_push_data
+				_get_density_tex_shader_push_data
 			)
 			_density_tex_shader.add_uniform(0, _make_uniform(
 				RenderingDevice.UNIFORM_TYPE_STORAGE_BUFFER, 0, [_particle_pos_buffer]
@@ -122,10 +131,10 @@ func _notification(what: int) -> void:
 
 			await get_tree().create_timer(0.1).timeout
 			_bind_texture_to_canvas_item(debug_display.get_canvas_item(), _density_tex, Rect2(Vector2.ZERO, TEXS))
-			# _bind_texture_to_canvas_item(debug_display.get_canvas_item(), _debug_draw_output, Rect2(Vector2.ZERO, TEXS))
+			_bind_texture_to_canvas_item(debug_display.get_canvas_item(), _debug_draw_output, Rect2(Vector2.ZERO, TEXS))
 		NOTIFICATION_PROCESS:
 			_rd.texture_clear(_debug_draw_kernel, Color.BLACK, 0, 1, 0, 1)
-			_rd.texture_clear(_debug_draw_output, Color.BLACK, 0, 1, 0, 1)
+			_rd.texture_clear(_debug_draw_output, Color.TRANSPARENT, 0, 1, 0, 1)
 
 			# var particle_spawn_data := _get_particle_spawn_data()
 			# var p_pos_data := PackedByteArray()
@@ -165,10 +174,27 @@ func _get_density_shader_push_data() -> PackedByteArray:
 	a.append_array(PackedInt32Array([0, 0]).to_byte_array()) # padding
 	return a
 
+func _get_density_tex_shader_push_data() -> PackedByteArray:
+	var a := PackedByteArray()
+	a.append_array(PackedInt32Array([particle_count]).to_byte_array())
+	a.append_array(PackedFloat32Array([particle_smoothing_radius]).to_byte_array())
+	# a.append_array(PackedInt32Array([0]).to_byte_array()) # padding
+	a.append_array(PackedFloat32Array([target_density / 1000.0, pressure_multiplier]).to_byte_array())
+	a.append_array(_encode_color(negative_pressure))
+	a.append_array(_encode_color(positive_pressure))
+	a.append_array(_encode_color(correct_pressure))
+	return a
+
+func _encode_color(color: Color, limit: int = 4) -> PackedByteArray:
+	var a := PackedFloat32Array()
+	for i in limit: a.append(color[i])
+	return a.to_byte_array()
+
 func _get_debug_draw_shader_push_data() -> PackedByteArray:
 	var a := PackedByteArray()
 	a.append_array(PackedFloat32Array([particle_radius]).to_byte_array())
-	a.append_array(PackedInt32Array([0, 0, 0]).to_byte_array()) # padding
+	a.append_array(_encode_color(particle_color, 3))
+	# a.append_array(PackedInt32Array([0, 0, 0]).to_byte_array()) # padding
 	return a
 
 func _init_shared_buffers() -> void:
@@ -192,19 +218,29 @@ func _init_shared_buffers() -> void:
 
 func _get_particle_spawn_data() -> Array:
 	var dict := []
-	var effective_spacing = particle_grid_spacing + 2 * particle_radius
-	var cols = int(ceil(sqrt(particle_count)))
-	var rows = int(ceil(float(particle_count) / cols))
-	var start_pos = (get_node(spawn_node_path) as Node2D).global_position
-	start_pos -= Vector2(cols - 1, rows - 1) * effective_spacing * 0.5
-	for row in range(rows):
-		for col in range(cols):
-			if len(dict) >= particle_count:
-				break
-			var pos = start_pos + Vector2(col, row) * effective_spacing
-			var vel = Vector2.ZERO
-			vel = random_point_on_unit_circle() * velocity_magnitude
+
+	if spawn_random:
+		for p in particle_count:
+			var off := Vector2(
+				randf_range(0.0, TEXS.x),
+				randf_range(0.0, TEXS.y)
+			)
+			var pos := off
+			var vel = random_point_on_unit_circle() * velocity_magnitude
 			dict.append({"pos": pos, "vel": vel})
+	else:
+		var effective_spacing = particle_grid_spacing + 2 * particle_radius
+		var cols = int(ceil(sqrt(particle_count)))
+		var rows = int(ceil(float(particle_count) / cols))
+		var start_pos = (get_node(spawn_node_path) as Node2D).global_position
+		start_pos -= Vector2(cols - 1, rows - 1) * effective_spacing * 0.5
+		for row in range(rows):
+			for col in range(cols):
+				if len(dict) >= particle_count:
+					break
+				var pos = start_pos + Vector2(col, row) * effective_spacing
+				var vel = random_point_on_unit_circle() * velocity_magnitude
+				dict.append({"pos": pos, "vel": vel})
 	return dict
 
 func _bind_texture_to_canvas_item(item: RID, texture: RID, rect: Rect2) -> RID:

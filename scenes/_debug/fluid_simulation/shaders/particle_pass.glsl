@@ -43,7 +43,7 @@ void handle_colisions(int idx) {
 layout(local_size_x = 64, local_size_y = 1, local_size_z = 1) in;
 void main() {
     int idx = int(gl_GlobalInvocationID.x);
-    if (idx > _particle_count)
+    if (idx >= _particle_count)
         return;
 
     ivec2 pixel_coords = ivec2(_position[idx]);
