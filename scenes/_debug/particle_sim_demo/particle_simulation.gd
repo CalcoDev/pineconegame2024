@@ -6,13 +6,29 @@ enum SpawnType {
 }
 
 @export var camera: KongleCamera
-@export var output_sprite: Sprite2D
 
-@export var output_sprite_2: Sprite2D
+@export var enable_sim := true
+@export var enable_bapple := true:
+	set(value):
+		if value == enable_bapple:
+			return
+		enable_bapple = value
+		if enable_bapple:
+			_bapple_first_frame = true
+			await get_tree().create_timer(0.2).timeout
+			_bapple_first_frame = false
 
-@export_flags_2d_physics var sim_physics_layers := 0
+@export_group("bapple_video")
+@export var bapple_display: Node2D
+@export var bapple_video: VideoStreamPlayer
+@export var bapple_audio: AudioStreamPlayer
+@export var bapple_polygon_update_speed := 1.0
 
-@export_group("spawn settings")
+var _bapple_polygon_update_timer := 0.0
+var _bapple_prev_poly_update_frame := 0
+var _bapple_first_frame := true
+
+@export_group("sim spawn settings")
 @export var particle_count := 500
 @export var spawn_type := SpawnType.POSITION
 @export var spawn_position := Vector2.ZERO
@@ -22,6 +38,8 @@ enum SpawnType {
 @export var velocity_magnitude := 0.0
 
 @export_group("sim settings")
+@export var particle_sim_display: Node2D
+@export_flags_2d_physics var sim_physics_layers := 0
 @export var gravity := 9.8
 
 @export var particle_color := Color.CYAN
@@ -29,108 +47,71 @@ enum SpawnType {
 
 const DISP_TEX_SIZE := Vector2i(320, 240) * 4
 
-@export var bapple_audio: AudioStreamPlayer
-@export var bapple: VideoStreamPlayer
-@export var update_speed := 1.0
-
 # region Node Lifecycle
-var t := 0.0
-var first := true
-
 func _ready() -> void:
-	await get_tree().create_timer(0.2).timeout
-	first = false
-	bapple.play()
-	bapple_audio.play()
+	if enable_bapple:
+		enable_bapple = false
+		enable_bapple = true
 
 func _process(_delta: float) -> void:
-	if first:
+	if not enable_bapple or _bapple_first_frame:
 		return
 	
-	t += _delta
-	if t > update_speed:
-		t = 0.0
+	_bapple_polygon_update_timer += _delta
+	if _bapple_polygon_update_timer > bapple_polygon_update_speed:
+		_bapple_polygon_update_timer = 0.0
 		for child in camera.get_parent().get_children():
 			if child is StaticBody2D:
 				camera.get_parent().remove_child(child)
-		
-		var frame_tex := output_sprite_2.texture
-		var map := BitMap.new()
-		map.create_from_image_alpha(frame_tex.get_image())
-		var polygons := map.opaque_to_polygons(Rect2(0, 0, 362, 272), 3)
-		for p in polygons:
-			var body = StaticBody2D.new()
-			var coll_poly = CollisionPolygon2D.new()
-			body.scale = Vector2(4, 4)
-			camera.get_parent().add_child(body)
-			body.add_child(coll_poly)
-			coll_poly.polygon = p
 
-# func _draw() -> void:
-# 	# for p in _poly.polygon:
-# 	# 	draw_circle(_poly.global_position + p, 10, Color.RED, false)
-# 	for c in camera.get_parent().get_children():
-# 		if c is StaticBody2D and c.get_child(0) is CollisionPolygon2D:
-# 			for p in c.get_child(0).polygon:
-# 				draw_circle(c.get_child(0).global_position + p, 20, Color.AQUA, false, 5.0)
-
+		_rd.texture_get_data_async(
+			_colorkey_tex_rid, 0,
+			func(bytes: PackedByteArray):
+				var curr_frame := Engine.get_process_frames()
+				if curr_frame < _bapple_prev_poly_update_frame:
+					return
+				_bapple_prev_poly_update_frame = curr_frame
+				var map := BitMap.new()
+				var img := Image.create_from_data(368, 272, false, Image.FORMAT_RGBAF, bytes)
+				map.create_from_image_alpha(img)
+				var polygons := map.opaque_to_polygons(Rect2(0, 0, 368, 272), 3)
+				for p in polygons:
+					var body = StaticBody2D.new()
+					var coll_poly = CollisionPolygon2D.new()
+					body.scale = Vector2(4, 4)
+					camera.get_parent().add_child(body)
+					body.add_child(coll_poly)
+					coll_poly.polygon = p
+		)
 
 func _notification(what: int) -> void:
 	match what:
 		NOTIFICATION_READY:
-			var img := Image.create(DISP_TEX_SIZE.x, DISP_TEX_SIZE.y, false, Image.FORMAT_RGBAF)
-			img.fill(Color.BLACK)
-			output_sprite.texture = ImageTexture.create_from_image(img)
-
-			# _rd = RenderingServer.create_local_rendering_device()
+			set_process(true)
 			_rd = RenderingServer.get_rendering_device()
 			_init_textures()
 			_init_particle_buffer()
 			_init_table_buffer()
 			_init_sim_shader()
 			_init_display_shader()
-			set_process(true)
 
 			_init_colorkey_shader()
 
 			await get_tree().create_timer(0.1).timeout
 			var tex_rd := RenderingServer.texture_rd_create(_output_tex_rid)
-			RenderingServer.canvas_item_add_texture_rect(output_sprite.get_canvas_item(), Rect2(Vector2.ZERO, DISP_TEX_SIZE), tex_rd)
+			RenderingServer.canvas_item_add_texture_rect(particle_sim_display.get_canvas_item(), Rect2(Vector2.ZERO, DISP_TEX_SIZE), tex_rd)
 
 			# var n_tex_rd := RenderingServer.texture_rd_create(_colorkey_tex_rid)
-			# RenderingServer.canvas_item_add_texture_rect(output_sprite_2.get_canvas_item(), Rect2(Vector2.ZERO, DISP_TEX_SIZE), n_tex_rd)
-			# output_sprite_2.texture = 
+			# RenderingServer.canvas_item_add_texture_rect(bapple_display.get_canvas_item(), Rect2(Vector2.ZERO, DISP_TEX_SIZE), n_tex_rd)
 		NOTIFICATION_PROCESS:
-			_rd.texture_clear(_kernel_tex_rid, Color.BLACK, 0, 1, 0, 1)
-			_rd.texture_clear(_output_tex_rid, Color.BLACK, 0, 1, 0, 1)
-			_update_sim_shader()
-			_update_disp_shader()
+			if enable_sim:
+				_rd.texture_clear(_kernel_tex_rid, Color.BLACK, 0, 1, 0, 1)
+				_rd.texture_clear(_output_tex_rid, Color.BLACK, 0, 1, 0, 1)
+				_update_sim_shader()
+				_update_disp_shader()
 			
-			# print(bapple.get_video_texture().get_rid())
-
-			# _rd.texture_update(_colorkey_tex_rid, 0, bapple.get_video_texture().get_image().get_data())
-			var dddata := bapple.get_video_texture().get_image()
-			dddata.convert(Image.Format.FORMAT_RGBAF)
-			_rd.texture_update(_colorkey_tex_rid, 0, dddata.get_data())
-
-			# _rd.texture_copy(_output_tex_rid, _colorkey_tex_rid, Vector3.ZERO, Vector3.ZERO, Vector3(360, 270, 0), 0, 0, 0, 0)
-			_update_colorkey_shader()
-			
-			# RenderingServer.texture_2d_get(_colorkey_tex_rid)
-			var data := _rd.texture_get_data(_colorkey_tex_rid, 0)
-			var img := Image.create_from_data(368, 272, false, Image.FORMAT_RGBAF, data)
-			output_sprite_2.texture = ImageTexture.create_from_image(img)
-			# _rd.texture_get_data_async(_colorkey_tex_rid, 0, func():
-			# 	print("test"))
-
-			# _rd.submit()
-			# _rd.sync()
-
-			# if Input.is_action_just_pressed("jump"):
-
-			# var data := _rd.texture_get_data(_colorkey_rid, 0)
-			# var img := Image.create_from_data(DISP_TEX_SIZE.x, DISP_TEX_SIZE.y, false, Image.FORMAT_RGBAF, data)
-			# (output_sprite.texture as ImageTexture).update(img)
+			if enable_bapple:
+				_update_colorkey_shader()
 		NOTIFICATION_PREDELETE:
 			_free_textures()
 			_free_particle_buffer()
@@ -150,6 +131,8 @@ var _colorkey_pipeline_rid := RID()
 var _colorkey_uniset_rid := RID()
 
 var _colorkey_tex_rid := RID()
+
+var _colrokey_input_samp_rid := RID()
 
 func _init_colorkey_shader() -> void:
 	var tf := RDTextureFormat.new()
@@ -172,13 +155,24 @@ func _init_colorkey_shader() -> void:
 	var shader_spirv := shader_source.get_spirv()
 	_colorkey_rid = _rd.shader_create_from_spirv(shader_spirv)
 
+	var input_tex_rid := RenderingServer.texture_get_rd_texture(bapple_video.get_video_texture().get_rid())
+
+	var samp_state := RDSamplerState.new()
+	_colrokey_input_samp_rid = _rd.sampler_create(samp_state)
+
+	var input_tex_uni := RDUniform.new()
+	input_tex_uni.uniform_type = RenderingDevice.UNIFORM_TYPE_SAMPLER_WITH_TEXTURE
+	input_tex_uni.binding = 0
+	input_tex_uni.add_id(_colrokey_input_samp_rid)
+	input_tex_uni.add_id(input_tex_rid)
+
 	var colorkey_tex_uni := RDUniform.new()
 	colorkey_tex_uni.uniform_type = RenderingDevice.UNIFORM_TYPE_IMAGE
 	colorkey_tex_uni.binding = 1
 	colorkey_tex_uni.add_id(_colorkey_tex_rid)
 
 	_colorkey_uniset_rid = _rd.uniform_set_create([
-		colorkey_tex_uni
+		input_tex_uni, colorkey_tex_uni
 	], _colorkey_rid, 0)
 
 	_colorkey_pipeline_rid = _rd.compute_pipeline_create(_colorkey_rid)
@@ -189,7 +183,6 @@ func _update_colorkey_shader() -> void:
 	var x_groups := (DISP_TEX_SIZE.x - 1) / 8 + 1
 	@warning_ignore("INTEGER_DIVISION")
 	var y_groups := (DISP_TEX_SIZE.y - 1) / 8 + 1
-
 
 	if Input.is_action_just_pressed("jump"):
 		_flip = !_flip
@@ -207,6 +200,8 @@ func _free_colorkey_shader() -> void:
 	_free_rid(_colorkey_rid)
 	_free_rid(_colorkey_uniset_rid)
 	_free_rid(_colorkey_pipeline_rid)
+
+	_free_rid(_colrokey_input_samp_rid)
 
 #endregion
 
@@ -435,7 +430,6 @@ func _init_sim_shader() -> void:
 	poly_verts_buf_uni.binding = 5
 	poly_verts_buf_uni.add_id(_poly_verts_buf_rid)
 
-	# var poly_info := _poly_info_data.to_byte_array()
 	var poly_info = PackedFloat32Array()
 	poly_info.resize(100000)
 	poly_info = poly_info.to_byte_array()
@@ -444,9 +438,6 @@ func _init_sim_shader() -> void:
 	poly_info_buf_uni.uniform_type = RenderingDevice.UNIFORM_TYPE_STORAGE_BUFFER
 	poly_info_buf_uni.binding = 6
 	poly_info_buf_uni.add_id(_poly_info_buf_rid)
-
-	# print(_poly_collider_cnt)
-	# print(_poly_info_data)
 
 	_sim_uniset_rid = _rd.uniform_set_create([
 		particle_buf_uni,
@@ -553,6 +544,9 @@ func _free_sim_shader() -> void:
 	
 	_free_rid(_obb_coll_data_buf_rid)
 	_free_rid(_obb_coll_rot_buf_rid)
+	
+	_free_rid(_poly_verts_buf_rid)
+	_free_rid(_poly_info_buf_rid)
 #endregion
 
 #region Display Shader
@@ -586,7 +580,6 @@ func _init_display_shader() -> void:
 	kernel_tex_uni.uniform_type = RenderingDevice.UNIFORM_TYPE_IMAGE
 	kernel_tex_uni.binding = 0
 	kernel_tex_uni.add_id(_kernel_tex_rid)
-
 
 	var output_tex_uni := RDUniform.new()
 	output_tex_uni.uniform_type = RenderingDevice.UNIFORM_TYPE_IMAGE
@@ -648,7 +641,7 @@ func _free_disp_shader() -> void:
 #region Compute Helpers
 ## returns whether rid was valid and could be freed
 func _free_rid(rid: RID) -> bool:
-	if rid:
+	if rid and rid != RID():
 		_rd.free_rid(rid)
 		return true
 	return false

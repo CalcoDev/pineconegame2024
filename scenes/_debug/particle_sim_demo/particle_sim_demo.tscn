@@ -1,8 +1,7 @@
-[gd_scene load_steps=9 format=3 uid="uid://bp7ylnbq632qy"]
+[gd_scene load_steps=7 format=3 uid="uid://bp7ylnbq632qy"]
 
 [ext_resource type="Script" uid="uid://dp7a8lsydrkfb" path="res://scripts/categories/camera/kongle_camera.gd" id="1_jap2a"]
 [ext_resource type="Script" uid="uid://btfaxnl48ytm1" path="res://scenes/_debug/particle_sim_demo/particle_simulation.gd" id="2_d0brx"]
-[ext_resource type="Shader" uid="uid://dskviqnfumd85" path="res://scenes/_debug/particle_sim_demo/demo.gdshader" id="3_pbodg"]
 [ext_resource type="VideoStream" uid="uid://c1iar6x22egsg" path="res://scenes/_debug/particle_sim_demo/bapple.ogv" id="3_tiwws"]
 [ext_resource type="AudioStream" uid="uid://rxq0xmfod364" path="res://scenes/_debug/particle_sim_demo/東方Bad Apple!! ＰＶ影絵.mp3" id="4_q5rij"]
 
@@ -12,39 +11,48 @@ size = Vector2(362.251, 77.6046)
 [sub_resource type="CircleShape2D" id="CircleShape2D_pa3b5"]
 radius = 124.064
 
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_i571w"]
-shader = ExtResource("3_pbodg")
-
 [node name="ParticleSim" type="Node2D"]
 
 [node name="KongleCamera" type="Node2D" parent="."]
 position = Vector2(640, 480)
 script = ExtResource("1_jap2a")
 
-[node name="OutputTexture" type="Sprite2D" parent="."]
-centered = false
-
-[node name="OutputTexture2" type="Sprite2D" parent="."]
-visible = false
-centered = false
-
-[node name="ParticleSimulation" type="Node2D" parent="." node_paths=PackedStringArray("camera", "output_sprite", "output_sprite_2", "bapple_audio", "bapple")]
+[node name="ParticleSimulation" type="Node2D" parent="." node_paths=PackedStringArray("camera", "bapple_display", "bapple_video", "bapple_audio", "particle_sim_display")]
 script = ExtResource("2_d0brx")
 camera = NodePath("../KongleCamera")
-output_sprite = NodePath("../OutputTexture")
-output_sprite_2 = NodePath("../OutputTexture2")
-sim_physics_layers = 1
-particle_count = 1000000
+enable_sim = false
+enable_bapple = false
+bapple_display = NodePath("../BappleDisplay")
+bapple_video = NodePath("../BappleVideo")
+bapple_audio = NodePath("../BappleAudio")
+bapple_polygon_update_speed = 0.05
+particle_count = 10
 spawn_type = 1
 spawn_position = Vector2(407, 623)
 spawn_bounds = Rect2(0, 0, 1280, 960)
 random_velocity = true
 velocity_magnitude = 2000.0
+particle_sim_display = NodePath("../ParticleSimDisplay")
+sim_physics_layers = 1
 gravity = 500.0
 particle_radius = 1.0
-bapple_audio = NodePath("../AudioStreamPlayer")
-bapple = NodePath("../VideoStreamPlayer")
-update_speed = 0.05
+
+[node name="ParticleSimDisplay" type="Node2D" parent="."]
+
+[node name="BappleDisplay" type="Sprite2D" parent="."]
+centered = false
+
+[node name="BappleVideo" type="VideoStreamPlayer" parent="."]
+offset_left = -1756.0
+offset_top = 93.0
+offset_right = -476.0
+offset_bottom = 1039.0
+stream = ExtResource("3_tiwws")
+autoplay = true
+
+[node name="BappleAudio" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("4_q5rij")
+volume_db = -24.043
 
 [node name="StaticBody2D" type="StaticBody2D" parent="."]
 position = Vector2(1405, 1036)
@@ -64,18 +72,3 @@ position = Vector2(-201, 728)
 
 [node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="StaticBody2D7"]
 polygon = PackedVector2Array(-49, 470, -16, 369, 119, 380, -19, 203, -164, 295, -215, 197, -269, 343, -158, 472)
-
-[node name="Marker2D" type="Marker2D" parent="."]
-position = Vector2(407, 623)
-
-[node name="VideoStreamPlayer" type="VideoStreamPlayer" parent="."]
-material = SubResource("ShaderMaterial_i571w")
-offset_left = -1756.0
-offset_top = 93.0
-offset_right = -476.0
-offset_bottom = 1039.0
-stream = ExtResource("3_tiwws")
-
-[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="."]
-stream = ExtResource("4_q5rij")
-volume_db = -24.043
