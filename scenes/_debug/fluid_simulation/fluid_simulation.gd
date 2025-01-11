@@ -8,6 +8,7 @@ extends Node2D
 @export var particle_smoothing_radius := 20.0
 
 @export var gravity := 0.0
+@export var velocity_magnitude := 0.0
 
 @export_group("Spawn Settings")
 @export_node_path("Node2D") var spawn_node_path := NodePath("")
@@ -17,9 +18,14 @@ const TEXS := Vector2i(320, 240) * 4
 
 var _rd: RenderingDevice
 
+var _shaders: Array[ComputeShader] = []
+
 var _particle_shader: ComputeShader
 var _density_shader: ComputeShader
 var _debug_draw_shader: ComputeShader
+
+var _density_tex_shader: ComputeShader
+var _density_tex := RID()
 
 # shared buffers
 var _particle_pos_buffer := RID() # store particle position
@@ -82,6 +88,24 @@ func _notification(what: int) -> void:
 			))
 			_density_shader.build_uniform_sets()
 
+			_density_tex = _make_texture(
+				TEXS.x, TEXS.y,
+				RenderingDevice.DataFormat.DATA_FORMAT_R32G32B32A32_SFLOAT,
+				_ALL_TEX_BITS
+			)
+			
+			_density_tex_shader = ComputeShader.new(
+				_rd, PATH + "/density_texture_pass.glsl", Vector3i(x_groups, y_groups, 1),
+				_get_density_shader_push_data
+			)
+			_density_tex_shader.add_uniform(0, _make_uniform(
+				RenderingDevice.UNIFORM_TYPE_STORAGE_BUFFER, 0, [_particle_pos_buffer]
+			))
+			_density_tex_shader.add_uniform(0, _make_uniform(
+				RenderingDevice.UNIFORM_TYPE_IMAGE, 1, [_density_tex]
+			))
+			_density_tex_shader.build_uniform_sets()
+
 			_debug_draw_shader = ComputeShader.new(
 				_rd, PATH + "/debug_draw.glsl", Vector3i(x_groups, y_groups, 1),
 				_get_debug_draw_shader_push_data
@@ -94,24 +118,39 @@ func _notification(what: int) -> void:
 			))
 			_debug_draw_shader.build_uniform_sets()
 
+			_shaders.assign([_particle_shader, _density_shader, _density_tex_shader, _debug_draw_shader])
+
 			await get_tree().create_timer(0.1).timeout
-			_bind_texture_to_canvas_item(debug_display.get_canvas_item(), _debug_draw_output, Rect2(Vector2.ZERO, TEXS))
+			_bind_texture_to_canvas_item(debug_display.get_canvas_item(), _density_tex, Rect2(Vector2.ZERO, TEXS))
+			# _bind_texture_to_canvas_item(debug_display.get_canvas_item(), _debug_draw_output, Rect2(Vector2.ZERO, TEXS))
 		NOTIFICATION_PROCESS:
 			_rd.texture_clear(_debug_draw_kernel, Color.BLACK, 0, 1, 0, 1)
 			_rd.texture_clear(_debug_draw_output, Color.BLACK, 0, 1, 0, 1)
 
-			_particle_shader.update_shader()
-			_density_shader.update_shader()
-			_debug_draw_shader.update_shader()
+			# var particle_spawn_data := _get_particle_spawn_data()
+			# var p_pos_data := PackedByteArray()
+			# var p_vel_data := PackedByteArray()
+			# for p in particle_spawn_data:
+			# 	var f := PackedFloat32Array()
+			# 	for i in 2: f.append(p["pos"][i])
+			# 	p_pos_data.append_array(f.to_byte_array())
+			# 	f.clear()
+			# 	for i in 2: f.append(p["vel"][i])
+			# 	p_vel_data.append_array(f.to_byte_array())
+			# _rd.buffer_update(_particle_pos_buffer, 0, p_pos_data.size(), p_pos_data)
+			# _rd.buffer_update(_particle_vel_buffer, 0, p_vel_data.size(), p_vel_data)
+
+			for shader in _shaders:
+				shader.update_shader()
 		NOTIFICATION_PREDELETE:
-			_particle_shader.free_shader()
-			_density_shader.free_shader()
-			_debug_draw_shader.free_shader()
+			for shader in _shaders:
+				shader.free_shader()
 			_free_rid(_particle_pos_buffer)
 			_free_rid(_particle_vel_buffer)
 			_free_rid(_density_buffer)
 			_free_rid(_debug_draw_kernel)
 			_free_rid(_debug_draw_output)
+			_free_rid(_density_tex)
 
 func _get_particle_shader_push_data() -> PackedByteArray:
 	var a := PackedByteArray()
@@ -164,6 +203,7 @@ func _get_particle_spawn_data() -> Array:
 				break
 			var pos = start_pos + Vector2(col, row) * effective_spacing
 			var vel = Vector2.ZERO
+			vel = random_point_on_unit_circle() * velocity_magnitude
 			dict.append({"pos": pos, "vel": vel})
 	return dict
 
@@ -203,3 +243,7 @@ func _free_rid(rid: RID) -> bool:
 		_rd.free_rid(rid)
 		return true
 	return false
+
+func random_point_on_unit_circle() -> Vector2:
+	var angle = randf() * PI * 2.0
+	return Vector2(cos(angle), sin(angle))

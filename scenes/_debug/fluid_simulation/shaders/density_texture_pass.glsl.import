@@ -1,0 +1,14 @@
+[remap]
+
+importer="glsl"
+type="RDShaderFile"
+uid="uid://d3g4m5qq6ke3c"
+path="res://.godot/imported/density_texture_pass.glsl-2cfe314f4ba999e80a9a0777b5d9ceac.res"
+
+[deps]
+
+source_file="res://scenes/_debug/fluid_simulation/shaders/density_texture_pass.glsl"
+dest_files=["res://.godot/imported/density_texture_pass.glsl-2cfe314f4ba999e80a9a0777b5d9ceac.res"]
+
+[params]
+
