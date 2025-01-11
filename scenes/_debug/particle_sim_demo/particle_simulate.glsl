@@ -30,12 +30,10 @@ layout(set = 0, binding = 4, std430) restrict buffer OBBColliderRotationBuffer {
     float data[];
 } _obb_col_rot;
 
-// for now colliding against a single polygno, which is bad
 layout(set = 0, binding = 5, std430) restrict buffer PolygonVerticesBuffer {
     vec2 data[];
 } _polygon_vertices;
 
-// for now colliding against a single polygno, which is bad
 struct PolygonVertexInfoBuffer {
     int count;
     int offset;

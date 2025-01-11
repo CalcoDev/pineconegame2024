@@ -1,0 +1,14 @@
+[remap]
+
+importer="glsl"
+type="RDShaderFile"
+uid="uid://dfea8cgwo2vc1"
+path="res://.godot/imported/particle_fluid_sim.glsl-a9c1cc7348b5bf75a73d7b5956141022.res"
+
+[deps]
+
+source_file="res://scenes/_debug/particle_sim_demo/particle_fluid_sim.glsl"
+dest_files=["res://.godot/imported/particle_fluid_sim.glsl-a9c1cc7348b5bf75a73d7b5956141022.res"]
+
+[params]
+

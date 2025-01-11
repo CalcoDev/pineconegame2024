@@ -1,8 +1,8 @@
 extends Node2D
 
 enum SpawnType {
-	POSITION,
 	POSITION_OBJECT,
+	POSITION_OBJECT_GRID,
 	BOX_RANDOM,
 }
 
@@ -19,7 +19,7 @@ enum SpawnType {
 			await get_tree().create_timer(0.2).timeout
 			_bapple_first_frame = false
 
-@export_group("bapple_video")
+@export_group("Bad Apple")
 @export var bapple_display: Node2D
 @export var bapple_video: VideoStreamPlayer
 @export var bapple_audio: AudioStreamPlayer
@@ -29,21 +29,31 @@ var _bapple_polygon_update_timer := 0.0
 var _bapple_prev_poly_update_frame := 0
 var _bapple_first_frame := true
 
-@export_group("sim spawn settings")
+@export_group("Sim Spawn Settings")
 @export var particle_count := 500
-@export var spawn_type := SpawnType.POSITION
+@export var spawn_type := SpawnType.POSITION_OBJECT
+
+@export_subgroup("Position Object")
 @export_node_path("Node2D") var spawn_node_path := NodePath("")
-@export var spawn_position := Vector2.ZERO
+
+@export_subgroup("Position Object Grid")
+@export var particle_grid_spacing := 10.0
+
+@export_subgroup("Bounds")
 @export var spawn_bounds := Rect2()
+
+@export_subgroup("Velocity")
 @export var random_velocity := false
 @export var directed_velocity := false
 @export var velocity_magnitude := 0.0
 
-@export_group("sim settings")
+@export_group("Sim Settings")
+@export var sim_is_fluid_sim := true
 @export var particle_sim_display: Node2D
-@export_flags_2d_physics var sim_physics_layers := 0
-@export var gravity := 9.8
 
+@export_flags_2d_physics var sim_physics_layers := 0
+
+@export var gravity := 9.8
 @export var particle_color := Color.CYAN
 @export var particle_radius := 2.0
 
@@ -291,6 +301,99 @@ var _sim_uniset_rid := RID()
 
 var _sim_table_uniset_rid := RID()
 
+func _init_sim_shader() -> void:
+	var source = "res://scenes/_debug/particle_sim_demo/particle_simulate.glsl"
+	if sim_is_fluid_sim:
+		source = "res://scenes/_debug/particle_sim_demo/particle_fluid_sim.glsl"
+	var shader_source: RDShaderFile = load(source)
+	var shader_spirv := shader_source.get_spirv()
+	_sim_rid = _rd.shader_create_from_spirv(shader_spirv)
+
+	var particle_buf_uni := RDUniform.new()
+	particle_buf_uni.uniform_type = RenderingDevice.UNIFORM_TYPE_STORAGE_BUFFER
+	particle_buf_uni.binding = 0
+	particle_buf_uni.add_id(_particle_buffer_rid)
+
+	if sim_is_fluid_sim:
+		_init_sim_fluid_sim(particle_buf_uni)
+	else:
+		_init_sim_particle_sim(particle_buf_uni)
+	
+	var output_tex_uni := RDUniform.new()
+	output_tex_uni.uniform_type = RenderingDevice.UNIFORM_TYPE_IMAGE
+	output_tex_uni.binding = 0
+	output_tex_uni.add_id(_kernel_tex_rid)
+
+	_sim_table_uniset_rid = _rd.uniform_set_create([
+		output_tex_uni
+	], _sim_rid, 1)
+
+	_sim_pipeline_rid = _rd.compute_pipeline_create(_sim_rid)
+
+func _update_sim_shader() -> void:
+	@warning_ignore("INTEGER_DIVISION")
+	var x_groups := (particle_count - 1) / 8 + 1
+
+	var push_constant_data: PackedByteArray
+	if sim_is_fluid_sim:
+		_update_sim_fluid_sim()
+		push_constant_data = _get_sim_fluid_push_constant()
+	else:
+		_update_sim_particle_sim()
+		push_constant_data = _get_sim_particle_push_constant()
+
+	var cl_rid := _rd.compute_list_begin()
+	_rd.compute_list_bind_compute_pipeline(cl_rid, _sim_pipeline_rid)
+	_rd.compute_list_bind_uniform_set(cl_rid, _sim_uniset_rid, 0)
+	_rd.compute_list_bind_uniform_set(cl_rid, _sim_table_uniset_rid, 1)
+	_rd.compute_list_set_push_constant(cl_rid, push_constant_data, push_constant_data.size())
+	_rd.compute_list_dispatch(cl_rid, x_groups, 1, 1)
+	_rd.compute_list_end()
+
+func _free_sim_shader() -> void:
+	_free_rid(_sim_rid)
+	_free_rid(_sim_uniset_rid)
+	_free_rid(_sim_pipeline_rid)
+
+	if sim_is_fluid_sim:
+		_free_sim_fluid_sim()
+	else:
+		_free_sim_particle_sim()
+
+#endregion
+
+#region Fluid Sim
+func _init_sim_fluid_sim(particle_buf_uni: RDUniform) -> void:
+	_sim_uniset_rid = _rd.uniform_set_create([
+		particle_buf_uni,
+	], _sim_rid, 0)
+
+func _get_sim_fluid_push_constant() -> PackedByteArray:
+	var a := PackedByteArray()
+	var f := PackedFloat32Array()
+	var i := PackedInt32Array()
+
+	i.clear()
+	i.append(particle_count)
+	a.append_array(i.to_byte_array())
+
+	f.clear()
+	f.append(get_process_delta_time())
+	f.append(gravity)
+	f.append(particle_radius)
+	a.append_array(f.to_byte_array())
+	
+	return a
+
+func _update_sim_fluid_sim() -> void:
+	pass
+
+func _free_sim_fluid_sim() -> void:
+	pass
+
+#endregion
+
+#region Particle Sim
 var _circle_collider_positions_buf_rid := RID()
 var _circle_collider_radius_buf_rid := RID()
 
@@ -374,16 +477,7 @@ func _update_sim_collider_info() -> void:
 		_poly_info_data.append(poly_info_offset)
 		poly_info_offset += poly_count
 
-func _init_sim_shader() -> void:
-	var shader_source: RDShaderFile = load("res://scenes/_debug/particle_sim_demo/particle_simulate.glsl")
-	var shader_spirv := shader_source.get_spirv()
-	_sim_rid = _rd.shader_create_from_spirv(shader_spirv)
-
-	var particle_buf_uni := RDUniform.new()
-	particle_buf_uni.uniform_type = RenderingDevice.UNIFORM_TYPE_STORAGE_BUFFER
-	particle_buf_uni.binding = 0
-	particle_buf_uni.add_id(_particle_buffer_rid)
-
+func _init_sim_particle_sim(particle_buf_uni: RDUniform) -> void:
 	_update_sim_collider_info()
 
 	_circle_collider_positions_buf_rid = _rd.storage_buffer_create(
@@ -447,19 +541,8 @@ func _init_sim_shader() -> void:
 		obb_coll_data_buf_uni, obb_coll_rot_buf_uni,
 		poly_verts_buf_uni, poly_info_buf_uni
 	], _sim_rid, 0)
-	
-	var output_tex_uni := RDUniform.new()
-	output_tex_uni.uniform_type = RenderingDevice.UNIFORM_TYPE_IMAGE
-	output_tex_uni.binding = 0
-	output_tex_uni.add_id(_kernel_tex_rid)
 
-	_sim_table_uniset_rid = _rd.uniform_set_create([
-		output_tex_uni
-	], _sim_rid, 1)
-
-	_sim_pipeline_rid = _rd.compute_pipeline_create(_sim_rid)
-
-func _get_sim_push_constant() -> PackedByteArray:
+func _get_sim_particle_push_constant() -> PackedByteArray:
 	var a := PackedByteArray()
 	var f := PackedFloat32Array()
 	var i := PackedInt32Array()
@@ -483,15 +566,11 @@ func _get_sim_push_constant() -> PackedByteArray:
 
 	return a
 
-func _update_sim_shader() -> void:
-	@warning_ignore("INTEGER_DIVISION")
-	var x_groups := (particle_count - 1) / 8 + 1
-
+func _update_sim_particle_sim() -> void:
 	var p_circ := _circle_collider_cnt
 	var p_obb := _obb_collider_cnt
 	
 	_update_sim_collider_info()
-	var push_constant_data := _get_sim_push_constant()
 
 	# _poly_verts_buf_rid
 	var poly_verts := _poly_verts_data.to_byte_array()
@@ -528,19 +607,7 @@ func _update_sim_shader() -> void:
 		# TODOcalco
 		pass
 
-	var cl_rid := _rd.compute_list_begin()
-	_rd.compute_list_bind_compute_pipeline(cl_rid, _sim_pipeline_rid)
-	_rd.compute_list_bind_uniform_set(cl_rid, _sim_uniset_rid, 0)
-	_rd.compute_list_bind_uniform_set(cl_rid, _sim_table_uniset_rid, 1)
-	_rd.compute_list_set_push_constant(cl_rid, push_constant_data, push_constant_data.size())
-	_rd.compute_list_dispatch(cl_rid, x_groups, 1, 1)
-	_rd.compute_list_end()
-
-func _free_sim_shader() -> void:
-	_free_rid(_sim_rid)
-	_free_rid(_sim_uniset_rid)
-	_free_rid(_sim_pipeline_rid)
-
+func _free_sim_particle_sim() -> void:
 	_free_rid(_circle_collider_positions_buf_rid)
 	_free_rid(_circle_collider_radius_buf_rid)
 	
@@ -550,6 +617,7 @@ func _free_sim_shader() -> void:
 	_free_rid(_poly_verts_buf_rid)
 	_free_rid(_poly_info_buf_rid)
 #endregion
+
 
 #region Display Shader
 var _disp_rid := RID()
@@ -657,15 +725,6 @@ func random_point_on_unit_circle() -> Vector2:
 func _get_spawn_particle_data() -> Array:
 	var dict := []
 	match spawn_type:
-		SpawnType.POSITION:
-			for p in particle_count:
-				var pos := spawn_position
-				var vel := Vector2.ZERO
-				if random_velocity:
-					vel = random_point_on_unit_circle() * velocity_magnitude
-				if directed_velocity:
-					vel = Vector2.UP * velocity_magnitude
-				dict.append({"pos": pos, "vel": vel})
 		SpawnType.POSITION_OBJECT:
 			for p in particle_count:
 				var pos := (get_node(spawn_node_path) as Node2D).global_position
@@ -675,6 +734,23 @@ func _get_spawn_particle_data() -> Array:
 				if directed_velocity:
 					vel = Vector2.UP * velocity_magnitude
 				dict.append({"pos": pos, "vel": vel})
+		SpawnType.POSITION_OBJECT_GRID:
+			var effective_spacing = particle_grid_spacing + 2 * particle_radius
+			var cols = int(ceil(sqrt(particle_count)))
+			var rows = int(ceil(float(particle_count) / cols))
+			var start_pos = (get_node(spawn_node_path) as Node2D).global_position
+			start_pos -= Vector2(cols - 1, rows - 1) * effective_spacing * 0.5
+			for row in range(rows):
+				for col in range(cols):
+					if len(dict) >= particle_count:
+						break
+					var pos = start_pos + Vector2(col, row) * effective_spacing
+					var vel = Vector2.ZERO
+					if random_velocity:
+						vel = random_point_on_unit_circle() * velocity_magnitude
+					if directed_velocity:
+						vel = Vector2.UP * velocity_magnitude
+					dict.append({"pos": pos, "vel": vel})
 		SpawnType.BOX_RANDOM:
 			for p in particle_count:
 				var off := Vector2(

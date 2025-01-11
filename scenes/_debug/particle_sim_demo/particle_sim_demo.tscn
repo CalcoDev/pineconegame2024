@@ -20,24 +20,24 @@ script = ExtResource("1_jap2a")
 [node name="ParticleSimulation" type="Node2D" parent="." node_paths=PackedStringArray("camera", "bapple_display", "bapple_video", "bapple_audio", "particle_sim_display")]
 script = ExtResource("2_d0brx")
 camera = NodePath("../KongleCamera")
+enable_bapple = false
 bapple_display = NodePath("../BappleDisplay")
 bapple_video = NodePath("../BappleVideo")
 bapple_audio = NodePath("../BappleAudio")
 bapple_polygon_update_speed = 0.025
-particle_count = 1000000
-spawn_type = 2
+particle_count = 100
+spawn_type = 1
 spawn_node_path = NodePath("../SpawnPosition")
-spawn_position = Vector2(727, 221)
 spawn_bounds = Rect2(0, 0, 1280, 960)
-random_velocity = true
 velocity_magnitude = 400.0
+sim_is_fluid_sim = false
 particle_sim_display = NodePath("../ParticleSimDisplay")
 sim_physics_layers = 1
 gravity = 500.0
-particle_radius = 1.0
+particle_radius = 10.0
 
 [node name="SpawnPosition" type="Marker2D" parent="."]
-position = Vector2(539, 432)
+position = Vector2(640, 480)
 
 [node name="ParticleSimDisplay" type="Node2D" parent="."]
 
@@ -57,20 +57,20 @@ stream = ExtResource("4_q5rij")
 volume_db = -24.043
 
 [node name="StaticBody2D" type="StaticBody2D" parent="."]
-position = Vector2(1405, 1036)
+position = Vector2(1454, 1036)
 rotation = -0.451898
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D"]
 shape = SubResource("RectangleShape2D_pa3b5")
 
 [node name="StaticBody2D3" type="StaticBody2D" parent="."]
-position = Vector2(-308, -159)
+position = Vector2(-168, 894)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D3"]
 shape = SubResource("CircleShape2D_pa3b5")
 
 [node name="StaticBody2D7" type="StaticBody2D" parent="."]
-position = Vector2(741, 127)
+position = Vector2(1714, -178)
 
 [node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="StaticBody2D7"]
 polygon = PackedVector2Array(-49, 470, -16, 369, 119, 380, -19, 203, -164, 295, -215, 197, -269, 343, -158, 472)
