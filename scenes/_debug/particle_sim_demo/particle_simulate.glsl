@@ -146,8 +146,6 @@ void handle_colisions(int idx) {
         }
     }
 
-    // polygon SAT collision
-    // todo calco this is absolutely terrible for performance but meh we chill
     for (int poly_idx = 0; poly_idx < _params.polygon_collider_count; ++poly_idx) {
         int count = _polygon_info.data[poly_idx].count;
         int offset = _polygon_info.data[poly_idx].offset;
@@ -159,15 +157,23 @@ void handle_colisions(int idx) {
         vec2 min_s;
         vec2 min_e;
 
+        float inside_edge = 0.0;
+
         for (int i = 0; i < count; ++i) {
             vec2 s = _polygon_vertices.data[offset + i];
             vec2 e = _polygon_vertices.data[offset + ((i + 1) % count)];
 
             float dist = point_line_distance(p, s, e);
+            bool a = dist < _params.particle_radius;
             if (dist < min_dist) {
-                min_dist = dist;
+                min_dist = dist * float(!a);
                 min_s = s;
                 min_e = e;
+            }
+            if (a) {
+                c = true;
+                inside_edge = dist;
+                break;
             }
 
             if (
@@ -178,32 +184,13 @@ void handle_colisions(int idx) {
             }
         }
 
-        if (!c) {
-            for (int i = 0; i < count; ++i) {
-                vec2 s = _polygon_vertices.data[offset + i];
-                vec2 e = _polygon_vertices.data[offset + ((i + 1) % count)];
-
-                if (circle_line(_particles.data[idx].position, _params.particle_radius, s, e)) {
-                    vec2 edge = e - s;
-                    vec2 particle_to_start = _particles.data[idx].position - s;
-                    float t = clamp(dot(particle_to_start, edge) / dot(edge, edge), 0.0, 1.0);
-                    vec2 closest_point = s + t * edge;
-                    vec2 normal = normalize(_particles.data[idx].position - closest_point);
-                    vec2 velocity = _particles.data[idx].velocity;
-                    vec2 reflected_velocity = velocity - 2.0 * dot(velocity, normal) * normal;
-                    _particles.data[idx].velocity = reflected_velocity;
-                    _particles.data[idx].position = closest_point + normal * _params.particle_radius;
-                    _particles.data[idx].color = vec4(1.0, 0.0, 0.0, 1.0);
-                    return;
-                }
-            }
-        } else {
+        if (c) {
             vec2 edge = min_e - min_s;
+            
             vec2 perp_clock = normalize(vec2(-edge.y, edge.x));
             vec2 perp_counter = normalize(vec2(edge.y, -edge.x));
-
+            
             vec2 perp;
-
             bool c = false;
             vec2 p = pos + perp_clock * (min_dist + _params.particle_radius);
             for (int i = 0; i < count; ++i) {
@@ -222,7 +209,17 @@ void handle_colisions(int idx) {
                 perp = perp_clock;
             }
 
-            _particles.data[idx].position = pos + (perp * (min_dist + _params.particle_radius));
+            _particles.data[idx].position = pos + (perp * (min_dist + (_params.particle_radius - inside_edge)));
+            _particles.data[idx].color = vec4(1.0, 0.0, 0.0, 1.0);
+
+            vec2 particle_to_start = _particles.data[idx].position - min_s;
+            float t = clamp(dot(particle_to_start, edge) / dot(edge, edge), 0.0, 1.0);
+            vec2 closest_point = min_s + t * edge;
+            vec2 normal = normalize(_particles.data[idx].position - closest_point);
+            vec2 velocity = _particles.data[idx].velocity;
+            vec2 reflected_velocity = velocity - 2.0 * dot(velocity, normal) * normal;
+            _particles.data[idx].velocity = reflected_velocity;
+
             return;
         }
     }

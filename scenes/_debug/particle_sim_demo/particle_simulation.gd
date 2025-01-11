@@ -2,6 +2,7 @@ extends Node2D
 
 enum SpawnType {
 	POSITION,
+	POSITION_OBJECT,
 	BOX_RANDOM,
 }
 
@@ -31,6 +32,7 @@ var _bapple_first_frame := true
 @export_group("sim spawn settings")
 @export var particle_count := 500
 @export var spawn_type := SpawnType.POSITION
+@export_node_path("Node2D") var spawn_node_path := NodePath("")
 @export var spawn_position := Vector2.ZERO
 @export var spawn_bounds := Rect2()
 @export var random_velocity := false
@@ -658,6 +660,15 @@ func _get_spawn_particle_data() -> Array:
 		SpawnType.POSITION:
 			for p in particle_count:
 				var pos := spawn_position
+				var vel := Vector2.ZERO
+				if random_velocity:
+					vel = random_point_on_unit_circle() * velocity_magnitude
+				if directed_velocity:
+					vel = Vector2.UP * velocity_magnitude
+				dict.append({"pos": pos, "vel": vel})
+		SpawnType.POSITION_OBJECT:
+			for p in particle_count:
+				var pos := (get_node(spawn_node_path) as Node2D).global_position
 				var vel := Vector2.ZERO
 				if random_velocity:
 					vel = random_point_on_unit_circle() * velocity_magnitude
