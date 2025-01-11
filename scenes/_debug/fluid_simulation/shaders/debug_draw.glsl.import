@@ -1,0 +1,14 @@
+[remap]
+
+importer="glsl"
+type="RDShaderFile"
+uid="uid://cxdun53f6eto0"
+path="res://.godot/imported/debug_draw.glsl-cb7263b94c58238d70964914f8926d6d.res"
+
+[deps]
+
+source_file="res://scenes/_debug/fluid_simulation/shaders/debug_draw.glsl"
+dest_files=["res://.godot/imported/debug_draw.glsl-cb7263b94c58238d70964914f8926d6d.res"]
+
+[params]
+

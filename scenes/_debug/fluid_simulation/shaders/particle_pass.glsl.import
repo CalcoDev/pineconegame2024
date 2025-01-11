@@ -1,0 +1,14 @@
+[remap]
+
+importer="glsl"
+type="RDShaderFile"
+uid="uid://e6sdxt164qa4"
+path="res://.godot/imported/particle_pass.glsl-fb81e64d6eead5652f93f0e1488cf80f.res"
+
+[deps]
+
+source_file="res://scenes/_debug/fluid_simulation/shaders/particle_pass.glsl"
+dest_files=["res://.godot/imported/particle_pass.glsl-fb81e64d6eead5652f93f0e1488cf80f.res"]
+
+[params]
+
