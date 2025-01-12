@@ -1,6 +1,7 @@
 extends Node2D
 
 @export var debug_display: Node2D
+@export var _background: ColorRect
 
 @export_group("Simulation Settings")
 @export var particle_count := 500
@@ -80,6 +81,9 @@ func _notification(what: int) -> void:
 			_particle_shader.add_uniform(0, _make_uniform(
 				RenderingDevice.UNIFORM_TYPE_STORAGE_BUFFER, 1, [_particle_vel_buffer]
 			))
+			_particle_shader.add_uniform(0, _make_uniform(
+				RenderingDevice.UNIFORM_TYPE_STORAGE_BUFFER, 2, [_density_buffer]
+			))
 			_particle_shader.add_uniform(1, _make_uniform(
 				RenderingDevice.UNIFORM_TYPE_IMAGE, 0, [_debug_draw_kernel]
 			))
@@ -127,7 +131,7 @@ func _notification(what: int) -> void:
 			))
 			_debug_draw_shader.build_uniform_sets()
 
-			_shaders.assign([_particle_shader, _density_shader, _density_tex_shader, _debug_draw_shader])
+			_shaders.assign([_density_shader, _particle_shader, _density_tex_shader, _debug_draw_shader])
 
 			await get_tree().create_timer(0.1).timeout
 			_bind_texture_to_canvas_item(debug_display.get_canvas_item(), _density_tex, Rect2(Vector2.ZERO, TEXS))
@@ -135,19 +139,23 @@ func _notification(what: int) -> void:
 		NOTIFICATION_PROCESS:
 			_rd.texture_clear(_debug_draw_kernel, Color.BLACK, 0, 1, 0, 1)
 			_rd.texture_clear(_debug_draw_output, Color.TRANSPARENT, 0, 1, 0, 1)
+			
+			# _rd.texture_clear(_density_tex, correct_pressure, 0, 1, 0, 1)
+			_background.color = correct_pressure
 
-			# var particle_spawn_data := _get_particle_spawn_data()
-			# var p_pos_data := PackedByteArray()
-			# var p_vel_data := PackedByteArray()
-			# for p in particle_spawn_data:
-			# 	var f := PackedFloat32Array()
-			# 	for i in 2: f.append(p["pos"][i])
-			# 	p_pos_data.append_array(f.to_byte_array())
-			# 	f.clear()
-			# 	for i in 2: f.append(p["vel"][i])
-			# 	p_vel_data.append_array(f.to_byte_array())
-			# _rd.buffer_update(_particle_pos_buffer, 0, p_pos_data.size(), p_pos_data)
-			# _rd.buffer_update(_particle_vel_buffer, 0, p_vel_data.size(), p_vel_data)
+			if not spawn_random:
+				var particle_spawn_data := _get_particle_spawn_data()
+				var p_pos_data := PackedByteArray()
+				var p_vel_data := PackedByteArray()
+				for p in particle_spawn_data:
+					var f := PackedFloat32Array()
+					for i in 2: f.append(p["pos"][i])
+					p_pos_data.append_array(f.to_byte_array())
+					f.clear()
+					for i in 2: f.append(p["vel"][i])
+					p_vel_data.append_array(f.to_byte_array())
+				_rd.buffer_update(_particle_pos_buffer, 0, p_pos_data.size(), p_pos_data)
+				_rd.buffer_update(_particle_vel_buffer, 0, p_vel_data.size(), p_vel_data)
 
 			for shader in _shaders:
 				shader.update_shader()
@@ -165,6 +173,8 @@ func _get_particle_shader_push_data() -> PackedByteArray:
 	var a := PackedByteArray()
 	a.append_array(PackedInt32Array([particle_count]).to_byte_array())
 	a.append_array(PackedFloat32Array([particle_radius, gravity, get_process_delta_time()]).to_byte_array())
+	
+	a.append_array(PackedFloat32Array([particle_smoothing_radius, target_density, pressure_multiplier, 0.0]).to_byte_array())
 	return a
 
 func _get_density_shader_push_data() -> PackedByteArray:
@@ -179,7 +189,7 @@ func _get_density_tex_shader_push_data() -> PackedByteArray:
 	a.append_array(PackedInt32Array([particle_count]).to_byte_array())
 	a.append_array(PackedFloat32Array([particle_smoothing_radius]).to_byte_array())
 	# a.append_array(PackedInt32Array([0]).to_byte_array()) # padding
-	a.append_array(PackedFloat32Array([target_density / 1000.0, pressure_multiplier]).to_byte_array())
+	a.append_array(PackedFloat32Array([target_density, pressure_multiplier]).to_byte_array())
 	a.append_array(_encode_color(negative_pressure))
 	a.append_array(_encode_color(positive_pressure))
 	a.append_array(_encode_color(correct_pressure))

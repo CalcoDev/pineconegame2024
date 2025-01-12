@@ -16,8 +16,11 @@ layout(set = 0, binding = 1, std430) restrict buffer DensityBuffer {
 };
 
 const float PI = 3.14159265359;
+const float SCALE = 100.0;
 
 float smoothing_kernel(float radius, float dist) {
+    radius /= SCALE;
+    dist /= SCALE;
     float volume = PI * pow(radius, 8) / 4;
     float value = max(0, radius * radius - dist * dist);
     return value * value * value / volume;
@@ -33,7 +36,7 @@ float calculate_density(vec2 pos) {
         density += mass * influence;
     }
 
-    return density;
+    return density * 3.0;
 }
 
 layout(local_size_x = 64, local_size_y = 1, local_size_z = 1) in;

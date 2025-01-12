@@ -20,16 +20,14 @@ color = Color(0, 0, 0, 1)
 position = Vector2(640, 480)
 script = ExtResource("1_mrsni")
 
-[node name="FluidSimulation" type="Node2D" parent="." node_paths=PackedStringArray("debug_display")]
+[node name="FluidSimulation" type="Node2D" parent="." node_paths=PackedStringArray("debug_display", "_background")]
 script = ExtResource("2_0tqs2")
 debug_display = NodePath("../DebugDisplay")
-particle_count = 1024
-particle_radius = 4.0
-particle_smoothing_radius = 50.0
-gravity = 500.0
-velocity_magnitude = 100.0
-target_density = 0.45
-pressure_multiplier = 15.49
+_background = NodePath("../ColorRect")
+particle_count = 2024
+particle_smoothing_radius = 51.7
+target_density = 15.895
+pressure_multiplier = 7.61
 particle_color = Color(1, 1, 1, 1)
 negative_pressure = Color(0.243756, 5.19812e-05, 0.886349, 1)
 positive_pressure = Color(0.878401, 0, 0.20557, 1)
