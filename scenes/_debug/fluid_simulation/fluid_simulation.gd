@@ -28,8 +28,6 @@ const TEXS := Vector2i(320, 240) * 4
 
 var _rd: RenderingDevice
 
-var _shaders: Array[ComputeShader] = []
-
 var _particle_shader: ComputeShader
 var _density_shader: ComputeShader
 var _debug_draw_shader: ComputeShader
@@ -47,16 +45,11 @@ var _density_buffer := RID() # store density at particle position
 var _debug_draw_kernel := RID()
 var _debug_draw_output := RID()
 
-func _notification(what: int) -> void:
+func __notification(what: int) -> void:
 	match what:
 		NOTIFICATION_READY:
 			set_process(true)
 			_rd = RenderingServer.get_rendering_device()
-
-			@warning_ignore("INTEGER_DIVISION")
-			var x_groups := (TEXS.x - 1) / 8 + 1
-			@warning_ignore("INTEGER_DIVISION")
-			var y_groups := (TEXS.y - 1) / 8 + 1
 
 			_init_shared_buffers()
 			_debug_draw_kernel = _make_texture(
@@ -72,8 +65,7 @@ func _notification(what: int) -> void:
 
 			const PATH := "res://scenes/_debug/fluid_simulation/shaders"
 			_particle_shader = ComputeShader.new(
-				_rd, PATH + "/particle_pass.glsl", Vector3i(64, 1, 1),
-				_get_particle_shader_push_data
+				_rd, PATH + "/particle_pass.glsl", _get_particle_shader_push_data
 			)
 			_particle_shader.add_uniform(0, _make_uniform(
 				RenderingDevice.UNIFORM_TYPE_STORAGE_BUFFER, 0, [_particle_pos_buffer]
@@ -90,8 +82,7 @@ func _notification(what: int) -> void:
 			_particle_shader.build_uniform_sets()
 
 			_density_shader = ComputeShader.new(
-				_rd, PATH + "/density_pass.glsl", Vector3i(64, 1, 1),
-				_get_density_shader_push_data
+				_rd, PATH + "/density_pass.glsl", _get_density_shader_push_data
 			)
 			_density_shader.add_uniform(0, _make_uniform(
 				RenderingDevice.UNIFORM_TYPE_STORAGE_BUFFER, 0, [_particle_pos_buffer]
@@ -108,8 +99,7 @@ func _notification(what: int) -> void:
 			)
 			
 			_density_tex_shader = ComputeShader.new(
-				_rd, PATH + "/density_texture_pass.glsl", Vector3i(x_groups, y_groups, 1),
-				_get_density_tex_shader_push_data
+				_rd, PATH + "/density_texture_pass.glsl", _get_density_tex_shader_push_data
 			)
 			_density_tex_shader.add_uniform(0, _make_uniform(
 				RenderingDevice.UNIFORM_TYPE_STORAGE_BUFFER, 0, [_particle_pos_buffer]
@@ -120,8 +110,7 @@ func _notification(what: int) -> void:
 			_density_tex_shader.build_uniform_sets()
 
 			_debug_draw_shader = ComputeShader.new(
-				_rd, PATH + "/debug_draw.glsl", Vector3i(x_groups, y_groups, 1),
-				_get_debug_draw_shader_push_data
+				_rd, PATH + "/debug_draw.glsl", _get_debug_draw_shader_push_data
 			)
 			_debug_draw_shader.add_uniform(0, _make_uniform(
 				RenderingDevice.UNIFORM_TYPE_IMAGE, 0, [_debug_draw_kernel]
@@ -130,8 +119,6 @@ func _notification(what: int) -> void:
 				RenderingDevice.UNIFORM_TYPE_IMAGE, 1, [_debug_draw_output]
 			))
 			_debug_draw_shader.build_uniform_sets()
-
-			_shaders.assign([_density_shader, _particle_shader, _density_tex_shader, _debug_draw_shader])
 
 			await get_tree().create_timer(0.1).timeout
 			_bind_texture_to_canvas_item(debug_display.get_canvas_item(), _density_tex, Rect2(Vector2.ZERO, TEXS))
@@ -157,11 +144,23 @@ func _notification(what: int) -> void:
 				_rd.buffer_update(_particle_pos_buffer, 0, p_pos_data.size(), p_pos_data)
 				_rd.buffer_update(_particle_vel_buffer, 0, p_vel_data.size(), p_vel_data)
 
-			for shader in _shaders:
-				shader.update_shader()
+			@warning_ignore("INTEGER_DIVISION")
+			var x_groups := (TEXS.x - 1) / 8 + 1
+			@warning_ignore("INTEGER_DIVISION")
+			var y_groups := (TEXS.y - 1) / 8 + 1
+			@warning_ignore("integer_division")
+			var part_x_group := (particle_count - 1) / 64 + 1
+			_density_shader.update_shader(part_x_group, 1, 1)
+			_particle_shader.update_shader(part_x_group, 1, 1)
+			_density_tex_shader.update_shader(x_groups, y_groups, 1)
+			_debug_draw_shader.update_shader(x_groups, y_groups, 1)
+
+			# _rd.submit()
 		NOTIFICATION_PREDELETE:
-			for shader in _shaders:
-				shader.free_shader()
+			_particle_shader.free_shader()
+			_density_shader.free_shader()
+			_debug_draw_shader.free_shader()
+			_density_tex_shader.free_shader()
 			_free_rid(_particle_pos_buffer)
 			_free_rid(_particle_vel_buffer)
 			_free_rid(_density_buffer)

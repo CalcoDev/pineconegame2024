@@ -20,26 +20,27 @@ script = ExtResource("1_jap2a")
 [node name="ParticleSimulation" type="Node2D" parent="." node_paths=PackedStringArray("camera", "bapple_display", "bapple_video", "bapple_audio", "particle_sim_display")]
 script = ExtResource("2_d0brx")
 camera = NodePath("../KongleCamera")
-enable_bapple = false
 bapple_display = NodePath("../BappleDisplay")
 bapple_video = NodePath("../BappleVideo")
 bapple_audio = NodePath("../BappleAudio")
 bapple_polygon_update_speed = 0.025
-particle_count = 100
-spawn_type = 1
+particle_count = 100000
+spawn_type = 2
 spawn_node_path = NodePath("../SpawnPosition")
 spawn_bounds = Rect2(0, 0, 1280, 960)
+random_velocity = true
 velocity_magnitude = 400.0
 sim_is_fluid_sim = false
 particle_sim_display = NodePath("../ParticleSimDisplay")
 sim_physics_layers = 1
 gravity = 500.0
-particle_radius = 10.0
+particle_radius = 1.0
 
 [node name="SpawnPosition" type="Marker2D" parent="."]
 position = Vector2(640, 480)
 
 [node name="ParticleSimDisplay" type="Node2D" parent="."]
+visible = false
 
 [node name="BappleDisplay" type="Sprite2D" parent="."]
 centered = false

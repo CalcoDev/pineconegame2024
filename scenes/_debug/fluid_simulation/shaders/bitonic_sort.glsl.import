@@ -1,0 +1,14 @@
+[remap]
+
+importer="glsl"
+type="RDShaderFile"
+uid="uid://cypqgp3yddwrf"
+path="res://.godot/imported/bitonic_sort.glsl-fd9d0d6b69c160749b50531adb764b97.res"
+
+[deps]
+
+source_file="res://scenes/_debug/fluid_simulation/shaders/bitonic_sort.glsl"
+dest_files=["res://.godot/imported/bitonic_sort.glsl-fd9d0d6b69c160749b50531adb764b97.res"]
+
+[params]
+

@@ -19,15 +19,8 @@ layout(set = 0, binding = 0, std430) restrict buffer PositionBuffer {
 layout(set = 0, binding = 1, rgba32f) uniform image2D _density_tex;
 
 const float PI = 3.14159265359;
-const float SCALE = 100.0;
 
-float smoothing_kernel(float radius, float dist) {
-    radius /= SCALE;
-    dist /= SCALE;
-    float volume = PI * pow(radius, 8) / 4;
-    float value = max(0, radius * radius - dist * dist);
-    return value * value * value / volume;
-}
+#include "_shared_density_data.glsl"
 
 float density_to_pressure(float density) {
     float error = density - _target_density;
@@ -46,15 +39,6 @@ float calculate_density(vec2 pos) {
     }
 
     return density * 3.0;
-}
-
-float smoothing_kernel_derivative(float radius, float dist) {
-    radius /= SCALE;
-    dist /= SCALE;
-    if (dist >= radius) return 0;
-    float f = radius * radius - dist * dist;
-    float scale = -24 / (PI * pow(radius, 8));
-    return scale * dist * f * f;
 }
 
 vec2 calculate_pressure_force(vec2 pos) {
@@ -81,12 +65,12 @@ void main() {
     float density = calculate_density(vec2(pos));
     float pressure = density_to_pressure(density);
    
-    pressure /= 255.0;
+    pressure /= 255.0 * 2 * 2;
     const float M = 0.01;
     vec4 col = vec4(pressure, 0.0, 0.0, 1.0);
     if (pressure < 0 - M) {
         col = _pressure_neg_col;
-        // pressure = 0.0;
+        pressure *= 2.0;
     }
     else if (pressure > 0 + M) {
         col = _pressure_pos_col;
@@ -97,9 +81,10 @@ void main() {
         // pressure = 1.0 - pressure;
     }
     imageStore(_density_tex, pos, vec4(col.rgb * min(abs(pressure), 1.0), 1.0));
+    // imageStore(_density_tex, pos, vec4(density, 1.0));
 
     // vec2 pressure_force = calculate_pressure_force(pos);
-    // imageStore(_density_tex, pos, vec4(abs(pressure_force) / 255, 0.0, 1.0));
+    // imageStore(_density_tex, pos, vec4(abs(density) / 25500000, 0.0, 0.0, 1.0));
     
     // float density = calculate_density(vec2(320, 240) * 2.0);
     // imageStore(_density_tex, pos, vec4(density / 255, 0.0, 0.0, 1.0));

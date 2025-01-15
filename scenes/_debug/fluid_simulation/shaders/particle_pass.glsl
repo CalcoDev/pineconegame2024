@@ -51,24 +51,8 @@ void handle_colisions(int idx) {
 }
 
 const float PI = 3.14159265359;
-const float SCALE = 100.0;
 
-float smoothing_kernel(float radius, float dist) {
-    radius /= SCALE;
-    dist /= SCALE;
-    float volume = PI * pow(radius, 8) / 4;
-    float value = max(0, radius * radius - dist * dist);
-    return value * value * value / volume;
-}
-
-float smoothing_kernel_derivative(float radius, float dist) {
-    radius /= SCALE;
-    dist /= SCALE;
-    if (dist >= radius) return 0;
-    float f = radius * radius - dist * dist;
-    float scale = -24 / (PI * pow(radius, 8));
-    return scale * dist * f * f;
-}
+#include "_shared_density_data.glsl"
 
 float density_to_pressure(float density) {
     float error = density - _target_density;
@@ -101,8 +85,9 @@ vec2 calculate_pressure_force(int idx) {
         vec2 dir = (dist == 0.0 ? vec2(1.0, 1.0) : ((pos - _position[i]) / dist));
         float slope = smoothing_kernel_derivative(_smoothing_radius, dist);
         // float density = _density[i];
-        float density = _density[idx];
-        pressure += density_to_pressure(density) * dir * slope * mass / density;
+        float p = density_to_pressure(_density[i]);
+        float shared_pressure = (p + density_to_pressure(_density[idx])) / 2.0;
+        pressure += shared_pressure * dir * slope * mass / _density[i];
     }
 
     return pressure;
@@ -117,14 +102,13 @@ void main() {
 
     ivec2 pixel_coords = ivec2(_position[idx]);
     
-    // _velocity[idx] += ((calculate_pressure_force(idx) / _density[idx]) * _delta) / .0;
-    _velocity[idx] += -((calculate_pressure_force(idx) / _density[idx]) * _delta) * 20.0;
+    // _velocity[idx] += -((calculate_pressure_force(idx) / _density[idx]) * _delta) * 20.0;
+    _velocity[idx] = -((calculate_pressure_force(idx) / _density[idx]) * _delta) * 200.0;
 
     _velocity[idx] += vec2(0.0, 1.0) * _gravity * _delta;
-    // _velocity[idx] += vec2(0.0, 1.0) * _density[idx] * _delta * 200.0;
     _position[idx] += _velocity[idx] * _delta;
     handle_colisions(idx);
     
     pixel_coords = ivec2(_position[idx]);
-    imageStore(_kernel_tex, pixel_coords, vec4(_density[idx], 0.0, 0.0, 1.0));
+    imageStore(_kernel_tex, pixel_coords, vec4(_density[idx] , 0.0, 0.0, 1.0));
 }

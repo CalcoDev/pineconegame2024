@@ -16,15 +16,8 @@ layout(set = 0, binding = 1, std430) restrict buffer DensityBuffer {
 };
 
 const float PI = 3.14159265359;
-const float SCALE = 100.0;
 
-float smoothing_kernel(float radius, float dist) {
-    radius /= SCALE;
-    dist /= SCALE;
-    float volume = PI * pow(radius, 8) / 4;
-    float value = max(0, radius * radius - dist * dist);
-    return value * value * value / volume;
-}
+#include "_shared_density_data.glsl"
 
 float calculate_density(vec2 pos) {
     float density = 0;

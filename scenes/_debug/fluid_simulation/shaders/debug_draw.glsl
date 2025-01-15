@@ -27,7 +27,7 @@ void main() {
             if (abs(dot(d, d)) < _particle_radius * _particle_radius) {
                 vec3 kernel_col = imageLoad(_kernel_tex, pos).rgb;
                 if (length(kernel_col) > 0.0) {
-                    // imageStore(_output_tex, pixel_coords, vec4(kernel_col, 1.0));
+                    // imageStore(_output_tex, pixel_coords, vec4(kernel_col.r, 1.0, 0.0, 1.0));
                     // imageStore(_output_tex, pixel_coords, vec4(_particle_color, 1.0));
                     imageStore(_output_tex, pixel_coords, vec4(vec4(_padding[0], _padding[1], _padding[2], 1.0)));
                 }

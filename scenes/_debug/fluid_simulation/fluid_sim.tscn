@@ -1,7 +1,8 @@
-[gd_scene load_steps=3 format=3 uid="uid://ce5sb6quu5koo"]
+[gd_scene load_steps=4 format=3 uid="uid://ce5sb6quu5koo"]
 
 [ext_resource type="Script" uid="uid://dp7a8lsydrkfb" path="res://scripts/categories/camera/kongle_camera.gd" id="1_mrsni"]
 [ext_resource type="Script" uid="uid://dpy4bsmvjfacq" path="res://scenes/_debug/fluid_simulation/fluid_simulation.gd" id="2_0tqs2"]
+[ext_resource type="Script" path="res://scenes/_debug/fluid_simulation/bitonic_sort.gd" id="3_f61ph"]
 
 [node name="FluidSim" type="Node2D"]
 
@@ -24,18 +25,20 @@ script = ExtResource("1_mrsni")
 script = ExtResource("2_0tqs2")
 debug_display = NodePath("../DebugDisplay")
 _background = NodePath("../ColorRect")
-particle_count = 2024
-particle_smoothing_radius = 51.7
-target_density = 15.895
-pressure_multiplier = 7.61
-particle_color = Color(1, 1, 1, 1)
+particle_count = 4096
+particle_smoothing_radius = 100.0
+target_density = 100.0
+particle_color = Color(1, 1, 0, 1)
 negative_pressure = Color(0.243756, 5.19812e-05, 0.886349, 1)
 positive_pressure = Color(0.878401, 0, 0.20557, 1)
-correct_pressure = Color(1, 1, 1, 1)
 spawn_random = true
 spawn_node_path = NodePath("../GridSpawnPosition")
+particle_grid_spacing = 14.25
 
 [node name="DebugDisplay" type="Node2D" parent="."]
 
 [node name="GridSpawnPosition" type="Marker2D" parent="."]
 position = Vector2(640, 480)
+
+[node name="Sorter" type="Node2D" parent="."]
+script = ExtResource("3_f61ph")

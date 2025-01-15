@@ -7,15 +7,12 @@ var _rd: RenderingDevice
 var _shader_rid := RID()
 var _pipeline_rid := RID()
 
-var _dispatch_size := Vector3i(8, 8, 1)
-
 var get_push_constant_data: Callable
 
 @warning_ignore("shadowed_variable")
-func _init(rd: RenderingDevice, path: String, dispatch_size: Vector3i, get_push_constant_data: Callable = _DEFAULT_PUSH_DATA, no_init: bool = false) -> void:
+func _init(rd: RenderingDevice, path: String, get_push_constant_data: Callable = _DEFAULT_PUSH_DATA, no_init: bool = false) -> void:
 	self._rd = rd
 	self._path = path
-	self._dispatch_size = dispatch_size
 	self.get_push_constant_data = get_push_constant_data
 
 	if not no_init:
@@ -44,7 +41,7 @@ func init_shader() -> void:
 # func get_push_constant_data() -> PackedByteArray:
 # 	return PackedByteArray()
 
-func update_shader() -> void:
+func update_shader(x: int, y: int, z: int) -> void:
 	var cl_rid := _rd.compute_list_begin()
 	_rd.compute_list_bind_compute_pipeline(cl_rid, _pipeline_rid)
 	for idx in _uniform_set_rids:
@@ -52,7 +49,7 @@ func update_shader() -> void:
 	# if get_push_constant_data:
 	var push_constant_data: PackedByteArray = get_push_constant_data.call()
 	_rd.compute_list_set_push_constant(cl_rid, push_constant_data, push_constant_data.size())
-	_rd.compute_list_dispatch(cl_rid, _dispatch_size.x, _dispatch_size.y, _dispatch_size.z)
+	_rd.compute_list_dispatch(cl_rid, x, y, z)
 	_rd.compute_list_end()
 
 func free_shader() -> void:
