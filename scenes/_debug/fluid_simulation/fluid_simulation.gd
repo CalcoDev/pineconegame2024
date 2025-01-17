@@ -3,6 +3,8 @@ extends Node2D
 @export var debug_display: Node2D
 @export var _background: ColorRect
 
+@export var lookup_table_size := 1024
+
 @export_group("Simulation Settings")
 @export var particle_count := 500
 @export var particle_radius := 2.0
@@ -32,6 +34,10 @@ var _particle_shader: ComputeShader
 var _density_shader: ComputeShader
 var _debug_draw_shader: ComputeShader
 
+var _lookup_shader: ComputeShader
+var _lookup_buffer := RID()
+var _lookup_offsets_buffer := RID()
+
 var _density_tex_shader: ComputeShader
 var _density_tex := RID()
 
@@ -45,7 +51,7 @@ var _density_buffer := RID() # store density at particle position
 var _debug_draw_kernel := RID()
 var _debug_draw_output := RID()
 
-func __notification(what: int) -> void:
+func _notification(what: int) -> void:
 	match what:
 		NOTIFICATION_READY:
 			set_process(true)
@@ -76,6 +82,12 @@ func __notification(what: int) -> void:
 			_particle_shader.add_uniform(0, _make_uniform(
 				RenderingDevice.UNIFORM_TYPE_STORAGE_BUFFER, 2, [_density_buffer]
 			))
+			_particle_shader.add_uniform(0, _make_uniform(
+				RenderingDevice.UNIFORM_TYPE_STORAGE_BUFFER, 3, [_lookup_buffer]
+			))
+			_particle_shader.add_uniform(0, _make_uniform(
+				RenderingDevice.UNIFORM_TYPE_STORAGE_BUFFER, 4, [_lookup_offsets_buffer]
+			))
 			_particle_shader.add_uniform(1, _make_uniform(
 				RenderingDevice.UNIFORM_TYPE_IMAGE, 0, [_debug_draw_kernel]
 			))
@@ -105,7 +117,16 @@ func __notification(what: int) -> void:
 				RenderingDevice.UNIFORM_TYPE_STORAGE_BUFFER, 0, [_particle_pos_buffer]
 			))
 			_density_tex_shader.add_uniform(0, _make_uniform(
-				RenderingDevice.UNIFORM_TYPE_IMAGE, 1, [_density_tex]
+				RenderingDevice.UNIFORM_TYPE_STORAGE_BUFFER, 1, [_density_buffer]
+			))
+			_density_tex_shader.add_uniform(0, _make_uniform(
+				RenderingDevice.UNIFORM_TYPE_IMAGE, 2, [_density_tex]
+			))
+			_density_tex_shader.add_uniform(0, _make_uniform(
+				RenderingDevice.UNIFORM_TYPE_STORAGE_BUFFER, 3, [_lookup_buffer]
+			))
+			_density_tex_shader.add_uniform(0, _make_uniform(
+				RenderingDevice.UNIFORM_TYPE_STORAGE_BUFFER, 4, [_lookup_offsets_buffer]
 			))
 			_density_tex_shader.build_uniform_sets()
 
@@ -119,6 +140,18 @@ func __notification(what: int) -> void:
 				RenderingDevice.UNIFORM_TYPE_IMAGE, 1, [_debug_draw_output]
 			))
 			_debug_draw_shader.build_uniform_sets()
+
+			_lookup_shader = ComputeShader.new(_rd, PATH + "/lookup_sort.glsl")
+			_lookup_shader.add_uniform(0, _make_uniform(
+				RenderingDevice.UNIFORM_TYPE_STORAGE_BUFFER, 0, [_lookup_buffer]
+			))
+			_lookup_shader.add_uniform(0, _make_uniform(
+				RenderingDevice.UNIFORM_TYPE_STORAGE_BUFFER, 1, [_lookup_offsets_buffer]
+			))
+			_lookup_shader.add_uniform(0, _make_uniform(
+				RenderingDevice.UNIFORM_TYPE_STORAGE_BUFFER, 2, [_particle_pos_buffer]
+			))
+			_lookup_shader.build_uniform_sets()
 
 			await get_tree().create_timer(0.1).timeout
 			_bind_texture_to_canvas_item(debug_display.get_canvas_item(), _density_tex, Rect2(Vector2.ZERO, TEXS))
@@ -152,6 +185,36 @@ func __notification(what: int) -> void:
 			var part_x_group := (particle_count - 1) / 64 + 1
 			_density_shader.update_shader(part_x_group, 1, 1)
 			_particle_shader.update_shader(part_x_group, 1, 1)
+			
+			# do lookup shader stuff!
+			_lookup_shader.get_push_constant_data = _get_lookup_shader_push_data.bind(
+				0, particle_count, lookup_table_size, 0, 0, 0
+			)
+			_lookup_shader.update_shader(part_x_group, 1, 1)
+
+			@warning_ignore("integer_division")
+			var num_pairs := _get_next_power_of_two(particle_count) / 2
+			var num_stages := floori(log(num_pairs * 2) / log(2))
+			for stage in num_stages:
+				for step in stage + 1:
+					var group_width := 1 << (stage - step)
+					var group_height := 2 * group_width - 1
+					_lookup_shader.get_push_constant_data = _get_lookup_shader_push_data.bind(
+						1, particle_count, lookup_table_size, group_width, group_height, step
+					)
+					_lookup_shader.update_shader(num_pairs, 1, 1)
+			
+			# todo (calco): should cache this or yknow not do that.
+			var offset_data := PackedInt32Array()
+			offset_data.resize(lookup_table_size)
+			offset_data.fill(-1)
+			_rd.buffer_update(_lookup_offsets_buffer, 0, lookup_table_size * 4, offset_data.to_byte_array())
+
+			_lookup_shader.get_push_constant_data = _get_lookup_shader_push_data.bind(
+				2, particle_count, lookup_table_size, 0, 0, 0
+			)
+			_lookup_shader.update_shader(part_x_group, 1, 1)
+
 			_density_tex_shader.update_shader(x_groups, y_groups, 1)
 			_debug_draw_shader.update_shader(x_groups, y_groups, 1)
 
@@ -161,19 +224,31 @@ func __notification(what: int) -> void:
 			_density_shader.free_shader()
 			_debug_draw_shader.free_shader()
 			_density_tex_shader.free_shader()
+			_particle_shader.free_shader()
 			_free_rid(_particle_pos_buffer)
 			_free_rid(_particle_vel_buffer)
 			_free_rid(_density_buffer)
 			_free_rid(_debug_draw_kernel)
 			_free_rid(_debug_draw_output)
 			_free_rid(_density_tex)
+			_free_rid(_lookup_buffer)
+			_free_rid(_lookup_offsets_buffer)
+
+@warning_ignore("shadowed_variable")
+func _get_lookup_shader_push_data(OP_MODE: int, num_entries: int, lookup_table_size: int, group_width: int, group_height: int, step_index: int) -> PackedByteArray:
+	var a := PackedByteArray()
+	a.append_array(PackedInt32Array([OP_MODE, num_entries, lookup_table_size, group_width, group_height, step_index]).to_byte_array())
+	a.append_array(PackedFloat32Array([particle_smoothing_radius]).to_byte_array())
+	a.append_array(PackedInt32Array([0]).to_byte_array())
+	return a
 
 func _get_particle_shader_push_data() -> PackedByteArray:
 	var a := PackedByteArray()
 	a.append_array(PackedInt32Array([particle_count]).to_byte_array())
 	a.append_array(PackedFloat32Array([particle_radius, gravity, get_process_delta_time()]).to_byte_array())
 	
-	a.append_array(PackedFloat32Array([particle_smoothing_radius, target_density, pressure_multiplier, 0.0]).to_byte_array())
+	a.append_array(PackedFloat32Array([particle_smoothing_radius, target_density, pressure_multiplier]).to_byte_array())
+	a.append_array(PackedInt32Array([lookup_table_size]).to_byte_array())
 	return a
 
 func _get_density_shader_push_data() -> PackedByteArray:
@@ -192,6 +267,7 @@ func _get_density_tex_shader_push_data() -> PackedByteArray:
 	a.append_array(_encode_color(negative_pressure))
 	a.append_array(_encode_color(positive_pressure))
 	a.append_array(_encode_color(correct_pressure))
+	a.append_array(PackedInt32Array([lookup_table_size, 0, 0, 0]).to_byte_array())
 	return a
 
 func _encode_color(color: Color, limit: int = 4) -> PackedByteArray:
@@ -224,6 +300,19 @@ func _init_shared_buffers() -> void:
 	for _p in particle_spawn_data:
 		density_data.append_array(PackedInt32Array([0]).to_byte_array())
 	_density_buffer = _rd.storage_buffer_create(density_data.size(), density_data)
+
+	var lookup_data := PackedByteArray()
+	for p in particle_spawn_data:
+		var a: int = floori(p["pos"].x / particle_smoothing_radius) * 15823
+		var b: int = floori(p["pos"].y / particle_smoothing_radius) * 9737333
+		@warning_ignore("shadowed_global_identifier")
+		var hash := a + b
+		lookup_data.append_array(PackedInt32Array([p, hash]).to_byte_array())
+	_lookup_buffer = _rd.storage_buffer_create(lookup_data.size(), lookup_data)
+
+	var offset_data := PackedByteArray()
+	offset_data.resize(lookup_table_size * 4)
+	_lookup_offsets_buffer = _rd.storage_buffer_create(offset_data.size(), offset_data)
 
 func _get_particle_spawn_data() -> Array:
 	var dict := []
@@ -292,3 +381,14 @@ func _free_rid(rid: RID) -> bool:
 func random_point_on_unit_circle() -> Vector2:
 	var angle = randf() * PI * 2.0
 	return Vector2(cos(angle), sin(angle))
+
+func _get_next_power_of_two(n: int) -> int:
+	if n <= 0:
+		return 1
+	n -= 1
+	n |= n >> 1
+	n |= n >> 2
+	n |= n >> 4
+	n |= n >> 8
+	n |= n >> 16
+	return n + 1

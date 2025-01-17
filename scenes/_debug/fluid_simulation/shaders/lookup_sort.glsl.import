@@ -1,0 +1,14 @@
+[remap]
+
+importer="glsl"
+type="RDShaderFile"
+uid="uid://dwql64i84jbj4"
+path="res://.godot/imported/lookup_sort.glsl-14eebcbac8a84b64bc105cf6e040a9ee.res"
+
+[deps]
+
+source_file="res://scenes/_debug/fluid_simulation/shaders/lookup_sort.glsl"
+dest_files=["res://.godot/imported/lookup_sort.glsl-14eebcbac8a84b64bc105cf6e040a9ee.res"]
+
+[params]
+

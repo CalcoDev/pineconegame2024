@@ -113,8 +113,8 @@ func _notification(what: int) -> void:
 			var tex_rd := RenderingServer.texture_rd_create(_output_tex_rid)
 			RenderingServer.canvas_item_add_texture_rect(particle_sim_display.get_canvas_item(), Rect2(Vector2.ZERO, DISP_TEX_SIZE), tex_rd)
 
-			var n_tex_rd := RenderingServer.texture_rd_create(_colorkey_tex_rid)
-			RenderingServer.canvas_item_add_texture_rect(bapple_display.get_canvas_item(), Rect2(Vector2.ZERO, DISP_TEX_SIZE), n_tex_rd)
+			# var n_tex_rd := RenderingServer.texture_rd_create(_colorkey_tex_rid)
+			# RenderingServer.canvas_item_add_texture_rect(bapple_display.get_canvas_item(), Rect2(Vector2.ZERO, DISP_TEX_SIZE), n_tex_rd)
 		NOTIFICATION_PROCESS:
 			if enable_sim:
 				_rd.texture_clear(_kernel_tex_rid, Color.BLACK, 0, 1, 0, 1)

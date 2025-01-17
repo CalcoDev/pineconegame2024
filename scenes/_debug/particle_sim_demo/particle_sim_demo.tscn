@@ -40,7 +40,6 @@ particle_radius = 1.0
 position = Vector2(640, 480)
 
 [node name="ParticleSimDisplay" type="Node2D" parent="."]
-visible = false
 
 [node name="BappleDisplay" type="Sprite2D" parent="."]
 centered = false
